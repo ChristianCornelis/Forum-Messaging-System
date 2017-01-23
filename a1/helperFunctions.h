@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*function to initialize a dynamically-allocated array based on size parameters */
 char ** initArray(int rows, int columns);
@@ -10,5 +11,9 @@ char ** initArray(int rows, int columns);
 /*function to destroy a dynamically-allocated array*/
 int destroyArray(char ** toDestroy, int rows);
 
+/*function to resize the array to twice the number of rows of the old size*/
+char ** resizeArray (char ** oldArray, int rows, int columns);
 
+/*function to check if the array needs to be resized*/
+int checkSize (int rowCnt, int rows);
 #endif

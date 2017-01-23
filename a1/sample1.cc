@@ -4,7 +4,7 @@
 
 int a;
 
-	/* different ways to access variables */
+	/* /different ways to access variables */
 class A {
 int a;
    void print1(int a) {

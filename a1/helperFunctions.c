@@ -8,10 +8,10 @@ char ** initArray(int rows, int columns)
     for (i = 0; i < rows; i++)
     {
         array[i] = malloc(sizeof(char) * columns);
+        
         for (j = 0; j < columns; j++)
         {
-            /*initializing all elements in the array to the DEL character*/
-            array[i][j] = (char) 127;
+            array[i][j] = (char)0;
         }
     }
 
@@ -31,4 +31,36 @@ int destroyArray(char ** toDestroy, int rows)
     free(toDestroy);
 
     return 1;
+}
+
+char ** resizeArray (char ** oldArray, int rows, int columns)
+{
+    char ** newArray;
+    newArray = initArray(rows * 2, columns);
+
+    int i, j;
+
+    for (i = 0; i < rows; i++)
+    {
+        /*
+        if (strcmp(oldArray[i], "") != 0)
+            strcpy(oldArray[i], newArray[i]);*/
+        for (j = 0; j < columns; j++)
+        {
+            newArray[i][j] = oldArray[i][j];
+        }
+    }
+
+    /*destroying old array*/
+    destroyArray(oldArray, rows);
+
+    return newArray;
+}
+
+/*function to check if the array needs to be resized*/
+int checkSize (int rowCnt, int rows)
+{
+    if (rowCnt == (rows-1))
+        return 1;
+    return 0;
 }
