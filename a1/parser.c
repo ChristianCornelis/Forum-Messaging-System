@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
 
                     character = getc(ccFile);
                 }
-
+                printf("CHARACTER: %d", character);
                 if (character == '\n' || character == '\r')
                 {
                     spacingArray[rowCnt][spacingColCnt] = (char) character;
@@ -248,10 +248,9 @@ int main(int argc, char *argv[])
             }
             continue;       
         }
-        /*
+        
         else
         {
-            printf("CHAR: %c", character);
             stringArray[rowCnt][stringColCnt] = (char) character;
             stringColCnt++;
             if (stringColCnt == columns -1)
@@ -266,7 +265,7 @@ int main(int argc, char *argv[])
                     rows *= 2;
                 }
             }
-        }*/
+        }
         character = getc(ccFile);
     }
 
