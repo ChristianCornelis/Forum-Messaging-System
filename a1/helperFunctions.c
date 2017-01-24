@@ -70,6 +70,9 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
     int nameLen = strlen(fileName);
     int i;
     int inClass = 0;
+    int isFunc = 0;
+    int braceCount = 0;
+    char className[1000];
     fileName[nameLen-1] = '\0';
 
     FILE* toWrite = NULL;
@@ -82,12 +85,43 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
     }
     for (i = 0; i < rowCnt; i++)
     {
+        isFunc = 0;
+        /*if encountering string "class"*/
         if (strcmp(strings[i], "class") == 0)
+        {
             fprintf(toWrite, "%sstruct", spacing[i]);
+            inClass = 1;
+            strcpy(className, strings[i+1]);
+        }
+        /*else if finds a (, handle for if encoutnering a function*/
+        else if (strcmp(strings[i+1], "(") == 0)
+        {
+            int count = i+1;
+            /*finding index of end bracket*/
+            while(strcmp(strings[count], ")") != 0)
+                count++;
+
+            /*if the a function-starting brace is close by*/
+            if (strcmp(strings[count+1], "{") == 0 || strcmp(strings[count+2], "{") == 0)
+                isFunc = 1;
+                braceCount++;
+
+            /*if in a class, and a function is being defined*/
+            if (inClass == 1 && isFunc == 1)
+            {
+                fprintf(toWrite, "%s%s%s", spacing[i], className, strings[i]);
+            }
+            else
+                fprintf(toWrite, "%s%s", spacing[i], strings[i]);
+        }
+        /*else just print out spacing and string normally*/
         else
             fprintf(toWrite, "%s%s", spacing[i], strings[i]);
+
+
     }
 
     fclose(toWrite);
+    /*free(className);*/
     return 0;
 }
