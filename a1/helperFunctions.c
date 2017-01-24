@@ -8,7 +8,7 @@ char ** initArray(int rows, int columns)
     for (i = 0; i < rows; i++)
     {
         array[i] = malloc(sizeof(char) * columns);
-        
+
         for (j = 0; j < columns; j++)
         {
             array[i][j] = (char)0;
@@ -81,7 +81,12 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
         return 1;
     }
     for (i = 0; i < rowCnt; i++)
-        fprintf(toWrite, "%s%s", spacing[i], strings[i]);
+    {
+        if (strcmp(strings[i], "class") == 0)
+            fprintf(toWrite, "%sstruct", spacing[i]);
+        else
+            fprintf(toWrite, "%s%s", spacing[i], strings[i]);
+    }
 
     fclose(toWrite);
     return 0;

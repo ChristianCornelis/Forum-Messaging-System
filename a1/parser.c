@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
                     }
 
                     stringArray[rowCnt][stringColCnt] = (char) character;
-                    stringColCnt++;               
+                    stringColCnt++;
                 }
 
                 else if (character == '\\')
@@ -106,12 +106,12 @@ int main(int argc, char *argv[])
                     stringColCnt++;
                 }
                 else
-                {                   
+                {
                     stringArray[rowCnt][stringColCnt] = (char) character;
                     stringColCnt++;
                 }
                 character = getc(ccFile);
-                
+
             }
             stringArray[rowCnt][stringColCnt] = (char)character;
             rowCnt++;
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
                 printf("CHARACTER: %d", character);
                 if (character == '\n' || character == '\r')
                 {
-                    
+
                     rowCnt++;
                     if (checkSize(rowCnt, rows) == 1)
                     {
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
 
                     if (prevPrevCharacter == '/' && prevCharacter == '*' && character == '/')
                         prevCharacter = '0';
-                    
+
                 }
                 stringArray[rowCnt][stringColCnt] = (char) character;
                 rowCnt++;
@@ -199,7 +199,7 @@ int main(int argc, char *argv[])
                 spacingColCnt = 0;
             }
         }
-         
+
         /*else if (character == ' ' || character == '\n' || character == '\t')
         {
             rowCnt++;
@@ -214,8 +214,8 @@ int main(int argc, char *argv[])
             spacingColCnt = 0;
             spacingArray[rowCnt][spacingColCnt] = (char) character;
         }*/
-        
-        else if (character == ' ' || character == '\t' || character == '\n' || character == '\r')
+
+        else if (character == ' ' || character == '\t' || character == '\n')
         {
             rowCnt++;
             if (checkSize(rowCnt, rows) == 1)
@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
             spacingArray[rowCnt][spacingColCnt] = (char) character;
             spacingColCnt++;
             character = getc(ccFile);
-            while (character == ' ' || character == '\t' || character == '\n' || character == '\r')
+            while (character == ' ' || character == '\t' || character == '\n')
             {
                 spacingArray[rowCnt][spacingColCnt] = (char) character;
                 spacingColCnt++;
@@ -247,9 +247,35 @@ int main(int argc, char *argv[])
                 }
                 character = getc(ccFile);
             }
-            continue;       
+            continue;
         }
-        
+        else if (character == '(' || character == ')')
+        {
+            if (stringColCnt != 0)
+            {
+                rowCnt++;
+                if (checkSize(rowCnt, rows) == 1)
+                {
+                    stringArray = resizeArray(stringArray, rows, columns);
+                    spacingArray = resizeArray(spacingArray, rows, columns);
+                    rows *= 2;
+                }
+                stringColCnt = 0;
+                spacingColCnt = 0;
+            }
+            stringArray[rowCnt][stringColCnt] = (char) character;
+            stringColCnt++;
+
+            rowCnt++;
+            if (checkSize(rowCnt, rows) == 1)
+            {
+                stringArray = resizeArray(stringArray, rows, columns);
+                spacingArray = resizeArray(spacingArray, rows, columns);
+                rows *= 2;
+            }
+            stringColCnt = 0;
+            spacingColCnt = 0;
+        }
         else
         {
             stringArray[rowCnt][stringColCnt] = (char) character;
@@ -274,13 +300,14 @@ int main(int argc, char *argv[])
 
     for (i = 0; i < rowCnt; i++)
     {
-        printf("%s%s" , spacingArray[i], stringArray[i]);
+        printf("%s\n", stringArray[i]);
+        /*printf("%s%s" , spacingArray[i], stringArray[i]);*/
         /*if (strcmp(stringArray[i], "\"") == 0)
             printf("\n");
         else if (strcmp(stringArray[i], "class") == 0)
             printf("struct");*/
     }
-    
+
     printToFile(argv[1], spacingArray, stringArray, rowCnt);
     destroyArray(stringArray, rows);
     destroyArray(spacingArray, rows);
