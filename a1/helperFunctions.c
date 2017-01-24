@@ -64,3 +64,25 @@ int checkSize (int rowCnt, int rows)
         return 1;
     return 0;
 }
+
+int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
+{
+    int nameLen = strlen(fileName);
+    int i;
+
+    fileName[nameLen-1] = '\0';
+
+    FILE* toWrite = NULL;
+    toWrite = fopen(fileName, "w");
+
+    if (toWrite == NULL)
+    {
+        printf("File not found. \nExitting");
+        return 1;
+    }
+    for (i = 0; i < rowCnt; i++)
+        fprintf(toWrite, "%s%s", spacing[i], strings[i]);
+
+    fclose(toWrite);
+    return 0;
+}

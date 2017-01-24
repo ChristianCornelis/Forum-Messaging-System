@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 
             if ((character = getc(ccFile)) == '/')
             {
-                while (character != '\n' && character != '\r' && character != EOF)
+                while (character != '\n' && character != EOF)
                 {
                     stringArray[rowCnt][stringColCnt] = (char) character;
                     stringColCnt++;
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
                 printf("CHARACTER: %d", character);
                 if (character == '\n' || character == '\r')
                 {
-                    spacingArray[rowCnt][spacingColCnt] = (char) character;
+                    
                     rowCnt++;
                     if (checkSize(rowCnt, rows) == 1)
                     {
@@ -165,6 +165,7 @@ int main(int argc, char *argv[])
                     }
                     stringColCnt = 0;
                     spacingColCnt = 0;
+                    spacingArray[rowCnt][spacingColCnt] = (char) character;
                 }
             }
 
@@ -232,7 +233,7 @@ int main(int argc, char *argv[])
             {
                 spacingArray[rowCnt][spacingColCnt] = (char) character;
                 spacingColCnt++;
-                if (spacingColCnt == columns -1)
+                if (spacingColCnt == columns)
                 {
                     rowCnt++;
                     spacingColCnt = 0;
@@ -279,7 +280,8 @@ int main(int argc, char *argv[])
         else if (strcmp(stringArray[i], "class") == 0)
             printf("struct");*/
     }
-
+    
+    printToFile(argv[1], spacingArray, stringArray, rowCnt);
     destroyArray(stringArray, rows);
     destroyArray(spacingArray, rows);
     fclose(ccFile);
