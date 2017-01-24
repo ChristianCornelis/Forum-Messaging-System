@@ -32,7 +32,7 @@ class B {
    }
 };
 
-	// simple function outside of a class 
+	// simple function outside of a class
 float product(float a, float b) {
    return( a*b );
 }
@@ -44,7 +44,7 @@ class A myA;
 class B myB;
 int value;
 
-   printf("Hello \" there\n");
+   printf("Hello    \" there\n");
    strcpy(str, "A string containing the word class may be tricky");
 
    a = 4;
@@ -57,4 +57,3 @@ int value;
    myB.print4();
 
 }
-

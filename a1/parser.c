@@ -48,19 +48,22 @@ int main(int argc, char *argv[])
 
             while (character != '"')
             {
-                if (character == ' ' || character == '\t' || character == '\n' || character == '\r')
+                /*if (character == ' ' || character == '\t' || character == '\n' || character == '\r')
                 {
-                    rowCnt++;
-                    if (checkSize(rowCnt, rows) == 1)
+                    stringArray[rowCnt][stringColCnt] = (char) character;
+                    stringColCnt++;
+                    if (stringColCnt == columns)
                     {
-                        stringArray = resizeArray(stringArray, rows, columns);
-                        spacingArray = resizeArray(spacingArray, rows, columns);
-                        rows *= 2;
+                        rowCnt++;
+                        spacingColCnt = 0;
+                        spacingColCnt = 0;
+                        if (checkSize(rowCnt, rows) == 1)
+                        {
+                            stringArray = resizeArray(stringArray, rows, columns);
+                            spacingArray = resizeArray(spacingArray, rows, columns);
+                            rows *= 2;
+                        }
                     }
-                    stringColCnt = 0;
-                    spacingColCnt = 0;
-                    spacingArray[rowCnt][spacingColCnt] = (char) character;
-                    spacingColCnt++;
                     character = getc(ccFile);
                     while (character == ' ' || character == '\t' || character == '\n' || character == '\r')
                     {
@@ -85,11 +88,11 @@ int main(int argc, char *argv[])
                     stringColCnt++;
                 }
 
-                else if (character == '\\')
+                else */if (character == '\\')
                 {
                     stringArray[rowCnt][stringColCnt] = (char) character;
                     stringColCnt++;
-                    if (stringColCnt == columns -1)
+                    if (stringColCnt == columns)
                     {
                         rowCnt++;
                         stringColCnt = 0;
@@ -104,11 +107,36 @@ int main(int argc, char *argv[])
                     character = getc(ccFile);
                     stringArray[rowCnt][stringColCnt] = (char) character;
                     stringColCnt++;
+
+                    if (stringColCnt == columns)
+                    {
+                        rowCnt++;
+                        stringColCnt = 0;
+                        spacingColCnt = 0;
+                        if (checkSize(rowCnt, rows) == 1)
+                        {
+                            stringArray = resizeArray(stringArray, rows, columns);
+                            spacingArray = resizeArray(spacingArray, rows, columns);
+                            rows *= 2;
+                        }
+                    }
                 }
                 else
                 {
                     stringArray[rowCnt][stringColCnt] = (char) character;
                     stringColCnt++;
+                    if (stringColCnt == columns)
+                    {
+                        rowCnt++;
+                        stringColCnt = 0;
+                        spacingColCnt = 0;
+                        if (checkSize(rowCnt, rows) == 1)
+                        {
+                            stringArray = resizeArray(stringArray, rows, columns);
+                            spacingArray = resizeArray(spacingArray, rows, columns);
+                            rows *= 2;
+                        }
+                    }
                 }
                 character = getc(ccFile);
 

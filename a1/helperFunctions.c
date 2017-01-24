@@ -69,7 +69,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
 {
     int nameLen = strlen(fileName);
     int i;
-
+    int inClass = 0;
     fileName[nameLen-1] = '\0';
 
     FILE* toWrite = NULL;
