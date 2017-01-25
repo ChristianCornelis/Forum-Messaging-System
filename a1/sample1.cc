@@ -7,7 +7,7 @@ int a;
 	/* /different ways to access variables */
 class A {
 int a;
-   void print1(int a) {
+   void print1(unsigned long long int a, signed int b) {
 		// print parameter - local to the function
       printf("output should be 1: %d\n", a);
    }

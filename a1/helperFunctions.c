@@ -65,6 +65,31 @@ int checkSize (int rowCnt, int rows)
     return 0;
 }
 
+/*function to check if a word is a type keyword*/
+int isKeyword (char * word)
+{
+    if (strcmp(word, "int") == 0)
+        return 1;
+    else if (strcmp(word, "double") == 0)
+        return 1;
+    else if (strcmp(word, "char") == 0)
+        return 1;
+    else if (strcmp(word, "signed") == 0)
+        return 1;
+    else if (strcmp(word, "unsigned") == 0)
+        return 1;
+    else if (strcmp(word, "short") == 0)
+        return 1;
+    else if (strcmp(word, "long") == 0)
+        return 1;
+    else if (strcmp(word, "float") == 0)
+        return 1;
+    else if (strcmp(word, "struct") == 0)
+        return 2;
+
+    return 0;
+}
+
 int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
 {
     int nameLen = strlen(fileName);
@@ -133,9 +158,33 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                     while (strcmp(strings[count],")") != 0)
                     {
                         fprintf(toWrite, "%c", strings[count][0]);
-                        count += 2;
+                        /*count += 2;*/
+                        /*if word is a type, check if other words following are types*/
+                        if (isKeyword(strings[count]) == 1)
+                        {
+                            int j;
+                            for (j = 1; j < 4; j++)
+                            {
+                                if (isKeyword(strings[count+j]) == 1)
+                                {
+                                    fprintf(toWrite, "%c", strings[count + j][0]);
+                                }
+                                else
+                                    break;
+                            }
 
-                        if (strcmp) /*have to do for structs as well!!!!! like struct person thatPerson would be a thing
+                            count += j+1;
+                        }
+                        /*else if current word is 'struct'*/
+                        else if (isKeyword(strings[count]) == 2)
+                        {
+                            count += 1;
+                        }
+
+                        else
+                            count += 2;
+
+                        /*if (strcmp) have to do for structs as well!!!!! like struct person thatPerson would be a thing*/
                         if (strcmp(strings[count], ",") == 0)
                             count += 2;
                     }

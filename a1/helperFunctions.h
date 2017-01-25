@@ -17,6 +17,9 @@ char ** resizeArray (char ** oldArray, int rows, int columns);
 /*function to check if the array needs to be resized*/
 int checkSize (int rowCnt, int rows);
 
+/*function to check if a word is a type keyword*/
+int isKeyword (char * word);
+
 /*function to print to a .c file*/
 int printToFile (char* fileName, char** spacing, char** strings, int rowCnt);
 #endif
