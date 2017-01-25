@@ -135,7 +135,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                         fprintf(toWrite, "%c", strings[count][0]);
                         count += 2;
 
-                        if (strcmp)
+                        if (strcmp) /*have to do for structs as well!!!!! like struct person thatPerson would be a thing
                         if (strcmp(strings[count], ",") == 0)
                             count += 2;
                     }
