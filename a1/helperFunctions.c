@@ -110,7 +110,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
             fprintf(toWrite, "%s%s", spacing[i], strings[i]);
         }
         /*else if finds a (, handle for if encoutnering a function*/
-        else if (strcmp(strings[i+1], "(") == 0)
+        else if (strcmp(strings[i+1], "(") == 0 && strcmp(strings[i], "main") != 0)
         {
             int count = i+1;
             /*finding index of end bracket*/
@@ -126,6 +126,20 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
             if (inClass == 1 && isFunc == 1)
             {
                 fprintf(toWrite, "%s%s%s", spacing[i], className, strings[i]);
+
+                if (strcmp(strings[i+1], "(") == 0 && strcmp(strings[i+2], ")") != 0 && isFunc == 1)
+                {
+                    int count = i+2;
+                    while (strcmp(strings[count],")") != 0)
+                    {
+                        fprintf(toWrite, "%c", strings[count][0]);
+                        count += 2;
+
+                        if (strcmp)
+                        if (strcmp(strings[count], ",") == 0)
+                            count += 2;
+                    }
+                }
             }
             else
                 fprintf(toWrite, "%s%s", spacing[i], strings[i]);

@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 
                     character = getc(ccFile);
                 }
-                
+
                 if (character == '\n' || character == '\r')
                 {
 
@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
             }
             continue;
         }
-        else if (character == '(' || character == ')')
+        else if (character == '(' || character == ')' || character == ',')
         {
             if (stringColCnt != 0)
             {
