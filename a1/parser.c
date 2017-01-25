@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 
                     character = getc(ccFile);
                 }
-                printf("CHARACTER: %d", character);
+                
                 if (character == '\n' || character == '\r')
                 {
 

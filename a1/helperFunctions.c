@@ -72,6 +72,8 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
     int inClass = 0;
     int isFunc = 0;
     int braceCount = 0;
+    int openBraceCount = 0;
+    int closeBraceCount = 0;
     char className[1000];
     fileName[nameLen-1] = '\0';
 
@@ -92,6 +94,20 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
             fprintf(toWrite, "%sstruct", spacing[i]);
             inClass = 1;
             strcpy(className, strings[i+1]);
+        }
+        /*else if to count all opening brackets*/
+        else if (strcmp(strings[i], "{") == 0)
+        {
+            openBraceCount++;
+            fprintf(toWrite, "%s%s", spacing[i], strings[i]);
+        }
+        /*else if to count all closing braces*/
+        else if (strcmp(strings[i], "}") == 0 || strcmp(strings[i], "};") == 0)
+        {
+            closeBraceCount++;
+            if (openBraceCount == closeBraceCount)
+                inClass = 0;
+            fprintf(toWrite, "%s%s", spacing[i], strings[i]);
         }
         /*else if finds a (, handle for if encoutnering a function*/
         else if (strcmp(strings[i+1], "(") == 0)
