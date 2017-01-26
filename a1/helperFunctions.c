@@ -86,6 +86,14 @@ int isKeyword (char * word)
         return 1;
     else if (strcmp(word, "struct") == 0)
         return 2;
+    else if (strcmp(word, "*") == 0)
+        return 3;
+    else if (strstr(word, "*") != NULL && (strstr(word, "double") == NULL && strstr(word, "int") == NULL && strstr(word, "char") == NULL
+            && strstr(word, "signed") == NULL && strstr(word, "unsigned") == NULL && strstr(word, "short") == NULL && strstr(word, "long") == NULL &&
+            strstr(word, "float") == NULL && strstr(word, "struct") == NULL))
+        return 4;
+    else if (strstr(word, "*") != NULL)
+        return 5;
 
     return 0;
 }
@@ -157,36 +165,104 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                     int count = i+2;
                     while (strcmp(strings[count],")") != 0)
                     {
-                        fprintf(toWrite, "%c", strings[count][0]);
-                        /*count += 2;*/
                         /*if word is a type, check if other words following are types*/
                         if (isKeyword(strings[count]) == 1)
                         {
-                            int j;
+                            if (isKeyword(strings[count+1]) == 3  || isKeyword(strings[count+1]) == 4)
+                            {
+                                printf("dis one result %d\n", isKeyword(strings[count+1]));
+                                fprintf(toWrite, "%c", strings[count][0]-32);
+
+                                if (isKeyword(strings[count+1]) == 3)
+                                    count += 3;
+                                else if (isKeyword(strings[count+1]) == 4)
+                                    count += 2;
+                            }
+                            else
+                            {
+                                fprintf(toWrite, "%c", strings[count][0]);
+                                printf("string %s result: %d", strings[count], isKeyword(strings[count+1]));
+                                count++;
+                            }
+                            /*int j;
+
                             for (j = 1; j < 4; j++)
                             {
-                                if (isKeyword(strings[count+j]) == 1)
+                                printf("in for word: %s\n", strings[count + j]);
+                                /*if next word is a type, and the next word is not a ptr
+                                if (isKeyword(strings[count+j]) == 1 && (isKeyword(strings[count+j+1]) != 3 && isKeyword(strings[count+j+1]) != 4))
                                 {
                                     fprintf(toWrite, "%c", strings[count + j][0]);
+                                    count+= 1;
+                                }
+                                /*else if one past word looked at is a *, or the keyword or the word after have a * in them
+                                else if (isKeyword(strings[count+j+1]) == 3 || isKeyword(strings[count+j]) == 4 || isKeyword(strings[count+j+1]) == 4)
+                                {
+                                    printf("ptr\n");
+                                    fprintf(toWrite, "%c", strings[count + j][0] - 32);
+                                    if (isKeyword(strings[count+j+1]) == 3)
+                                        count++;
+                                    
+                                    else if (isKeyword(strings[count+j]) == 4)
+                                        count += 2;
+                                    else if (isKeyword(strings[count+j+1]) == 4)
+                                        count++;
+                                    break;
+                                    count++;
                                 }
                                 else
                                     break;
-                            }
 
-                            count += j+1;
+                                
+                            }
+                            
+                            if (strcmp(strings[count + j], ")") != 0 || strcmp(strings[count +j], ",") != 0)
+                                count += j+1;
+                            printf("STRINGLoop: %s\n",strings[count]);*/
                         }
                         /*else if current word is 'struct'*/
                         else if (isKeyword(strings[count]) == 2)
                         {
-                            count += 1;
+                            fprintf(toWrite, "%c", strings[count][0]);
+                            printf("struct result: %d\n", isKeyword(strings[count+2]));
+                            /*if * is in between struct name and variable, ex struct myStruct * a*/
+                            if (isKeyword(strings[count+2]) == 3)
+                            {
+                                fprintf(toWrite, "%c", strings[count+1][0] - 32);
+                                count++;
+                            }
+                            /*else if * is attached to struct name, ex struct myStruct* a*/
+                            else if (isKeyword(strings[count+2]) == 4)
+                                fprintf(toWrite, "%c", strings[count+1][0] - 32);
+                            /*else if * is attached to struct variable name, ex struct myStruct *a*/
+                            else if (isKeyword(strings[count+1]) == 4)
+                                fprintf(toWrite, "%c", strings[count+1][0]-32);
+                            else
+                                fprintf(toWrite, "%c", strings[count+1][0]);
+
+                            count += 3;
                         }
 
+                        else if (isKeyword(strings[count]) == 5)
+                        {
+                            printf("here\n, Aresult %d\n", isKeyword(strings[count]));
+                            fprintf(toWrite, "%c", strings[count][0] - 32);
+                            count+= 2;
+                        }
                         else
-                            count += 2;
+                            count += 1;
 
                         /*if (strcmp) have to do for structs as well!!!!! like struct person thatPerson would be a thing*/
-                        if (strcmp(strings[count], ",") == 0)
+                        if (strcmp(strings[count], "") == 0)
+                            count += 1;
+                        else if (strcmp(strings[count], ",") == 0)
+                        {
                             count += 2;
+                            fprintf(toWrite, "|");
+                        }
+
+                        /*fprintf(toWrite, "|");*/
+                        printf("STRING: %s\n",strings[count]);
                     }
                 }
             }
