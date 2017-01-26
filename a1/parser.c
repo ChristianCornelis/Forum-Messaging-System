@@ -328,7 +328,7 @@ int main(int argc, char *argv[])
 
     for (i = 0; i < rowCnt; i++)
     {
-        printf("%s\n", stringArray[i]);
+        printf("|%s|\n", stringArray[i]);
         /*printf("%s%s" , spacingArray[i], stringArray[i]);*/
         /*if (strcmp(stringArray[i], "\"") == 0)
             printf("\n");

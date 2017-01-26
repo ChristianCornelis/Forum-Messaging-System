@@ -108,16 +108,20 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
     int openBraceCount = 0;
     int closeBraceCount = 0;
     char className[1000];
-    char** functionStrings = initArray(20, 500);
-    char ** functionSpacing = initArray(20, 50);
-    char** oldFunctionNames = initArray(30, 250);
-    char** newFunctionNames = initArray(30, 250);
-    int functionRowCnt = 20;
-    int functionSpacingCols = 0;
-    int functionStringCols = 0;
-    int functionNamesRowCnt = 30;
+    char** functions = NULL;
+    int functionRows = 20;
+    int functionCols = 10;
+    int functionRowCnt = 0;
+    char tempSize[10];
+    char** oldFunctionNames = initArray(100, 250);
+    char** newFunctionNames = initArray(100, 250);
+    int functionNamesRowCnt = 0;
+    int functionNamesRows = 100;
     int oldFunctionNamesCols = 0;
     int newFunctionNamesCols = 0;
+    int funcStart = 0;
+    int funcEnd = 0;
+    char* newName = NULL;
 
     fileName[nameLen-1] = '\0';
 
@@ -133,11 +137,13 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
     {
         isFunc = 0;
         /*if encountering string "class"*/
-        if (strcmp(strings[i], "class") == 0)
+        if (strcmp(strings[i], "class") == 0 && strcmp(strings[i+2], "{") == 0)
         {
             fprintf(toWrite, "%sstruct", spacing[i]);
             inClass = 1;
             strcpy(className, strings[i+1]);
+            functions = initArray(20, 10);
+            functionRowCnt = 0;
         }
         /*else if to count all opening brackets*/
         else if (strcmp(strings[i], "{") == 0)
@@ -150,8 +156,30 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
         {
             closeBraceCount++;
             if (openBraceCount == closeBraceCount)
+            {
                 inClass = 0;
-            fprintf(toWrite, "%s%s", spacing[i], strings[i]);
+                fprintf(toWrite, "%s%s", spacing[i], strings[i]);
+                int k = 0;
+                for (k = 0; k < functionRowCnt; k++)
+                {
+                    int index1 = atoi(functions[k]);
+                    int index2 = atoi(functions[k+1]);
+                    int j = 0;
+                    for (j = index1; j <= index2; j++)
+                    {
+                        if (strcmp(strings[i+1], "(") == 0 && strcmp(strings[i+2], ")") != 0 && isFunc == 1)
+                        {
+                            fprintf(toWrite, "%s%s", spacing[j], newFunctionNames[functionNamesRowCnt-1]);
+                        }
+                        else
+                            fprintf(toWrite, "%s%s", spacing[j],strings[j]);
+                    }
+                    k++;
+                }
+
+                destroyArray(functions, functionRows);
+                functions = NULL;
+            }
         }
         /*else if finds a (, handle for if encoutnering a function*/
         else if (strcmp(strings[i+1], "(") == 0 && strcmp(strings[i], "main") != 0)
@@ -169,113 +197,48 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
             /*if in a class, and a function is being defined*/
             if (inClass == 1 && isFunc == 1)
             {
+                funcStart = 0;
+                funcEnd = 0;
                 fprintf(toWrite, "%s%s%s", spacing[i], className, strings[i]);
 
                 /*if function has parameters*/
                 if (strcmp(strings[i+1], "(") == 0 && strcmp(strings[i+2], ")") != 0 && isFunc == 1)
                 {
-                    int count = i+2;
-                    /*while the end bracket for parameter list is not found*/
-                    while (strcmp(strings[count],")") != 0)
+                    funcStart = i;
+                    
+                    while (strstr(spacing[funcStart], "\n") == NULL)
+                        funcStart--;
+
+                    funcEnd = funcStart;
+                    while ((strcmp(strings[funcEnd], "}") != 0))
                     {
-                        /*if word is a type, check if other words following are types*/
-                        if (isKeyword(strings[count]) == 1)
-                        {
-                            /*if next keyword contains a **/
-                            if (isKeyword(strings[count+1]) == 3  || isKeyword(strings[count+1]) == 4)
-                            {
-                                fprintf(toWrite, "%c", strings[count][0]-32);
-
-                                if (isKeyword(strings[count+1]) == 3)
-                                    count += 3;
-                                else if (isKeyword(strings[count+1]) == 4)
-                                    count += 2;
-                            }
-                            else
-                            {
-                                fprintf(toWrite, "%c", strings[count][0]);
-                                count++;
-                            }
-                            /*int j;
-
-                            for (j = 1; j < 4; j++)
-                            {
-                                printf("in for word: %s\n", strings[count + j]);
-                                /*if next word is a type, and the next word is not a ptr
-                                if (isKeyword(strings[count+j]) == 1 && (isKeyword(strings[count+j+1]) != 3 && isKeyword(strings[count+j+1]) != 4))
-                                {
-                                    fprintf(toWrite, "%c", strings[count + j][0]);
-                                    count+= 1;
-                                }
-                                /*else if one past word looked at is a *, or the keyword or the word after have a * in them
-                                else if (isKeyword(strings[count+j+1]) == 3 || isKeyword(strings[count+j]) == 4 || isKeyword(strings[count+j+1]) == 4)
-                                {
-                                    printf("ptr\n");
-                                    fprintf(toWrite, "%c", strings[count + j][0] - 32);
-                                    if (isKeyword(strings[count+j+1]) == 3)
-                                        count++;
-                                    
-                                    else if (isKeyword(strings[count+j]) == 4)
-                                        count += 2;
-                                    else if (isKeyword(strings[count+j+1]) == 4)
-                                        count++;
-                                    break;
-                                    count++;
-                                }
-                                else
-                                    break;
-
-                                
-                            }
-                            
-                            if (strcmp(strings[count + j], ")") != 0 || strcmp(strings[count +j], ",") != 0)
-                                count += j+1;
-                            printf("STRINGLoop: %s\n",strings[count]);*/
-                        }
-                        /*else if current word is 'struct'*/
-                        else if (isKeyword(strings[count]) == 2)
-                        {
-                            fprintf(toWrite, "%c", strings[count][0]);
-                            /*if * is in between struct name and variable, ex struct myStruct * a*/
-                            if (isKeyword(strings[count+2]) == 3)
-                            {
-                                fprintf(toWrite, "%c", strings[count+1][0] - 32);
-                                count++;
-                            }
-                            /*else if * is attached to struct name, ex struct myStruct* a*/
-                            else if (isKeyword(strings[count+2]) == 4)
-                                fprintf(toWrite, "%c", strings[count+1][0] - 32);
-                            /*else if * is attached to struct variable name, ex struct myStruct *a*/
-                            else if (isKeyword(strings[count+1]) == 4)
-                                fprintf(toWrite, "%c", strings[count+1][0]-32);
-                            else
-                                fprintf(toWrite, "%c", strings[count+1][0]);
-
-                            count += 3;
-                        }
-                        /*else if the keyword doesn't contain a type, but contains a **/
-                        else if (isKeyword(strings[count]) == 5)
-                        {
-                            fprintf(toWrite, "%c", strings[count][0] - 32);
-                            count+= 2;
-                        }
-                        else
-                            count += 1;
-
-                        /*if blank, increase count*/
-                        if (strcmp(strings[count], "") == 0)
-                            count += 1;
-                        /*else if a comma, skip to the next keyword and print a | to separate parameters in method name in order to ensure unique method signatures*/
-                        else if (strcmp(strings[count], ",") == 0)
-                        {
-                            count += 2;
-                            fprintf(toWrite, "|");
-                        }
+                        funcEnd++;
                     }
+
+                    sprintf(tempSize, "%d", funcStart);
+                    strcpy(functions[functionRowCnt], tempSize);
+                    functionRowCnt++;
+                    sprintf(tempSize, "%d", funcEnd);
+                    strcpy(functions[functionRowCnt], tempSize);
+                    functionRowCnt++;
+
+                    if (functionRowCnt == functionRows)
+                        functions = resizeArray(functions, functionRows, functionCols);
+
+                    int count = i+2;
+                    newName = renameFuncs(strings, spacing, count, toWrite, funcStart);
+                    strcpy(newFunctionNames[functionNamesRowCnt], newName);
+                    free(newName);
+                    fprintf(toWrite, "();");
+                    i = funcEnd;
                 }
+
+                
             }
             else
                 fprintf(toWrite, "%s%s", spacing[i], strings[i]);
+            
+            continue;
         }
         /*else just print out spacing and string normally*/
         else
@@ -284,10 +247,114 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
 
     }
 
-    destroyArray(functionStrings, functionRowCnt);
-    destroyArray(functionSpacing, functionRowCnt);
-    destroyArray(oldFunctionNames, functionNamesRowCnt);
-    destroyArray(newFunctionNames, functionNamesRowCnt);
+    destroyArray(oldFunctionNames, functionNamesRows);
+    destroyArray(newFunctionNames, functionNamesRows);
     fclose(toWrite);
     return 0;
+}
+
+/*function to rename functions inside classes*/
+char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int funcStart)
+{
+    /*mallocing for new name*/
+    char* newName = malloc(sizeof(char) * 1000);
+    strcpy(newName, "");
+    char temp[2] = "";
+
+    int countCpy = count -1;
+
+    while(strcmp(strings[funcStart+1], "(") != 0)
+    {
+
+        strcat(newName, spacing[funcStart+1]);
+        strcat(newName, strings[funcStart+1]);
+        funcStart++;
+    }
+
+    /*while the end bracket for parameter list is not found*/
+    while (strcmp(strings[count],")") != 0)
+    {
+        /*if word is a type, check if other words following are types*/
+        if (isKeyword(strings[count]) == 1)
+        {
+            /*if next keyword contains a **/
+            if (isKeyword(strings[count+1]) == 3  || isKeyword(strings[count+1]) == 4)
+            {
+                fprintf(toWrite, "%c", strings[count][0]-32);
+                temp[0] = strings[count][0]-32;
+                strcat(newName, temp);
+
+                if (isKeyword(strings[count+1]) == 3)
+                    count += 3;
+                else if (isKeyword(strings[count+1]) == 4)
+                    count += 2;
+            }
+            else
+            {
+                fprintf(toWrite, "%c", strings[count][0]);
+                temp[0] = strings[count][0];
+                strcat(newName, temp);
+                count++;
+            }
+        }
+        /*else if current word is 'struct'*/
+        else if (isKeyword(strings[count]) == 2)
+        {
+            fprintf(toWrite, "%c", strings[count][0]);
+            /*if * is in between struct name and variable, ex struct myStruct * a*/
+            if (isKeyword(strings[count+2]) == 3)
+            {
+                fprintf(toWrite, "%c", strings[count+1][0] - 32);
+                temp[0] = strings[count+1][0]-32;
+                strcat(newName, temp);
+                count++;
+            }
+            /*else if * is attached to struct name, ex struct myStruct* a*/
+            else if (isKeyword(strings[count+2]) == 4)
+            {
+                fprintf(toWrite, "%c", strings[count+1][0] - 32);
+                temp[0] = strings[count+1][0]-32;
+                strcat(newName, temp);
+            }
+            /*else if * is attached to struct variable name, ex struct myStruct *a*/
+            else if (isKeyword(strings[count+1]) == 4)
+            {
+                fprintf(toWrite, "%c", strings[count+1][0]-32);
+                temp[0] = strings[count+1][0]-32;
+                strcat(newName, temp);
+            }
+            else
+            {
+                fprintf(toWrite, "%c", strings[count+1][0]);
+                temp[0] = strings[count+1][0];
+                strcat(newName, temp);
+            }
+
+            count += 3;
+        }
+        /*else if the keyword doesn't contain a type, but contains a **/
+        else if (isKeyword(strings[count]) == 5)
+        {
+            fprintf(toWrite, "%c", strings[count][0] - 32);
+            temp[0] = strings[count][0]-32;
+            strcat(newName, temp);
+            count+= 2;
+        }
+        else
+            count += 1;
+
+        /*if blank, increase count*/
+        if (strcmp(strings[count], "") == 0)
+            count += 1;
+        /*else if a comma, skip to the next keyword and print a | to separate parameters in method name in order to ensure unique method signatures*/
+        else if (strcmp(strings[count], ",") == 0)
+        {
+            count += 2;
+            fprintf(toWrite, "|");
+            temp[0] = '|';
+            strcat(newName, temp);
+        }
+    }
+
+    return newName;
 }
