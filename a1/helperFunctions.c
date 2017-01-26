@@ -108,6 +108,17 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
     int openBraceCount = 0;
     int closeBraceCount = 0;
     char className[1000];
+    char** functionStrings = initArray(20, 500);
+    char ** functionSpacing = initArray(20, 50);
+    char** oldFunctionNames = initArray(30, 250);
+    char** newFunctionNames = initArray(30, 250);
+    int functionRowCnt = 20;
+    int functionSpacingCols = 0;
+    int functionStringCols = 0;
+    int functionNamesRowCnt = 30;
+    int oldFunctionNamesCols = 0;
+    int newFunctionNamesCols = 0;
+
     fileName[nameLen-1] = '\0';
 
     FILE* toWrite = NULL;
@@ -160,17 +171,19 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
             {
                 fprintf(toWrite, "%s%s%s", spacing[i], className, strings[i]);
 
+                /*if function has parameters*/
                 if (strcmp(strings[i+1], "(") == 0 && strcmp(strings[i+2], ")") != 0 && isFunc == 1)
                 {
                     int count = i+2;
+                    /*while the end bracket for parameter list is not found*/
                     while (strcmp(strings[count],")") != 0)
                     {
                         /*if word is a type, check if other words following are types*/
                         if (isKeyword(strings[count]) == 1)
                         {
+                            /*if next keyword contains a **/
                             if (isKeyword(strings[count+1]) == 3  || isKeyword(strings[count+1]) == 4)
                             {
-                                printf("dis one result %d\n", isKeyword(strings[count+1]));
                                 fprintf(toWrite, "%c", strings[count][0]-32);
 
                                 if (isKeyword(strings[count+1]) == 3)
@@ -181,7 +194,6 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                             else
                             {
                                 fprintf(toWrite, "%c", strings[count][0]);
-                                printf("string %s result: %d", strings[count], isKeyword(strings[count+1]));
                                 count++;
                             }
                             /*int j;
@@ -224,7 +236,6 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                         else if (isKeyword(strings[count]) == 2)
                         {
                             fprintf(toWrite, "%c", strings[count][0]);
-                            printf("struct result: %d\n", isKeyword(strings[count+2]));
                             /*if * is in between struct name and variable, ex struct myStruct * a*/
                             if (isKeyword(strings[count+2]) == 3)
                             {
@@ -242,27 +253,24 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
 
                             count += 3;
                         }
-
+                        /*else if the keyword doesn't contain a type, but contains a **/
                         else if (isKeyword(strings[count]) == 5)
                         {
-                            printf("here\n, Aresult %d\n", isKeyword(strings[count]));
                             fprintf(toWrite, "%c", strings[count][0] - 32);
                             count+= 2;
                         }
                         else
                             count += 1;
 
-                        /*if (strcmp) have to do for structs as well!!!!! like struct person thatPerson would be a thing*/
+                        /*if blank, increase count*/
                         if (strcmp(strings[count], "") == 0)
                             count += 1;
+                        /*else if a comma, skip to the next keyword and print a | to separate parameters in method name in order to ensure unique method signatures*/
                         else if (strcmp(strings[count], ",") == 0)
                         {
                             count += 2;
                             fprintf(toWrite, "|");
                         }
-
-                        /*fprintf(toWrite, "|");*/
-                        printf("STRING: %s\n",strings[count]);
                     }
                 }
             }
@@ -276,7 +284,10 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
 
     }
 
+    destroyArray(functionStrings, functionRowCnt);
+    destroyArray(functionSpacing, functionRowCnt);
+    destroyArray(oldFunctionNames, functionNamesRowCnt);
+    destroyArray(newFunctionNames, functionNamesRowCnt);
     fclose(toWrite);
-    /*free(className);*/
     return 0;
 }
