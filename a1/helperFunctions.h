@@ -24,5 +24,5 @@ int isKeyword (char * word);
 int printToFile (char* fileName, char** spacing, char** strings, int rowCnt);
 
 /*function to rename functions inside classes*/
-char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int funcStart);
+char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int funcStart, char className[]);
 #endif
