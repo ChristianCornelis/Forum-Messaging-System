@@ -238,15 +238,15 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
             else
                 fprintf(toWrite, "%s%s", spacing[i], strings[i]);
             
-            continue;
+            
         }
         /*else just print out spacing and string normally*/
         else
             fprintf(toWrite, "%s%s", spacing[i], strings[i]);
 
-
+        printf("I: %d\n", i);
     }
-
+    printf("%s\n", strings[50]);
     destroyArray(oldFunctionNames, functionNamesRows);
     destroyArray(newFunctionNames, functionNamesRows);
     fclose(toWrite);
