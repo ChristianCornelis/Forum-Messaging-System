@@ -118,7 +118,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
     int braceCount = 0;
     int openBraceCount = 0;
     int closeBraceCount = 0;
-    char className[1000];
+    char className[1000] = "";
     char** functions = NULL;
     int functionRows = 150;
     int functionCols = 10;
@@ -133,6 +133,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
     int funcStart = 0;
     int funcEnd = 0;
     char* newName = NULL;
+    int nameIndex = 0;
 
     fileName[nameLen-1] = '\0';
 
@@ -199,37 +200,28 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                         {
                             if (strcmp(strings[j], oldFunctionNames[l]) == 0)
                             {
-                                printf("func name new: %s\n", newFunctionNames[l]);
                                 found = 1;
                                 fprintf(toWrite, "%s%s", spacing[j], newFunctionNames[l]);
                                 j++;
                                 break;
                             }
                         }
-                        /*
-                        if (strcmp(strings[j+1], "(") == 0 && strcmp(strings[j+2], ")") != 0 )
-                        {
-                            printf("before");
-                            printf("in dat if %s\n", newFunctionNames[functionNamesRowCnt-1]);
-                            fprintf(toWrite, "%s%s", spacing[j], newFunctionNames[functionNamesRowCnt-1]);
-                            printf("after");    
-                        }
-                        else if (strcmp(strings[j+1], "(") == 0 && strcmp(strings[j+2], ")") == 0 && isFunc == 1)
-                        {
-                            printf("Im in here!");
-                            fprintf(toWrite, "%s%s", spacing[j], newFunctionNames[functionNamesRowCnt-1]);
-                            printf("in dat else\n");
-                        }
-                        else*/
 
                             fprintf(toWrite, "%s%s", spacing[j],strings[j]);
                     }
                     k++;
                 }
-
+                fprintf(toWrite, "\n   void constructor%s (struct * %s tempStruct) {\n", className, className);
+                for (k = nameIndex; k < functionNamesRowCnt; k++)
+                {
+                    fprintf(toWrite, "      tempStruct->%s = %s\n", newFunctionNames[k], newFunctionNames[k]);
+                }
+                fprintf(toWrite, "   }\n");
                 destroyArray(functions, functionRows);
                 functionRowCnt = 0;
                 functions = NULL;
+
+                nameIndex = functionNamesRowCnt;
             }
         }
         /*else if finds a (, handle for if encoutnering a function*/
@@ -291,48 +283,9 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                     free(newName);
                     i = funcEnd;
                 }
-
-                /*else if (strcmp(strings[i+1], "(") == 0 && strcmp(strings[i+2], ")") == 0)
-                {
-                    funcStart = i;
-                    
-                    while (strstr(spacing[funcStart], "\n") == NULL)
-                        funcStart--;
-
-                    funcEnd = funcStart;
-                    while ((strcmp(strings[funcEnd], "}") != 0))
-                    {
-                        funcEnd++;
-                    }
-
-                    sprintf(tempSize, "%d", funcStart);
-                    strcpy(functions[functionRowCnt], tempSize);
-                    functionRowCnt++;
-                    sprintf(tempSize, "%d", funcEnd);
-                    strcpy(functions[functionRowCnt], tempSize);
-                    functionRowCnt++;
-
-                    int count = i+2;
-                    newName = renameFuncs(strings, spacing, count, toWrite, funcStart, className);
-                    strcpy(newFunctionNames[functionNamesRowCnt], newName);
-                    functionNamesRowCnt++;
-                    if (functionNamesRowCnt == functionNamesRows)
-                    {
-                        oldFunctionNames = resizeArray(oldFunctionNames, functionNamesRowCnt, oldFunctionNamesCols);
-                        newFunctionNames = resizeArray(newFunctionNames,functionNamesRowCnt, newFunctionNamesCols);
-                        functionNamesRowCnt *= 2;
-                    }
-                    free(newName);
-                    fprintf(toWrite, "();");
-                    i = funcEnd;
-                }*/
-
-                
             }
             else
-                fprintf(toWrite, "%s%s", spacing[i], strings[i]);
-            
-            
+                fprintf(toWrite, "%s%s", spacing[i], strings[i]);  
         }
         /*else just print out spacing and string normally*/
         else
@@ -375,30 +328,14 @@ char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int 
         funcStart++;
     }
 
+
     strcpy(tempName, strings[funcStart]);
-   if (strstr(tempName, "*") != NULL)
+
+    /*eliminating the * in the function name if present*/
+    if (strstr(tempName, "*") != NULL)
         memmove(tempName, tempName+1, strlen(tempName));
     strcat(newName, tempName);
     free(tempName);
-    /*
-    int b = 0;
-    printf("NewnAME: %s\n", newName);
-    printf("len: %zd\n", strlen(newName));
-
-    while (newName[b] != '\0')
-    {
-        printf("char: %c\n", newName[b]);
-        if (newName[b] == '*')
-            newName[b] = (char) 0;        
-        b++;
-    }
-    for (b = 0; b < strlen(newName); b++)
-    {
-        printf("CHAR: |%c|\n", newName[b]);
-        if (newName[b] == '*')
-            newName[b] = (char) 0;
-    }*/
-    printf("NAME:2 %s\n", newName);
 
     /*while the end bracket for parameter list is not found*/
     while (strcmp(strings[count],")") != 0)
