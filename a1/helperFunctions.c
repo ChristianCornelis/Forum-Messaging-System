@@ -148,7 +148,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
     {
         isFunc = 0;
         /*if encountering string "class"*/
-        if (strcmp(strings[i], "class") == 0 && strcmp(strings[i+2], "{") == 0)
+        if (strcmp(strings[i], "class") == 0 && (strcmp(strings[i+2], "{") == 0 || strstr(strings[i+1], "{") != NULL))
         {
             fprintf(toWrite, "%sstruct", spacing[i]);
             inClass = 1;
@@ -243,7 +243,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                 fprintf(toWrite, "%s(*%s%s", spacing[i], className, strings[i]);
 
                 /*if function has parameters*/
-                if (strcmp(strings[i+1], "(") == 0 && strcmp(strings[i+2], ")") != 0)
+                if (strcmp(strings[i+1], "(") == 0)
                 {
                     funcStart = i;
                     
@@ -275,7 +275,6 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                         functionNamesRowCnt *= 2;
                     }
                     free(newName);
-                    fprintf(toWrite, "();");
                     i = funcEnd;
                 }
 
@@ -340,8 +339,9 @@ char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int 
     char* newName = malloc(sizeof(char) * 1000);
     strcpy(newName, "");
     char temp[2] = "";
+    char params[1000] = "(";
 
-    int countCpy = count -1;
+    int countCpy = count-2;
 
     printf("name: |%s|\n", className);
     /*fprintf(toWrite, "%s%s%s", spacing[i], className, strings[i]);*/
@@ -369,12 +369,14 @@ char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int 
         /*if word is a type, check if other words following are types*/
         if (isKeyword(strings[count]) == 1)
         {
-            /*if next keyword contains a **/
+            /*if next keyword contains a '*' */
             if (isKeyword(strings[count+1]) == 3  || isKeyword(strings[count+1]) == 4)
             {
                 fprintf(toWrite, "%c", strings[count][0]-32);
                 temp[0] = strings[count][0]-32;
                 strcat(newName, temp);
+                strcat(params, strings[count]);
+                strcat(params, "*");
 
                 if (isKeyword(strings[count+1]) == 3)
                     count += 3;
@@ -386,6 +388,8 @@ char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int 
                 fprintf(toWrite, "%c", strings[count][0]);
                 temp[0] = strings[count][0];
                 strcat(newName, temp);
+                strcat(params, strings[count]);
+                strcat(params, " ");
                 count++;
             }
         }
@@ -395,26 +399,34 @@ char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int 
             fprintf(toWrite, "%c", strings[count][0]);
             temp[0] = strings[count][0];
             strcat(newName, temp);
+            strcat(params, strings[count]);
+            strcat(params, " ");
             /*if * is in between struct name and variable, ex struct myStruct * a*/
             if (isKeyword(strings[count+2]) == 3)
             {
                 fprintf(toWrite, "%c", strings[count+1][0] - 32);
                 temp[0] = strings[count+1][0]-32;
                 strcat(newName, temp);
+                strcat(params, strings[count+1]);
+                strcat(params, "*");
                 count++;
             }
-            /*else if * is attached to struct name, ex struct myStruct* a*/
+            /*else if * is attached to struct name, ex struct myStruct a* */
             else if (isKeyword(strings[count+2]) == 4)
             {
                 fprintf(toWrite, "%c", strings[count+1][0] - 32);
                 temp[0] = strings[count+1][0]-32;
+                strcat(params, strings[count+1]);
+                strcat(params, "*");
                 strcat(newName, temp);
             }
-            /*else if * is attached to struct variable name, ex struct myStruct *a*/
+            /*else if * is attached to struct variable name, ex struct myStruct* a*/
             else if (isKeyword(strings[count+1]) == 4)
             {
                 fprintf(toWrite, "%c", strings[count+1][0]-32);
                 temp[0] = strings[count+1][0]-32;
+                strcat(params, strings[count+1]);
+                strcat(params, "*");
                 strcat(newName, temp);
             }
             else
@@ -426,12 +438,13 @@ char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int 
 
             count += 3;
         }
-        /*else if the keyword doesn't contain a type, but contains a **/
+        /*else if the keyword doesn't contain a type, but contains a * */
         else if (isKeyword(strings[count]) == 5)
         {
             fprintf(toWrite, "%c", strings[count][0] - 32);
             temp[0] = strings[count][0]-32;
             strcat(newName, temp);
+            strcat(params, strings[count]);
             count+= 2;
         }
         else
@@ -447,10 +460,11 @@ char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int 
             fprintf(toWrite, "|");
             temp[0] = '|';
             strcat(newName, temp);
+            strcat(params, ", ");
         }
     }
 
-    fprintf(toWrite, "%c", ')');
-
+    fprintf(toWrite, ")%s%s", params, ");");
+    strcpy(strings[countCpy], newName);
     return newName;
 }

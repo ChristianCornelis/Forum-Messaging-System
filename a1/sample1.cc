@@ -7,17 +7,17 @@ int a;
 	/* /different ways to access variables */
 class A {
 int a;
-   void print1 (struct myStruct * b, int *a[], long long double* i, float * s) {
+   int *print1 (int* a, char* mysus, unsigned long long int c) {
 		// print parameter - local to the function
       printf("output should be 1: %d\n", a);
    }
-   void print2(int a) {
+   void print2(struct myStruct *b) {
 		// create a local variable
       int a = 2;
 		// print local variable
       printf("output should be 2: %d\n", a);
    }
-   void print3(float b) {
+   void print3() {
 		// there is a class variable named a so
 		// assign value to it and print the class variable
       a = 3;
@@ -26,7 +26,7 @@ int a;
 };
 
 class B {
-   void print4(int b) {
+   void print4() {
 		// there is no class variable named a so print global variable
       printf("output should be 4: %d\n", a);
    }
