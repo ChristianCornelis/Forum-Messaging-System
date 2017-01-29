@@ -7,7 +7,7 @@ int a;
 	/* /different ways to access variables */
 class A {
 int a;
-   int *print1 (int* a, char* mysus, unsigned long long int c) {
+   int print1 (int* a, char* mysus, unsigned long long int c) {
 		// print parameter - local to the function
       printf("output should be 1: %d\n", a);
    }

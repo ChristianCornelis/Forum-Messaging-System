@@ -25,4 +25,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt);
 
 /*function to rename functions inside classes*/
 char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int funcStart, char className[]);
+
+/*function to check if a string is a class variable*/
+int isClassVar (char** classVars, char* string, int classVarsCnt);
 #endif

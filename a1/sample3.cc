@@ -119,7 +119,7 @@ E {
 int main(int argc, char *argv[]) {
 class A myA;
 class B myB1,myB2, myB3;
-class B myC;
+class C myC;
 int x, y;
 char str[50];
 struct mystruct *sptr;

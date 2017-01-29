@@ -157,6 +157,18 @@ int main(int argc, char *argv[])
         {
             stringArray[rowCnt][stringColCnt] = (char) character;
             stringColCnt++;
+            if (stringColCnt == columns)
+            {
+                rowCnt++;
+                stringColCnt = 0;
+                spacingColCnt = 0;
+                if (checkSize(rowCnt, rows) == 1)
+                {
+                    stringArray = resizeArray(stringArray, rows, columns);
+                    spacingArray = resizeArray(spacingArray, rows, columns);
+                    rows *= 2;
+                }
+            }
 
             if ((character = getc(ccFile)) == '/')
             {
@@ -226,6 +238,23 @@ int main(int argc, char *argv[])
                 stringColCnt = 0;
                 spacingColCnt = 0;
             }
+            else
+            {
+                stringArray[rowCnt][stringColCnt] = (char) character;
+                stringColCnt++;
+                if (stringColCnt == columns)
+                {
+                    rowCnt++;
+                    stringColCnt = 0;
+                    spacingColCnt = 0;
+                    if (checkSize(rowCnt, rows) == 1)
+                    {
+                        stringArray = resizeArray(stringArray, rows, columns);
+                        spacingArray = resizeArray(spacingArray, rows, columns);
+                        rows *= 2;
+                    }
+                }
+            }
         }
 
         /*else if (character == ' ' || character == '\n' || character == '\t')
@@ -277,7 +306,7 @@ int main(int argc, char *argv[])
             }
             continue;
         }
-        else if (character == '(' || character == ')' || character == ',')
+        else if (character == '(' || character == ')' || character == ',' || character == '}' || character == '{' || character == ';' || character == '.')
         {
             if (stringColCnt != 0)
             {
