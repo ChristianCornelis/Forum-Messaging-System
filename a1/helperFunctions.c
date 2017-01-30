@@ -1,5 +1,12 @@
+/***************************************************
+Christian Cornelis        ccorneli@mail.uoguelph.ca
+CIS*2750                  ID# 0939357
+January 29th, 2016        Assignment 1
+***************************************************/
+
 #include "helperFunctions.h"
 
+/*function to inialize a 2D array of strings*/
 char ** initArray(int rows, int columns)
 {
     char ** array;
@@ -29,6 +36,7 @@ char ** initArray(int rows, int columns)
     return array;
 }
 
+/*function to free all memory allocated for a 2D string array*/
 int destroyArray(char ** toDestroy, int rows)
 {
     int i;
@@ -44,6 +52,7 @@ int destroyArray(char ** toDestroy, int rows)
     return 1;
 }
 
+/*function to resize a 2D array of strings and return a larger one with all contents copied in*/
 char ** resizeArray (char ** oldArray, int rows, int columns)
 {
     char ** newArray;
@@ -53,9 +62,6 @@ char ** resizeArray (char ** oldArray, int rows, int columns)
 
     for (i = 0; i < rows; i++)
     {
-        /*
-        if (strcmp(oldArray[i], "") != 0)
-            strcpy(oldArray[i], newArray[i]);*/
         for (j = 0; j < columns; j++)
         {
             newArray[i][j] = oldArray[i][j];
@@ -109,6 +115,7 @@ int isKeyword (char * word)
     return 0;
 }
 
+/*function to format output to conform to C syntax and print it to the C file*/
 int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
 {
     int nameLen = strlen(fileName);
@@ -250,29 +257,15 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
             if (openBraceCount == closeBraceCount && inClass == 1)
             {
                 inClass = 0;
-                /*if ((strcmp(strings[i], "}") == 0 && strcmp(strings[i+1], ";") != 0))
-                    fprintf(toWrite, "%s%s", spacing[i], strings[i]);*/
-                /*else if (strcmp(strings[i], "}") == 0 && strcmp(strings[i+1], ";") != 0)
-                {*/
-                    fprintf(toWrite, "%s%s", spacing[i], strings[i]);
-                    fprintf(toWrite, "%s%s", spacing[i+1], strings[i+1]);
-                    i++;
-                
+                fprintf(toWrite, "%s%s", spacing[i], strings[i]);
+                fprintf(toWrite, "%s%s", spacing[i+1], strings[i+1]);
+                i++;
+            
                 int k = 0;
-                printf("className: %s\n", className);
                 char** funcClassVars = initArray(100, 250);
                 int funcClassVarsCnt = 0;
                 int funcClassVarIndex = 0;
                 char** funcClassVarsClasses = initArray(100, 250);
-                /*char** localFuncClassVars = createTempClassVarsList(localClassVars, localClassVarsCnt, className);
-                int localFuncClassVarsCnt = 0;
-                int localClassVarIndex = 0;
-                while(strcmp(localFuncClassVars[localFuncClassVarsCnt], "") != 0)
-                {
-                    printf("LOCALFUNCCLASSVARS: %s\n", localFuncClassVars[localFuncClassVarsCnt]);
-                    localFuncClassVarsCnt++;
-
-                }*/
                 for (k = 0; k < functionRowCnt; k++)
                 {
                     char** localFuncClassVars = createTempClassVarsList(localClassVars, localClassVarsCnt, className);
@@ -280,9 +273,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                     int localClassVarIndex = 0;
                     while(strcmp(localFuncClassVars[localFuncClassVarsCnt], "") != 0)
                     {
-                        printf("LOCALFUNCCLASSVARS: %s\n", localFuncClassVars[localFuncClassVarsCnt]);
                         localFuncClassVarsCnt++;
-
                     }
                     int index1 = atoi(functions[k]);
                     int index2 = atoi(functions[k+1]);
@@ -319,10 +310,11 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                             {
                                 if (strstr(strings[j-1], oldFunctionNames[s]) != NULL)
                                 {
+                                    found = 1;
                                     fprintf(toWrite, "%s%sstruct %s* classVarStruct", spacing[j], strings[j], className);
                                     if (strcmp(strings[j+1], ")") != 0)
                                         fprintf(toWrite, ", ");
-                                    found = 1;
+                                    break;
                                 }
                             }
 
@@ -549,7 +541,6 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
         /*else if a class variable is found*/
         else if (inClass == 1 && isKeyword(strings[i]) == 1 && strcmp(strings[i+2], "(") != 0)
         {
-            printf("Class var found: %s\n", strings[i+1]);
             fprintf(toWrite, "%s%s", spacing[i], strings[i]);
             strcpy(localClassVars[localClassVarsCnt], strings[i+1]);
             localClassVarsCnt++;
@@ -561,7 +552,6 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                 {
                     if (strcmp(strings[v], "") == 0)
                         v++;
-                    printf("Class var found: |%s|\n", strings[v]);
                     strcpy(localClassVars[localClassVarsCnt], strings[v]);
                     localClassVarsCnt++;
                     v++;
@@ -575,10 +565,6 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
 
                 }
             }
-
-            int f = 0;
-            for (f = 0; f < localClassVarsCnt; f++)
-                printf("%s\n", localClassVars[f]);
         }
         /*else just print out spacing and string normally*/
         else
@@ -617,6 +603,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
         }
     }
 
+    /*freeing memory*/
     destroyArray(oldFunctionNames, functionNamesRows);
     destroyArray(newFunctionNames, functionNamesRows);
     destroyArray(classVars, 100);
@@ -794,20 +781,6 @@ int isLocalClassVar (char** localClassVars, int localClassVarsCnt, char* string,
 
     for (i = 0; i < localClassVarsCnt; i++)
     {
-        /*
-        if (strstr(localClassVars[i], "class ") != NULL && strstr(localClassVars[i], className) != NULL)
-        {
-            int j = i+1;
-            while (strstr(localClassVars[j], "class ") == NULL && j < localClassVarsCnt)
-            {
-                if (strcmp(localClassVars[j], string) == 0)
-                {
-                    printf("returning %d\n", j);
-                    return j;
-                }
-            }
-        }*/
-
         if (strcmp(localClassVars[i], string) == 0)
         {
             return i;
@@ -819,16 +792,13 @@ int isLocalClassVar (char** localClassVars, int localClassVarsCnt, char* string,
 
 char** createTempClassVarsList(char** localClassVars, int localClassVarsCnt, char* className)
 {
-    int i = 0; 
-    int startIndex = 0;
-    int endIndex = 0;
+    int i = 0;
     char** tempList = initArray(250, 250);
     int tempListCnt = 0;
     for (i = 0; i < localClassVarsCnt; i++)
     {
         if (strstr(localClassVars[i], "class ") != NULL && strstr(localClassVars[i], className) != NULL)
         {
-            startIndex = i;
 
             int j = i+1;
             while (strstr(localClassVars[j], "class ") == NULL && j < localClassVarsCnt)

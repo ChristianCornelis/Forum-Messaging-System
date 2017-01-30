@@ -1,3 +1,9 @@
+/***************************************************
+Christian Cornelis        ccorneli@mail.uoguelph.ca
+CIS*2750                  ID# 0939357
+January 29th, 2016        Assignment 1
+***************************************************/
+
 #include "helperFunctions.h"
 int main(int argc, char *argv[])
 {
@@ -31,7 +37,6 @@ int main(int argc, char *argv[])
     character = getc(ccFile);
     while (character != EOF)
     {
-        printf("in");
         if (character == '"')
         {
             stringArray[rowCnt][stringColCnt] = (char)character;
@@ -48,47 +53,7 @@ int main(int argc, char *argv[])
 
             while (character != '"')
             {
-                /*if (character == ' ' || character == '\t' || character == '\n' || character == '\r')
-                {
-                    stringArray[rowCnt][stringColCnt] = (char) character;
-                    stringColCnt++;
-                    if (stringColCnt == columns)
-                    {
-                        rowCnt++;
-                        spacingColCnt = 0;
-                        spacingColCnt = 0;
-                        if (checkSize(rowCnt, rows) == 1)
-                        {
-                            stringArray = resizeArray(stringArray, rows, columns);
-                            spacingArray = resizeArray(spacingArray, rows, columns);
-                            rows *= 2;
-                        }
-                    }
-                    character = getc(ccFile);
-                    while (character == ' ' || character == '\t' || character == '\n' || character == '\r')
-                    {
-                        spacingArray[rowCnt][spacingColCnt] = (char) character;
-                        spacingColCnt++;
-                        if (spacingColCnt == columns)
-                        {
-                            rowCnt++;
-                            spacingColCnt = 0;
-                            spacingColCnt = 0;
-                            if (checkSize(rowCnt, rows) == 1)
-                            {
-                                stringArray = resizeArray(stringArray, rows, columns);
-                                spacingArray = resizeArray(spacingArray, rows, columns);
-                                rows *= 2;
-                            }
-                        }
-                        character = getc(ccFile);
-                    }
-
-                    stringArray[rowCnt][stringColCnt] = (char) character;
-                    stringColCnt++;
-                }
-
-                else */if (character == '\\')
+                if (character == '\\')
                 {
                     stringArray[rowCnt][stringColCnt] = (char) character;
                     stringColCnt++;
@@ -240,37 +205,28 @@ int main(int argc, char *argv[])
             }
             else
             {
+                rowCnt++;
+                stringColCnt = 0;
+                spacingColCnt = 0;
+                if (checkSize(rowCnt, rows) == 1)
+                {
+                    stringArray = resizeArray(stringArray, rows, columns);
+                    spacingArray = resizeArray(spacingArray, rows, columns);
+                    rows *= 2;
+                }
                 stringArray[rowCnt][stringColCnt] = (char) character;
                 stringColCnt++;
-                if (stringColCnt == columns)
+                rowCnt++;
+                stringColCnt = 0;
+                spacingColCnt = 0;
+                if (checkSize(rowCnt, rows) == 1)
                 {
-                    rowCnt++;
-                    stringColCnt = 0;
-                    spacingColCnt = 0;
-                    if (checkSize(rowCnt, rows) == 1)
-                    {
-                        stringArray = resizeArray(stringArray, rows, columns);
-                        spacingArray = resizeArray(spacingArray, rows, columns);
-                        rows *= 2;
-                    }
+                    stringArray = resizeArray(stringArray, rows, columns);
+                    spacingArray = resizeArray(spacingArray, rows, columns);
+                    rows *= 2;
                 }
             }
         }
-
-        /*else if (character == ' ' || character == '\n' || character == '\t')
-        {
-            rowCnt++;
-            if (checkSize(rowCnt, rows) == 1)
-            {
-                stringArray = resizeArray(stringArray, rows, columns);
-                spacingArray = resizeArray(spacingArray, rows, columns);
-                rows *= 2;
-                printf("expanded: %d\n", rows);
-            }
-            stringColCnt = 0;
-            spacingColCnt = 0;
-            spacingArray[rowCnt][spacingColCnt] = (char) character;
-        }*/
 
         else if (character == ' ' || character == '\t' || character == '\n')
         {
@@ -306,7 +262,7 @@ int main(int argc, char *argv[])
             }
             continue;
         }
-        else if (character == '(' || character == ')' || character == ',' || character == '}' || character == '{' || character == ';' || character == '.')
+        else if (character == '(' || character == ')' || character == ',' || character == '}' || character == '{' || character == ';' || character == '.' || character == '*')
         {
             if (stringColCnt != 0)
             {
@@ -351,18 +307,6 @@ int main(int argc, char *argv[])
             }
         }
         character = getc(ccFile);
-    }
-
-    int i;
-
-    for (i = 0; i < rowCnt; i++)
-    {
-        printf("|%s|\n", stringArray[i]);
-        /*printf("%s%s" , spacingArray[i], stringArray[i]);*/
-        /*if (strcmp(stringArray[i], "\"") == 0)
-            printf("\n");
-        else if (strcmp(stringArray[i], "class") == 0)
-            printf("struct");*/
     }
 
     printToFile(argv[1], spacingArray, stringArray, rowCnt);
