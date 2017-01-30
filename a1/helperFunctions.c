@@ -138,6 +138,8 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
     char** classVars = initArray(100, 250);
     int classVarsCnt = 0;
     char** classVarsClasses = initArray(100, 250);
+    char** localClassVars = initArray(500, 250);
+    int localClassVarsCnt = 0;
 
     fileName[nameLen-1] = '\0';
 
@@ -158,6 +160,9 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
             fprintf(toWrite, "%sstruct", spacing[i]);
             inClass = 1;
             strcpy(className, strings[i+1]);
+            strcpy(localClassVars[localClassVarsCnt], "class ");
+            strcat(localClassVars[localClassVarsCnt], className);
+            localClassVarsCnt++;
             /*saving class name*/
             strcpy(oldFunctionNames[functionNamesRowCnt], "class ");
             strcat(oldFunctionNames[functionNamesRowCnt], className);
@@ -172,6 +177,9 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
         {
             fprintf(toWrite, "%sstruct", spacing[i]);
             inClass = 1;
+            strcpy(localClassVars[localClassVarsCnt], "class ");
+            strcat(localClassVars[localClassVarsCnt], className);
+            localClassVarsCnt++;
             strcpy(className, strings[i+1]);
             /*saving class name*/
             strcpy(oldFunctionNames[functionNamesRowCnt], "class ");
@@ -192,18 +200,42 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
         /*else if encountering a class variable*/
         else if (strcmp(strings[i], "class") == 0)
         {
-           fprintf(toWrite, "%sstruct", spacing[i]);
-           int h = 0;
-           while (strcmp(strings[i+2+h], ";") != 0)
-           {
-               strcpy(classVars[classVarsCnt], strings[i+2 + h]);
-               strcpy(classVarsClasses[classVarsCnt], strings[i+1]);
-               classVarsCnt++;
-               h++;
+            fprintf(toWrite, "%sstruct", spacing[i]);
+            fprintf(toWrite, "%s%s", spacing[i+1], strings[i+1]);
+            int h = 0;
+            char** constructors = initArray(100, 250);
+            int constructorCnt = 0;
+            while (strcmp(strings[i+2+h], ";") != 0)
+            {
+                fprintf(toWrite, "%s%s", spacing[i+2+h],strings[i+2+h]);
+                strcpy(classVars[classVarsCnt], strings[i+2 + h]);
+                strcpy(classVarsClasses[classVarsCnt], strings[i+1]);
+                classVarsCnt++;
+                strcpy(constructors[constructorCnt], spacing[i]);
+                strcat(constructors[constructorCnt], "constructor");
+                strcat(constructors[constructorCnt], strings[i+1]);
+                strcat(constructors[constructorCnt], "(&");
+                strcat(constructors[constructorCnt], strings[i+2+h]);
+                strcat(constructors[constructorCnt], ");");
+                h++;
+                constructorCnt++;
 
                 if (strcmp(strings[i+2+h], ",") == 0)
+                {
+                    fprintf(toWrite, "%s%s", spacing[i+2+h],strings[i+2+h]);
                     h++;
-           } 
+                    if (strcmp(strings[i+2+h], "") == 0)
+                    {
+                        fprintf(toWrite, "%s%s", spacing[i+2+h],strings[i+2+h]);
+                        h++;
+                    }
+                }
+            }
+            i = i+h+2;
+            fprintf(toWrite, "%s%s", spacing[i], strings[i]);
+            for (h = 0; h < constructorCnt; h++)
+                fprintf(toWrite, "%s", constructors[h]);
+            destroyArray(constructors, 100); 
         }
         /*else if to count all opening brackets*/
         else if (strcmp(strings[i], "{") == 0)
@@ -232,80 +264,165 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                 int funcClassVarsCnt = 0;
                 int funcClassVarIndex = 0;
                 char** funcClassVarsClasses = initArray(100, 250);
+                /*char** localFuncClassVars = createTempClassVarsList(localClassVars, localClassVarsCnt, className);
+                int localFuncClassVarsCnt = 0;
+                int localClassVarIndex = 0;
+                while(strcmp(localFuncClassVars[localFuncClassVarsCnt], "") != 0)
+                {
+                    printf("LOCALFUNCCLASSVARS: %s\n", localFuncClassVars[localFuncClassVarsCnt]);
+                    localFuncClassVarsCnt++;
+
+                }*/
                 for (k = 0; k < functionRowCnt; k++)
                 {
+                    char** localFuncClassVars = createTempClassVarsList(localClassVars, localClassVarsCnt, className);
+                    int localFuncClassVarsCnt = 0;
+                    int localClassVarIndex = 0;
+                    while(strcmp(localFuncClassVars[localFuncClassVarsCnt], "") != 0)
+                    {
+                        printf("LOCALFUNCCLASSVARS: %s\n", localFuncClassVars[localFuncClassVarsCnt]);
+                        localFuncClassVarsCnt++;
+
+                    }
                     int index1 = atoi(functions[k]);
                     int index2 = atoi(functions[k+1]);
                     int j = 0;
                     int l = 0;
                     for (j = index1; j <= index2; j++)
                     {
-                        /*(for (l = 0; l < functionNamesRowCnt; l++)
+                        /*replacing function names for local class functions*/
+                        for (l = 0; l < functionNamesRowCnt; l++)
                         {
-                            printf("Old name: %s\n", oldFunctionNames[l]);
                             if (strstr(oldFunctionNames[l], className) != NULL && strstr(oldFunctionNames[l], "class ") != NULL)
                             {
                                 int g = l+1;
-                                while (strstr(oldFunctionNames[g], "class ") == NULL)
+                                while (strstr(oldFunctionNames[g], "class ") == NULL && g < functionNamesRowCnt)
                                 {
                                     if (strcmp(oldFunctionNames[g], strings[j]) == 0)
                                     {
-                                        fprintf(toWrite, "%s" , newFunctionNames[g]);
+                                        fprintf(toWrite, "%s%s" , spacing[j], newFunctionNames[g]);
+                                        j++;
                                         break;
                                     }
                                     g++;
                                 }
                             }
 
-                        }*/
-                        /*
-                        for (l = 0; l < functionNamesRowCnt; l++)
+                        }
+
+                        /*printing extra function parameters if necessary*/
+                        if (strcmp(strings[j], "(") == 0)
                         {
-                            if (strcmp(strings[j], oldFunctionNames[l]) == 0)
+                            int s = 0;
+                            int found = 0;
+                            for (s = 0; s < functionNamesRowCnt; s++)
                             {
-                                printf("in weird loop\n");
-                                found = 1;
-                                fprintf(toWrite, "%s%s", spacing[j], newFunctionNames[l]);
-                                j++;
-                                break;
+                                if (strstr(strings[j-1], oldFunctionNames[s]) != NULL)
+                                {
+                                    fprintf(toWrite, "%s%sstruct %s* classVarStruct", spacing[j], strings[j], className);
+                                    if (strcmp(strings[j+1], ")") != 0)
+                                        fprintf(toWrite, ", ");
+                                    found = 1;
+                                }
                             }
-                        }*/
+
+                            if (found == 0)
+                                fprintf(toWrite, "%s%s", spacing[j], strings[j]);
+                            j++;
+                        }
+
                         /*if encountering a class variable*/
                         if (strcmp(strings[j], "class") == 0)
                         {
-                           fprintf(toWrite, "%sstruct", spacing[j]);
+                           fprintf(toWrite, "%sstruct%s%s", spacing[j], spacing[j+1], strings[j+1]);
                            int h = 0;
-                           
+                           char** constructors = initArray(100, 250);
+                           int constructorCnt = 0;
+
                            while (strcmp(strings[j+2+h], ";") != 0)
                            {
                                 fprintf(toWrite, "%s%s", spacing[j+2+h],strings[j+2+h]);
-                                /*char* toPrint = malloc(sizeof(char) * 1000);
-                                strcpy(toPrint, "");*/
+                                /*copying class variable name and class into lists*/
                                 strcpy(funcClassVars[funcClassVarsCnt], strings[j+2 + h]);
                                 strcpy(funcClassVarsClasses[funcClassVarsCnt], strings[j+1]);
                                 funcClassVarsCnt++;
-                                /*strcat(toPrint, spacing[j]);
-                                strcat(toPrint, "constructor");
-                                strcat(toPrint, funcClassVars[funcClassVarIndex]);
-                                strcat(toPrint, "(&");
-                                strcat(toPrint, strings[j+2+h]);
-                                strcat(toPrint, ")\n");
-                                fprintf(toWrite, "%s", toPrint);*/
-                                fprintf(toWrite, "%sconstructor%s(&%s);\n", spacing[j], funcClassVarsClasses[funcClassVarsCnt-1], strings[j+2+h]);
+                                /*creating constructor for the class variable and saving it in constructor list*/
+                                strcpy(constructors[constructorCnt], spacing[j]);
+                                strcat(constructors[constructorCnt], "constructor");
+                                strcat(constructors[constructorCnt], strings[j+1]);
+                                strcat(constructors[constructorCnt], "(&");
+                                strcat(constructors[constructorCnt], strings[j+2+h]);
+                                strcat(constructors[constructorCnt], ");");
                                 h++;
-
+                                constructorCnt++;
+                                /*if multiple class varaible declarations on one line*/
                                 if (strcmp(strings[j+2+h], ",") == 0)
+                                {
+                                    fprintf(toWrite, "%s%s", spacing[j+2+h],strings[j+2+h]);
                                     h++;
-                                /*free(toPrint);*/
+                                    if (strcmp(strings[j+2+h], "") == 0)
+                                    {
+                                        fprintf(toWrite, "%s%s", spacing[j+2+h],strings[j+2+h]);
+                                        h++;
+                                    }
+                                }
                            } 
-                           
+                            j = j+h+2;
+                            fprintf(toWrite, "%s%s", spacing[j], strings[j]);
+                            /*printing out constructors, then freeing constructor list*/
+                            for (h = 0; h < constructorCnt; h++)
+                                fprintf(toWrite, "%s", constructors[h]);
+                            destroyArray(constructors, 100);
+                            
                            
                         }
-                        
+
+                        /*else if string is a local class variable*/
+                        else if (isLocalClassVar(localFuncClassVars, localFuncClassVarsCnt, strings[j], className) != -1 && strcmp(strings[j], "") != 0)
+                        {
+
+                            localClassVarIndex = isLocalClassVar(localFuncClassVars, localFuncClassVarsCnt, strings[j], className);
+                            fprintf(toWrite, "%s", spacing[j]);
+                            /*if string before var is not a type*/
+                            if (isKeyword(strings[j-1]) == 0)
+                            {
+                                
+                                /*if string before is a comma*/
+                                if (strcmp(strings[j-1], ",") == 0 || strcmp(strings[j-1], "") == 0)
+                                {
+                                    int d = j-2;
+                                    while (isKeyword(strings[d]) != 1 || strcmp(strings[d], ";") == 0 || strstr(strings[d], "//") != NULL || strstr(strings[d], "\"") != NULL)
+                                    {
+                                        if (strcmp(strings[d], ",") == 0 || strcmp(strings[d], "") == 0)
+                                            d--;
+                                        else
+                                            break;
+                                    }
+
+                                    /*if variable is local, delete from list*/
+                                    if (isKeyword(strings[d]) == 1)
+                                    {
+                                        strcpy(localFuncClassVars[localClassVarIndex], "");
+                                    }
+                                    
+                                }
+                            }
+
+                            else if (isKeyword(strings[j-1]) == 1)
+                            {
+                                strcpy(localFuncClassVars[localClassVarIndex], "");
+                            }
+                            if (strcmp(localFuncClassVars[localClassVarIndex], "") != 0)
+                                fprintf(toWrite, "classVarStruct->");
+                            fprintf(toWrite, "%s",strings[j]);
+
+                            
+                        }
+
                         /*if word is a class variable*/
                         else if ((funcClassVarIndex = isClassVar(funcClassVars, strings[j], funcClassVarsCnt)) != -1)
                         {
-                            /*fprintf(toWrite, "%s%s", spacing[j],strings[j]);*/
+                            fprintf(toWrite, "%s%s", spacing[j],strings[j]);
 
                             int f = 0;
                             int g = 0;
@@ -322,8 +439,8 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                                         {
                                             if (strcmp(oldFunctionNames[g], strings[j+2]) == 0)
                                             {
-                                                fprintf(toWrite, ".%s" , newFunctionNames[g]);
-                                                j += 2;
+                                                fprintf(toWrite, ".%s%s&%s, " , newFunctionNames[g], strings[j+3], strings[j]);
+                                                j += 3;
                                                 break;
                                             }
                                             g++;
@@ -338,22 +455,25 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                             fprintf(toWrite, "%s%s", spacing[j],strings[j]);
                     }
                     k++;
+
+                    destroyArray(localFuncClassVars, 250);
                 }
 
                 /*printing out constructors*/
                 if (nameIndex != functionNamesRowCnt && nameIndex+1 != functionNamesRowCnt)
                 {
-                    fprintf(toWrite, "\n\tvoid constructor%s (struct * %s tempStruct) {\n", className, className);
+                    fprintf(toWrite, "\n\tvoid constructor%s (struct %s *tempStruct) {\n", className, className);
                     for (k = nameIndex; k < functionNamesRowCnt; k++)
                     {
                         if (strstr(newFunctionNames[k], "class") == NULL)
-                            fprintf(toWrite, "\t\ttempStruct->%s = &%s;\n", newFunctionNames[k], newFunctionNames[k]);
+                            fprintf(toWrite, "\t\ttempStruct->%s = %s;\n", newFunctionNames[k], newFunctionNames[k]);
                     }
                     fprintf(toWrite, "\t}\n");
                 }
                 destroyArray(functions, functionRows);
                 destroyArray(funcClassVarsClasses, 100);
                 destroyArray(funcClassVars, 100);
+                
                 functionRowCnt = 0;
                 functions = NULL;
 
@@ -426,6 +546,40 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                 fprintf(toWrite, "%s%s", spacing[i], strings[i]);  
         }
         
+        /*else if a class variable is found*/
+        else if (inClass == 1 && isKeyword(strings[i]) == 1 && strcmp(strings[i+2], "(") != 0)
+        {
+            printf("Class var found: %s\n", strings[i+1]);
+            fprintf(toWrite, "%s%s", spacing[i], strings[i]);
+            strcpy(localClassVars[localClassVarsCnt], strings[i+1]);
+            localClassVarsCnt++;
+
+            if (strcmp(strings[i+2], ",") == 0)
+            {
+                int v = i +3;
+                while (strcmp(strings[v], ";") != 0)
+                {
+                    if (strcmp(strings[v], "") == 0)
+                        v++;
+                    printf("Class var found: |%s|\n", strings[v]);
+                    strcpy(localClassVars[localClassVarsCnt], strings[v]);
+                    localClassVarsCnt++;
+                    v++;
+
+                    if (strcmp(strings[v], ",") == 0 || strcmp(strings[v], "") == 0)
+                    {
+                        v++;
+                        if (strcmp(strings[v], "") == 0)
+                            v++;
+                    }
+
+                }
+            }
+
+            int f = 0;
+            for (f = 0; f < localClassVarsCnt; f++)
+                printf("%s\n", localClassVars[f]);
+        }
         /*else just print out spacing and string normally*/
         else
             fprintf(toWrite, "%s%s", spacing[i], strings[i]);
@@ -444,12 +598,14 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                     if (strstr(oldFunctionNames[f], classVarsClasses[classVarIndex]) != NULL && strstr(oldFunctionNames[f], "class ") != NULL)
                     {
                         g = f+1;
-                        while (strstr(oldFunctionNames[g], "class ") == NULL)
+                        while (strstr(oldFunctionNames[g], "class ") == NULL && g < functionNamesRowCnt)
                         {
                             if (strcmp(oldFunctionNames[g], strings[i+2]) == 0)
                             {
-                                fprintf(toWrite, ".%s" , newFunctionNames[g]);
-                                i += 2;
+                                fprintf(toWrite, ".%s%s&%s" , newFunctionNames[g], strings[i+3], strings[i]);
+                                if (strcmp(strings[i+4], ")") != 0)
+                                    fprintf(toWrite, ", ");
+                                i += 3;
                                 break;
                             }
                             g++;
@@ -465,18 +621,20 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
     destroyArray(newFunctionNames, functionNamesRows);
     destroyArray(classVars, 100);
     destroyArray(classVarsClasses, 100);
+    destroyArray(localClassVars, 500);
     fclose(toWrite);
     return 0;
 }
 
 /*function to rename functions inside classes*/
-char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int funcStart, char className[])
+char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int funcStart, char* className)
 {
     /*mallocing for new name*/
     char* newName = malloc(sizeof(char) * 1000);
     strcpy(newName, "");
     char temp[2] = "";
-    char params[1000] = "(";
+    char params[1000];
+    sprintf(params, "(struct %s*", className);
     char* tempName = malloc(sizeof(char) * 1000);
     strcpy(tempName, "");
     int countCpy = count-2;
@@ -497,6 +655,8 @@ char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int 
         funcStart++;
     }
 
+    if (strcmp(strings[funcStart+2], ")") != 0)
+        strcat(params, ", ");
 
     strcpy(tempName, strings[funcStart]);
 
@@ -626,4 +786,61 @@ int isClassVar (char** classVars, char* string, int classVarsCnt)
     }
 
     return -1;
+}
+
+int isLocalClassVar (char** localClassVars, int localClassVarsCnt, char* string, char* className)
+{
+    int i = 0;
+
+    for (i = 0; i < localClassVarsCnt; i++)
+    {
+        /*
+        if (strstr(localClassVars[i], "class ") != NULL && strstr(localClassVars[i], className) != NULL)
+        {
+            int j = i+1;
+            while (strstr(localClassVars[j], "class ") == NULL && j < localClassVarsCnt)
+            {
+                if (strcmp(localClassVars[j], string) == 0)
+                {
+                    printf("returning %d\n", j);
+                    return j;
+                }
+            }
+        }*/
+
+        if (strcmp(localClassVars[i], string) == 0)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+char** createTempClassVarsList(char** localClassVars, int localClassVarsCnt, char* className)
+{
+    int i = 0; 
+    int startIndex = 0;
+    int endIndex = 0;
+    char** tempList = initArray(250, 250);
+    int tempListCnt = 0;
+    for (i = 0; i < localClassVarsCnt; i++)
+    {
+        if (strstr(localClassVars[i], "class ") != NULL && strstr(localClassVars[i], className) != NULL)
+        {
+            startIndex = i;
+
+            int j = i+1;
+            while (strstr(localClassVars[j], "class ") == NULL && j < localClassVarsCnt)
+            {
+                strcpy(tempList[tempListCnt], localClassVars[j]);
+                tempListCnt++;
+                j++;
+            }
+
+            return tempList;
+        }
+    }
+
+    return NULL;
 }

@@ -134,7 +134,7 @@ class E myE;
    name = malloc(sizeof(char)*100);
 
    myA.a = 5;
-   myA.a = 10;
+   myA.aa = 10;
    printf("output should be 15: ");
    myA.add();
 

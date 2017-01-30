@@ -24,8 +24,14 @@ int isKeyword (char * word);
 int printToFile (char* fileName, char** spacing, char** strings, int rowCnt);
 
 /*function to rename functions inside classes*/
-char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int funcStart, char className[]);
+char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int funcStart, char* className);
 
 /*function to check if a string is a class variable*/
 int isClassVar (char** classVars, char* string, int classVarsCnt);
+
+/*function to check if a string is a local class variable*/
+int isLocalClassVar (char** localClassVars, int localClassVarsCnt, char* string, char* className);
+
+/*function to copy all local class variables for a specific class to a new list*/
+char** createTempClassVarsList(char** localClassVars, int localClassVarsCnt, char* className);
 #endif

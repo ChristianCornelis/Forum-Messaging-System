@@ -4,14 +4,14 @@
 
 int a;
 
-	/* /different ways to access variables */
+	/* different ways to access variables */
 class A {
 int a;
-   int print1 (int* a, char* mysus, unsigned long long int c) {
+   void print1(int a) {
 		// print parameter - local to the function
       printf("output should be 1: %d\n", a);
    }
-   void print2(struct myStruct *b) {
+   void print2() {
 		// create a local variable
       int a = 2;
 		// print local variable
@@ -32,7 +32,7 @@ class B {
    }
 };
 
-	// simple function outside of a class
+	// simple function outside of a class 
 float product(float a, float b) {
    return( a*b );
 }
@@ -43,8 +43,9 @@ int main(int argc, char *argv[]) {
 class A myA;
 class B myB;
 int value;
+char str[100];
 
-   printf("Hello    \" there\n");
+   printf("Hello \" there\n");
    strcpy(str, "A string containing the word class may be tricky");
 
    a = 4;
@@ -57,3 +58,4 @@ int value;
    myB.print4();
 
 }
+
