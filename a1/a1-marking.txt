@@ -1,0 +1,32 @@
+CIS*2750 Assignment 1
+Marking Scheme
+Marked out of 10.
+
+Test Cases
+
+**** Fail test 1                      ****  -1
+**** Success test 2
+**** Success test 3
+**** Success test 4
+**** Success test 5
+**** Fail test 6                      ****  -1
+**** Success test 7
+**** Fail test 8                      ****  -1
+**** Fail test 9                      ****  -1
+**** Fail test 10                      ****  -1
+
+
+General Assignment Requirements
+-1  Specification not followed.
+-1  Poor formatting or variable names in source code.
+
+
+Submission and Documentation
+-1   Assignment not submitted correctly -in a subdirectory or named incorrectly.
+-1   File not submitted as a tar file - submitted as a zip file.
+-1   Documentation not included, name or ID missing from documentation file.
+-2   Program segmentation faults at any time.
+-10  Code doesn't compile.
+
+Total
+

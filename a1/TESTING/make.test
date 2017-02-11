@@ -1,0 +1,45 @@
+
+
+all: test1 test2 test3 test4 test5 test6 test7 test8 test9 test10
+
+test1:
+	./a1 test1.cc; \
+	gcc test1.c -o test1
+
+test2:
+	./a1 test2.cc; \
+	gcc test2.c -o test2
+
+test3:
+	./a1 test3.cc; \
+	gcc test3.c -o test3
+
+test4:
+	./a1 test4.cc; \
+	gcc test4.c -o test4
+
+test5:
+	./a1 test5.cc; \
+	gcc test5.c -o test5
+
+test6:
+	./a1 test6.cc; \
+	gcc test6.c -o test6
+
+test7:
+	./a1 test7.cc; \
+	gcc test7.c -o test7
+
+test8:
+	./a1 test8.cc; \
+	gcc test8.c -o test8
+
+test9:
+	./a1 test9.cc; \
+	gcc test9.c -o test9
+
+test10:
+	./a1 test10.cc; \
+	gcc test10.c -o test10
+
+
