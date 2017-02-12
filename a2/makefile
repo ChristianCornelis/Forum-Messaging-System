@@ -1,4 +1,4 @@
-all: a1 addAuthor
+all: a1 addAuthor post.c post
 
 a1: parser.c helperFunctions.c helperFunctions.h
 	gcc -Wall -ansi parser.c helperFunctions.c -g -o a1
@@ -12,6 +12,15 @@ libstream.a: stream.c stream.h helperFunctions.h
 addAuthor.o: addAuthor.c helperFunctions.h stream.h
 	gcc -Wall -ansi -c addAuthor.c -o addAuthor.o
 
+post.c: a1 post.cc
+	./a1 post.cc
+
+post: post.o helperFunctions.h stream.h
+	gcc -Wall -ansi post.o helperFunctions.c -o post -lstream -L.
+
+post.o: post.c helperFunctions.h stream.h
+	gcc -Wall -ansi -c post.c -o post.o
+	
 clean:
 	rm *.o
 	

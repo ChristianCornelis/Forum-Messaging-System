@@ -123,6 +123,8 @@ int isKeyword (char * word)
         return 1;
     else if (strcmp(word, "float") == 0)
         return 1;
+    else if (strcmp(word, "userPost*") == 0)
+        return 1;
     else if (strcmp(word, "struct") == 0)
         return 2;
     else if (strcmp(word, "*") == 0)
@@ -456,7 +458,11 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                                         {
                                             if (strcmp(oldFunctionNames[g], strings[j+2]) == 0)
                                             {
-                                                fprintf(toWrite, ".%s%s&%s, " , newFunctionNames[g], strings[j+3], strings[j]);
+                                                /*if function takes more than one parameter*/
+                                                if (strstr(newFunctionNames[g], "_") != NULL || strstr(newFunctionNames[g], "C") != NULL)
+                                                    fprintf(toWrite, ".%s%s&%s, " , newFunctionNames[g], strings[j+3], strings[j]);
+                                                else
+                                                   fprintf(toWrite, ".%s%s&%s" , newFunctionNames[g], strings[j+3], strings[j]); 
                                                 j += 3;
                                                 break;
                                             }
@@ -689,7 +695,6 @@ char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int 
         /*if word is a type, followed by two *'s*/
         if (isKeyword(strings[count]) == 1 && isKeyword(strings[count+1]) == 3 && isKeyword(strings[count+2]) == 3)
         {
-            printf("YES****************************\n");
             fprintf(toWrite, "%c", strings[count][0]-32);
             temp[0] = strings[count][0]-32;
             strcat(newName, temp);

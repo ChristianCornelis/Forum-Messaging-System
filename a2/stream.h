@@ -9,6 +9,8 @@ February 19th, 2016       Assignment 2
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
 struct userPost {
     char * username;
     char * streamname;
