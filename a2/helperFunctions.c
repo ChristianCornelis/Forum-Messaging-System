@@ -124,7 +124,7 @@ int isKeyword (char * word)
     else if (strcmp(word, "float") == 0)
         return 1;
     else if (strcmp(word, "userPost*") == 0)
-        return 1;
+        return 7;
     else if (strcmp(word, "struct") == 0)
         return 2;
     else if (strcmp(word, "*") == 0)
@@ -431,8 +431,11 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                             {
                                 strcpy(localFuncClassVars[localClassVarIndex], "");
                             }
-                            if (strcmp(localFuncClassVars[localClassVarIndex], "") != 0)
+                            if (strcmp(localFuncClassVars[localClassVarIndex], "") != 0 && strcmp(localFuncClassVars[localClassVarIndex], "*") != 0)
+                            {
+                                printf("STRING: %s\n", localFuncClassVars[localClassVarIndex]);
                                 fprintf(toWrite, "classVarStruct->");
+                            }
                             fprintf(toWrite, "%s",strings[j]);
 
                             

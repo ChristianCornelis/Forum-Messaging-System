@@ -31,11 +31,18 @@ class PostEntry
         userPost * toReturn = malloc(sizeof(userPost));
 
         /*mallocing for strings inside struct*/
-        toReturn->username      = malloc(sizeof(char) * (strlen(username) +1));
-        toReturn->streamname    = malloc(sizeof(char) * (strlen(streamname) +1));
-        toReturn->date          = malloc(sizeof(char) * (strlen(date) + 1));
-        toReturn->text          = malloc(sizeof(char) * (strlen(text) + 1));
+        /*toReturn->username      = malloc(sizeof(char) * (sizeof(username) +1));
+        toReturn->streamname    = malloc(sizeof(char) * (sizeof(streamname) +1));
+        toReturn->date          = malloc(sizeof(char) * (sizeof(date) + 1));
+        toReturn->text          = malloc(sizeof(char) * (sizeof(text) + 1));*/
 
+        /*mallocing for strings inside struct*/
+        toReturn->username      = initString(300);
+        toReturn->streamname    = initString(300);
+        toReturn->date          = initString(300);
+        toReturn->text          = initString(10000);
+
+        printf("username: %d\n", sizeof(username));
         /*copying strings to struct*/
         strcpy(toReturn->username, username);
         strcpy(toReturn->streamname, streamname);
@@ -99,12 +106,14 @@ class a
         /*getting user data*/
         char* data = pe.readInput();
         char* stream = initString(1000);
-        stream = strtok(temp, " ");
+        stream = strtok(stream, " ");
         char* text = initString(10000);
         text = strtok(data, "\0");
         char* time = pe.getDateTime();
 
         userPost* post = pe.formatEntry(userName, stream, time, text);
+
+        printf("stream: %s\n", post->streamname);
         return;
     }
 };
