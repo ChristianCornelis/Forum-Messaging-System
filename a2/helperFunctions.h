@@ -14,6 +14,12 @@ January 29th, 2016        Assignment 1
 /*function to initialize a dynamically-allocated array based on size parameters */
 char ** initArray(int rows, int columns);
 
+/*function to initialize a string*/
+char* initString (int size);
+
+/*function to reset all characters in a string to '\0'*/
+char * clearString (char* toClear, int size);
+
 /*function to destroy a dynamically-allocated array*/
 int destroyArray(char ** toDestroy, int rows);
 

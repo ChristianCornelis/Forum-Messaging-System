@@ -36,6 +36,28 @@ char ** initArray(int rows, int columns)
     return array;
 }
 
+/*function to initialize a string*/
+char* initString (int size)
+{
+    char* string = malloc(sizeof(char) * size);
+
+    int i = 0;
+    for (i = 0; i < size; i++)
+        string[i] = '\0';
+
+    return string;
+}
+
+/*function to reset all characters in a string to '\0'*/
+char * clearString (char* toClear, int size)
+{
+    int i;
+
+    for (i = 0; i < size; i++)
+        toClear[i] = '\0';
+
+    return toClear;
+}
 /*function to free all memory allocated for a 2D string array*/
 int destroyArray(char ** toDestroy, int rows)
 {
