@@ -57,6 +57,7 @@ int main(int argc, char const *argv[])
     int j = 0;
     int k = 0;
 
+    /*iterate through user input and break it up into the separate streams*/
     while (streams[j] != '\0')
     {
         /*if comma or null terminator is reached, then add the stream name to the list*/
@@ -79,17 +80,13 @@ int main(int argc, char const *argv[])
         j++;
     }
 
-    int b = 0;
-
-    for (b = 0; b < streamListCnt; b++)
-        printf("Stream: %s\n", streamList[b]);
-
     /*freeing unneeded variables*/
     free(indivStream);
     free(streams);
 
-    char* fileName = initString(100);
-
+    char* fileName = initString(255);
+    strcpy(fileName, "messages/");
+    /*iterating through the list of streams and adding or removing the author accordingly*/
     for (i = 0; i < streamListCnt; i++)
     {
         strcat(fileName, streamList[i]);
@@ -101,20 +98,41 @@ int main(int argc, char const *argv[])
             FILE* fptr = fopen(fileName, "a");
             fprintf(fptr, "%s 0\n", author);
             fclose(fptr);
+
+            char* fileName2 = initString(255);
+            char* fileName3 = initString(255);
+
+            strcpy(fileName2, "messages/");
+            strcat(fileName2, streamList[i]);
+            strcat(fileName2, "StreamData");
+
+            strcpy(fileName3, "messages/");
+            strcat(fileName3, streamList[i]);
+            strcat(fileName3, "Stream");
+            FILE* streamData = fopen(fileName2, "w");
+            FILE* stream = fopen(fileName3, "w");
+
+            fclose(streamData);
+            fclose(stream);
+            printf("%s was successfully added to the %s stream.\n", author, streamList[i]);
         }
         /*else if the author IS in the streams user file already and the author is to be removed*/
         else if (checkAuthorExists(author, fileName) == 1 && isRemovable == 1)
         {
             char** fileAuthors = initArray(100, 300);
             removeAuthor(author, fileName);
+            printf("%s was successfully removed from the %s stream.\n", author, streamList[i]);
         }
-        else if (checkAuthorExists(author, fileName) == -1 && isRemovable == -1)
+        else if (checkAuthorExists(author, fileName) == -1 && isRemovable == 1)
             printf("%s is not currently in the %s stream and cannot be removed from it.\n", author, streamList[i]);
+        else
+            printf("%s is already in the %s stream.\n", author, streamList[i]);
 
-        printf("exists: %d\n", checkAuthorExists(author, fileName));
-        fileName = clearString(fileName, 100);
+        /*clearing the fileName string to avoid issues with strcat*/
+        fileName = clearString(fileName, 255);
     }
 
+    /*freeing all malloc'd memory*/
     destroyArray(streamList, 50);
     free(author);
     free(fileName);    
@@ -156,14 +174,16 @@ void removeAuthor(char* author, char* fileName)
     char** authors = initArray(100, 300);
     int authorsCnt = 0;
     char line[255] = "";
+    char temp[255] = "";
 
     /*parse the file and compare all author names in it to the removeable author's name*/
     while (fgets(line, 255, fptr) != NULL)
     {
-        char* name = strtok(line, " ");
+        strcpy(temp, line);
+        char* name = strtok(temp, " ");
 
         /*if the name on the line is not the authors, add it to the array*/
-        if (strcmp(name, author) != 0)
+        if (strcmp(name, author) != 0 && strcmp(name, "\n") != 0)
         {
             strcpy(authors[authorsCnt], line);
             authorsCnt++;
@@ -176,7 +196,10 @@ void removeAuthor(char* author, char* fileName)
     fptr = fopen(fileName, "w");
     int i;
     for (i = 0; i < authorsCnt; i++)
-        fprintf(fptr, "%s\n", authors[i]);
+    {
+        if (strcmp(authors[i], "") != 0)
+            fprintf(fptr, "%s", authors[i]);
+    }
 
     fclose(fptr);
     destroyArray(authors, 100);

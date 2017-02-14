@@ -5,6 +5,9 @@
 struct A {
    int a;
 };
+	void constructorA (struct A *tempStruct) {
+	}
+
 
 
 

@@ -4,7 +4,7 @@ Marked out of 10.
 
 Test Cases
 
-**** Fail test 1                      ****  -1
+**** Success test 1
 **** Success test 2
 **** Success test 3
 **** Success test 4
