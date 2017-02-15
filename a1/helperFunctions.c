@@ -482,7 +482,8 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
             /*finding index of end bracket*/
             while(strcmp(strings[count], ")") != 0)
                 count++;
-
+            int funcBraceCount = 0;
+            int funcCloseBraceCount = 0;
 
             /*if the a function-starting brace is close by*/
             if (strcmp(strings[count+1], "{") == 0 || strcmp(strings[count+2], "{") == 0)
@@ -508,9 +509,14 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                         funcStart--;
 
                     funcEnd = funcStart;
-                    while ((strcmp(strings[funcEnd], "}") != 0))
+
+                    while ((funcBraceCount != funcCloseBraceCount)|| strcmp(strings[funcEnd], "}")!= 0)
                     {
                         funcEnd++;
+                        if (strcmp(strings[funcEnd], "}") == 0)
+                            funcCloseBraceCount++;
+                        else if (strcmp(strings[funcEnd], "{") == 0)
+                            funcBraceCount++;
                     }
                     sprintf(tempSize, "%d", funcStart);
                     strcpy(functions[functionRowCnt], tempSize);

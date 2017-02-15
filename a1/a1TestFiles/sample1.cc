@@ -7,8 +7,12 @@ int a;
 	/* different ways to access variables */
 class A {
 int a;
-   void print1(int a) {
+   int print1(int a) {
 		// print parameter - local to the function
+   	if (a < 0)
+   	{
+   		printf("ay lmao");
+   	}
       printf("output should be 1: %d\n", a);
    }
    void print2() {

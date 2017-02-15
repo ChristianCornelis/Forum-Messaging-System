@@ -6,7 +6,9 @@ February 19th, 2016       Assignment 2
 
 #ifndef __CCORNELI_STREAM_H__
 #define __CCORNELI_STREAM_H__
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 struct userPost {
     char * username;
     char * streamname;
@@ -15,6 +17,8 @@ struct userPost {
 }; typedef struct userPost userPost;
 
 void updateStream (struct userPost * st);
-void addUser(char * username, char * list);
+void addUser(char * username, char * list, int isRemovable);
 void removeUser(char * username, char * list);
+/*function to check if an author is already present in a stream's file*/
+int checkAuthorExists(char* author, char* fileName);
 #endif
