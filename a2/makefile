@@ -1,5 +1,7 @@
-all: addAuthor
+all: a1 addAuthor
 
+a1: parser.c helperFunctions.c helperFunctions.h
+	gcc -Wall -ansi parser.c helperFunctions.c -g -o a1
 addAuthor: addAuthor.o libstream.a helperFunctions.c
 	gcc addAuthor.o helperFunctions.c -o addAuthor -lstream -L.
 

@@ -474,16 +474,15 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                 }
 
                 /*printing out constructors*/
-                if (nameIndex != functionNamesRowCnt && nameIndex+1 != functionNamesRowCnt)
+                
+                fprintf(toWrite, "\n\tvoid constructor%s (struct %s *tempStruct) {\n", className, className);
+                for (k = nameIndex; k < functionNamesRowCnt; k++)
                 {
-                    fprintf(toWrite, "\n\tvoid constructor%s (struct %s *tempStruct) {\n", className, className);
-                    for (k = nameIndex; k < functionNamesRowCnt; k++)
-                    {
-                        if (strstr(newFunctionNames[k], "class") == NULL)
-                            fprintf(toWrite, "\t\ttempStruct->%s = %s;\n", newFunctionNames[k], newFunctionNames[k]);
-                    }
-                    fprintf(toWrite, "\t}\n");
+                    if (strstr(newFunctionNames[k], "class") == NULL)
+                        fprintf(toWrite, "\t\ttempStruct->%s = %s;\n", newFunctionNames[k], newFunctionNames[k]);
                 }
+                fprintf(toWrite, "\t}\n");
+                
                 destroyArray(functions, functionRows);
                 destroyArray(funcClassVarsClasses, 100);
                 destroyArray(funcClassVars, 100);
@@ -518,6 +517,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
             /*if in a class, and a function is being defined*/
             if (inClass == 1 && isFunc == 1)
             {
+                printf("IN A FUNCTION*******************************************\n");
                 funcStart = 0;
                 funcEnd = 0;
                 fprintf(toWrite, "%s(*%s%s", spacing[i], className, strings[i]);
