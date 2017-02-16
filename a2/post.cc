@@ -35,10 +35,10 @@ class PostEntry
 
 class a
 {
-    void getInfo(int argc, char const * argv[])
+    void getInfo(int argc, char** argv)
     {
         int i;
-        if (argc > 2)
+        if (argc < 2)
         {
             printf("Error: Not enough arguments.\nExitting.\n");
         }
@@ -55,9 +55,12 @@ class a
 };
 int main(int argc, char const *argv[])
 {
+    int i = 0;
     class a myA;
     int newArgc = argc;
-    char** newArgv = &argv;
-    myA.getInfo(newArgc, &newArgv);
+    char** newArgv = initArray(argc, 255);
+    for (i = 0; i < argc; i++)
+        strcpy(newArgv[i], argv[i]);
+    myA.getInfo(newArgc, newArgv);
     return 0;
 }

@@ -133,6 +133,8 @@ int isKeyword (char * word)
         return 4;
     else if (strstr(word, "*") != NULL)
         return 5;
+    else if (strcmp(word, "char**") == 0)
+        return 6;
 
     return 0;
 }
@@ -482,7 +484,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                         fprintf(toWrite, "\t\ttempStruct->%s = %s;\n", newFunctionNames[k], newFunctionNames[k]);
                 }
                 fprintf(toWrite, "\t}\n");
-                
+
                 destroyArray(functions, functionRows);
                 destroyArray(funcClassVarsClasses, 100);
                 destroyArray(funcClassVars, 100);
@@ -517,7 +519,6 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
             /*if in a class, and a function is being defined*/
             if (inClass == 1 && isFunc == 1)
             {
-                printf("IN A FUNCTION*******************************************\n");
                 funcStart = 0;
                 funcEnd = 0;
                 fprintf(toWrite, "%s(*%s%s", spacing[i], className, strings[i]);
