@@ -184,6 +184,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
     }
     for (i = 0; i < rowCnt; i++)
     {
+
         isFunc = 0;
         /*if encountering string "class"*/
         if (strcmp(strings[i], "class") == 0 && strcmp(strings[i+2], "{") == 0)
@@ -548,7 +549,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                     strcpy(functions[functionRowCnt], tempSize);
                     functionRowCnt++;
 
-
+                    /*building new function name*/
                     int count = i+2;
                     newName = renameFuncs(strings, spacing, count, toWrite, funcStart, className);
                     strcpy(newFunctionNames[functionNamesRowCnt], newName);
@@ -685,8 +686,20 @@ char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int 
     /*while the end bracket for parameter list is not found*/
     while (strcmp(strings[count],")") != 0)
     {
+        /*if word is a type, followed by two *'s*/
+        if (isKeyword(strings[count]) == 1 && isKeyword(strings[count+1]) == 3 && isKeyword(strings[count+2]) == 3)
+        {
+            printf("YES****************************\n");
+            fprintf(toWrite, "%c", strings[count][0]-32);
+            temp[0] = strings[count][0]-32;
+            strcat(newName, temp);
+            strcat(params, strings[count]);
+            strcat(params, "*");
+            strcat(params, "*");
+            count+=2;
+        }
         /*if word is a type, check if other words following are types*/
-        if (isKeyword(strings[count]) == 1)
+        else if (isKeyword(strings[count]) == 1)
         {
             /*if next keyword contains a '*' */
             if (isKeyword(strings[count+1]) == 3  || isKeyword(strings[count+1]) == 4)

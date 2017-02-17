@@ -17,7 +17,7 @@ class PostEntry
             strcat(text, line);
         }
 
-
+        return NULL;
     }
     void formatEntry()
     {
@@ -51,6 +51,8 @@ class a
                 exit(1);
             }
         }
+
+        return;
     }
 };
 int main(int argc, char const *argv[])

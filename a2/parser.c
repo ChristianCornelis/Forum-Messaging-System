@@ -308,9 +308,9 @@ int main(int argc, char *argv[])
         }
         character = getc(ccFile);
     }
-    int i = 0;
+    /*int i = 0;
     for (i = 0; i < rowCnt; i++)
-        printf("|%s|\n", stringArray[i]);
+        printf("|%s|\n", stringArray[i]);*/
     printToFile(argv[1], spacingArray, stringArray, rowCnt);
     destroyArray(stringArray, rows);
     destroyArray(spacingArray, rows);
