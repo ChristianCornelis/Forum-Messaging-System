@@ -32,7 +32,6 @@ char ** initArray(int rows, int columns)
             array[i][j] = (char)0;
         }
     }
-
     return array;
 }
 
@@ -123,7 +122,7 @@ int isKeyword (char * word)
         return 1;
     else if (strcmp(word, "float") == 0)
         return 1;
-    else if (strcmp(word, "userPost*") == 0)
+    else if (strcmp(word, "userPost") == 0)
         return 7;
     else if (strcmp(word, "struct") == 0)
         return 2;
@@ -462,7 +461,7 @@ int printToFile (char* fileName, char** spacing, char** strings, int rowCnt)
                                             if (strcmp(oldFunctionNames[g], strings[j+2]) == 0)
                                             {
                                                 /*if function takes more than one parameter*/
-                                                if (strstr(newFunctionNames[g], "_") != NULL || strstr(newFunctionNames[g], "C") != NULL)
+                                                if (strstr(newFunctionNames[g], "_") != NULL || strstr(newFunctionNames[g], "C") != NULL || strstr(newFunctionNames[g], "U") != NULL)
                                                     fprintf(toWrite, ".%s%s&%s, " , newFunctionNames[g], strings[j+3], strings[j]);
                                                 else
                                                    fprintf(toWrite, ".%s%s&%s" , newFunctionNames[g], strings[j+3], strings[j]); 
@@ -786,6 +785,16 @@ char* renameFuncs(char** strings, char** spacing, int count, FILE* toWrite, int 
             strcat(newName, temp);
             strcat(params, strings[count]);
             count+= 2;
+        }
+        /*else if the keyword is userPost* */
+        else if (isKeyword(strings[count]) == 7 && isKeyword(strings[count+1]) == 3)
+        {
+            fprintf(toWrite, "%c", strings[count][0] - 32);
+            temp[0] = strings[count][0]-32;
+            strcat(newName, temp);
+            strcat(params, strings[count]);
+            strcat(params, "*");
+            count+=2;
         }
         else
             count += 1;

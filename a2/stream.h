@@ -10,6 +10,9 @@ February 19th, 2016       Assignment 2
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 struct userPost {
     char * username;
@@ -18,9 +21,19 @@ struct userPost {
     char * text;
 }; typedef struct userPost userPost;
 
+
+/*function to add a new posting to a specific stream*/
 void updateStream (struct userPost * st);
+
+/*function to add a user to a list of streams*/
 void addUser(char * username, char * list, int isRemovable);
+
+/*function to remove a user from a stream*/
 void removeUser(char * username, char * list);
+
 /*function to check if an author is already present in a stream's file*/
 int checkAuthorExists(char* author, char* fileName);
+
+/*function to free all memory for a user post struct*/
+void destroyStruct(userPost* toDestroy);
 #endif

@@ -15,10 +15,15 @@ int main(int argc, char const *argv[])
         printf("Error: An author ID must be inputted to be removed.\nExitting\n");
         return 1;
     }
-    else if (argc > 3)
+
+    int j = 0;
+    for (j = 0; j < argc; j++)
     {
-        printf("Error: Too many arguments present.\nExitting\n");
-        return 1;
+        if ((strcmp(argv[j], "-r") == 0) && (j != 1 && j != argc-1))
+        {
+            printf("Error: The -r flag can only be before or after a username.\nExitting.\n");
+            exit(1);
+        }
     }
 
     int a;
@@ -38,6 +43,12 @@ int main(int argc, char const *argv[])
         }
         else
             strcat(author, argv[i]);
+
+        if (argc > 2 && i + 1 != argc)
+        {
+            if (strcmp(argv[i+1], "-r") != 0 && strcmp(argv[i], "-r") != 0)
+                strcat(author, " ");
+        }
         i++;
     }
 

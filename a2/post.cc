@@ -3,27 +3,49 @@
 
 class PostEntry
 {
-    char* readInput()
+    char* readInput(char* username)
     {
         printf("\nstream: ");
         char * stream = initString(1000);
 
         fgets(stream, 1000, stdin);
-        
-        char line[500];
+        char* line = initString(500);
         char* text = initString(10000);
-        strcpy(text, stream);
-        strcat(text, " ");
+        strcpy(text, stream); 
+        stream[strlen(stream)-1] = '\0';
+        char* filename = initString(1000);
 
+        /*if messages folder does not exist, then create it*/
+        if (!opendir("messages"))
+        {
+            mkdir("messages/", 0777);
+        }
+        strcpy(filename,"messages/");
+        strcat(stream, "StreamUsers");
+        strcat(filename, stream);
+
+        /*if the user is not permitted to add to the stream, then print an error message and don't accept user input*/
+        if (checkAuthorExists(username, filename) == 0)
+        {
+            printf("Error: This user does not have permission to post in this stream.\nUse the addauthor program to gain permission to post to this stream.\n");
+            free(stream);
+            free(filename);
+            free(line);
+            text = clearString(text, 10000);
+            return text;
+        }
         /*prompting user for text and reading it in until CTRL + d is entered*/
         printf("enter text: ");
         while(fgets(line, 500, stdin) != NULL)
         {
             printf("-");
             strcat(text, line);
+            clearString(line, 500);
         }
 
         free(stream);
+        free(filename);
+        free(line);
         return text;
     }
     userPost* formatEntry(char* username, char* streamname, char* date, char* text)
@@ -31,18 +53,11 @@ class PostEntry
         userPost * toReturn = malloc(sizeof(userPost));
 
         /*mallocing for strings inside struct*/
-        /*toReturn->username      = malloc(sizeof(char) * (sizeof(username) +1));
-        toReturn->streamname    = malloc(sizeof(char) * (sizeof(streamname) +1));
-        toReturn->date          = malloc(sizeof(char) * (sizeof(date) + 1));
-        toReturn->text          = malloc(sizeof(char) * (sizeof(text) + 1));*/
-
-        /*mallocing for strings inside struct*/
         toReturn->username      = initString(300);
         toReturn->streamname    = initString(300);
         toReturn->date          = initString(300);
         toReturn->text          = initString(10000);
 
-        printf("username: %d\n", sizeof(username));
         /*copying strings to struct*/
         strcpy(toReturn->username, username);
         strcpy(toReturn->streamname, streamname);
@@ -61,13 +76,14 @@ class PostEntry
         time_t t = time(NULL);
         struct tm* tm = localtime(&t);
         char* timeString = malloc(sizeof(char)*100);
-        strftime(timeString, sizeof(timeString), "%c", tm);
+        sprintf(timeString, "%d %d %d %d:%d:%d", tm->tm_year + 1900, tm->tm_mon+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
 
         return timeString;
     }
 
-    void submitPost()
+    void submitPost(userPost* up)
     {
+        updateStream(up);
         return;
     }   
 };
@@ -95,8 +111,7 @@ class a
             else
             {
                 strcat(userName, argv[i]);
-
-                if (argv[i+1] != NULL)
+                if (argc > 2 && i + 1 != argc)
                     strcat(userName, " ");
             }
         }
@@ -104,16 +119,29 @@ class a
         class PostEntry pe;
 
         /*getting user data*/
-        char* data = pe.readInput();
-        char* stream = initString(1000);
-        stream = strtok(stream, " ");
-        char* text = initString(10000);
-        text = strtok(data, "\0");
-        char* time = pe.getDateTime();
+        char* data = pe.readInput(userName);
+        
+        /*if the user has permission to post in the stream, then update the files necessary*/
+        if (strcmp(data, "") != 0)
+        {
+            char* stream = strtok(data, "\n");
+            char* text = strtok(NULL, "\0");
+            char* time = pe.getDateTime();
 
-        userPost* post = pe.formatEntry(userName, stream, time, text);
+            userPost* post = pe.formatEntry(userName, stream, time, text);
+            pe.submitPost(post);
+            free(data);
+            free(time);
+            free(userName);
 
-        printf("stream: %s\n", post->streamname);
+            destroyStruct(post);
+        }
+        /*else, free variables and exit*/
+        else
+        {
+            free(data);
+            free(userName);
+        }
         return;
     }
 };
@@ -126,7 +154,6 @@ int main(int argc, char const *argv[])
     for (i = 0; i < argc; i++)
         strcpy(newArgv[i], argv[i]);
     myA.getInfo(newArgc, newArgv);
-
     destroyArray(newArgv, argc);
 
 

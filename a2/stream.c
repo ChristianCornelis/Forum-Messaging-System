@@ -1,14 +1,74 @@
 #include "stream.h"
 #include "helperFunctions.h"
+
+/*function to add a new posting to a specific stream*/
 void updateStream (struct userPost * st)
 {
+    /*creating fileNames for opening*/
+    char* fileName = initString(255);
+    strcpy(fileName, "messages/");
+    strcat(fileName, st->streamname);
+    strcat(fileName, "StreamUsers");
+
+    char* fileName2 = initString(255);
+    strcpy(fileName2, "messages/");
+    strcat(fileName2, st->streamname);
+    strcat(fileName2, "StreamData");
+
+    char* fileName3 = initString(255);
+    strcpy(fileName3, "messages/");
+    strcat(fileName3, st->streamname);
+    strcat(fileName3, "Stream");
+
+    /*if the stream does not exist, make the files but do not add anything to them*/
+    if (checkAuthorExists(st->username, fileName) == -1)
+    {
+        printf("Error: Invalid stream name: Stream does not exist.\nStream files created.\nTo post to this stream, please use the addauthor program to gain permission to post to this stream\n");
+
+        /*creating files and closing immediately*/
+        FILE* streamsUsers = fopen(fileName, "w");
+        FILE* streamData = fopen(fileName2, "w");
+        FILE* stream = fopen(fileName3, "w");
+        fclose(streamsUsers);
+        fclose(streamData);
+        fclose(stream);
+    }
+    /*else if user does not have permission to post in the stream*/
+    else if (checkAuthorExists(st->username, fileName) == 0)
+        printf("Error: This user does not have permission to post in this stream.\nUse the addauthor program to gain permission to post to this stream.\n");
+
+    /*else if the user does have permission to post in the stream*/
+    else if (checkAuthorExists(st->username, fileName) == 1)
+    {
+        /*adding user post to the stream file*/
+        FILE* stream = fopen(fileName3, "a");
+        fprintf(stream, "Sender: %s\n", st->username);
+        fprintf(stream, "Data: %s\n", st->date);
+        fprintf(stream, "%s", st->text);
+        fclose(stream);
+
+        /*adding the size of the text post to the streamdata file*/
+        FILE* streamData = fopen(fileName2, "a");
+        fprintf(streamData, "%zd\n", strlen(st->text));
+        fclose(streamData);
+
+        printf("Post successfully added to the stream.\n");
+
+    }
+    else
+        printf("suys");
+    free(fileName);
+    free(fileName2);
+    free(fileName3);
+
     return;
 }
 
+/*function to add a user to a list of streams*/
 void addUser(char * username, char * list, int isRemovable)
 {
     int a = 0; 
-   char * indivStream = malloc(sizeof(char) *300);
+    char * indivStream = malloc(sizeof(char) *300);
     for (a = 0; a < 300; a++)
         indivStream[a] = '\0';
     char** streamList = initArray(50, 500);
@@ -42,6 +102,11 @@ void addUser(char * username, char * list, int isRemovable)
     /*freeing unneeded variables*/
     free(indivStream);
 
+    /*if messages folder does not exist, then create it*/
+    if (!opendir("messages"))
+    {
+        mkdir("messages/", 0777);
+    }
     int i = 0;
     /*iterating through the list of streams and adding or removing the author accordingly*/
     for (i = 0; i < streamListCnt; i++)
@@ -50,7 +115,6 @@ void addUser(char * username, char * list, int isRemovable)
         strcpy(fileName, "messages/");
         strcat(fileName, streamList[i]);
         strcat(fileName, "StreamUsers");
-        printf("CHECK: %d\n", checkAuthorExists(username, fileName));
         /*if the author is not in the streams user file already, then add the author name to it*/
         if ((checkAuthorExists(username, fileName) == 0 || checkAuthorExists(username, fileName) == -1) && isRemovable == 0)
         {
@@ -103,6 +167,7 @@ void addUser(char * username, char * list, int isRemovable)
     return;
 }
 
+/*function to remove a user from a stream*/
 void removeUser(char * username, char * list)
 {
     int a = 0;
@@ -142,6 +207,12 @@ void removeUser(char * username, char * list)
 
     int g = 0;
 
+    /*if messages folder does not exist, then create it*/
+    if (!opendir("messages"))
+    {
+        mkdir("messages/", 0777);
+    }
+
     for (g = 0; g < streamListCnt; g++)
     {
         char* fileName = initString(255);
@@ -159,7 +230,13 @@ void removeUser(char * username, char * list)
         while (fgets(line, 255, fptr) != NULL)
         {
             strcpy(temp, line);
-            char* name = strtok(temp, " ");
+
+            int index = strlen(temp) -1;
+            while (temp[index] != ' ')
+                index--;
+            temp[index] = '\0';
+            char name[255] = "";
+            strcpy(name, temp);
 
             /*if the name on the line is not the authors, add it to the array*/
             if (strcmp(name, username) != 0 && strcmp(name, "\n") != 0)
@@ -201,10 +278,17 @@ int checkAuthorExists(char* author, char* fileName)
         return -1;
     }
 
+    int index;
     /*go through the file and check if any of the user's names are the same as the author in question*/
     while (fgets(line, 255, fptr) != NULL)
     {
-        char* name = strtok(line, " ");
+        index = strlen(line) -1;
+        while (line[index] != ' ')
+            index--;
+        line[index] = '\0';
+        char name[255];
+        strcpy(name, line);
+
         /*if the authors name IS in the file already, return 1*/
         if (strcmp(author, name) == 0)
         {
@@ -215,4 +299,19 @@ int checkAuthorExists(char* author, char* fileName)
 
     fclose(fptr);
     return 0;
+}
+
+/*function to free all memory for a user post struct*/
+void destroyStruct(userPost* toDestroy)
+{
+    if (!toDestroy)
+        return;
+
+    free(toDestroy->username);
+    free(toDestroy->streamname);
+    free(toDestroy->date);
+    free(toDestroy->text);
+    free(toDestroy);
+
+    return;
 }
