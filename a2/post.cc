@@ -42,7 +42,6 @@ class PostEntry
             strcat(text, line);
             clearString(line, 500);
         }
-
         free(stream);
         free(filename);
         free(line);
@@ -124,12 +123,42 @@ class a
         /*if the user has permission to post in the stream, then update the files necessary*/
         if (strcmp(data, "") != 0)
         {
-            char* stream = strtok(data, "\n");
-            char* text = strtok(NULL, "\0");
+            printf("%s\n", data);
+            int k = 0;
+            int j = 0;
+            char* stream = initString(1000);
+            char* text = initString(10000);
+            while (data[k] != '\n')
+            {
+                stream[k] = data[k];
+                k++;
+            }
+            k++;
+
+            while(data[k] != '\0')
+            {
+                text[j] = data[k];
+                j++;
+                k++;
+            }
+            /*char* stream = strtok(data, "\n");
+            char* text = "\n";
+            int a = (int) strlen(stream) +1;
+            int b = 0;
+            printf("a %d\n", a);
+            while (data[a] != '\0')
+            {
+                text[b] = data[a];
+            }
+            printf("|%s|\n", data);*/
+            printf("stream; %s\n text: %s\n", stream, text);
+            /*char* text = strtok(NULL, "\0");*/
             char* time = pe.getDateTime();
 
             userPost* post = pe.formatEntry(userName, stream, time, text);
             pe.submitPost(post);
+            free(stream);
+            free(text);
             free(data);
             free(time);
             free(userName);

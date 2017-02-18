@@ -102,11 +102,13 @@ void addUser(char * username, char * list, int isRemovable)
     /*freeing unneeded variables*/
     free(indivStream);
 
+    DIR* dirPtr;
     /*if messages folder does not exist, then create it*/
-    if (!opendir("messages"))
+    if (!(dirPtr=opendir("messages")))
     {
         mkdir("messages/", 0777);
     }
+    free(dirPtr);
     int i = 0;
     /*iterating through the list of streams and adding or removing the author accordingly*/
     for (i = 0; i < streamListCnt; i++)
