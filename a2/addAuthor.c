@@ -60,6 +60,20 @@ int main(int argc, char const *argv[])
     printf("list streams: ");
     /*getting user-inputted streams*/
     fgets(streams, 1000, stdin);
+    if (strcmp(streams, "\n") == 0)
+    {
+        printf("Error: Invalid stream name.\nExitting");
+        free(streams);
+        free(author);
+        return 1;
+    }
+    else if (strstr(streams, " ") != NULL)
+    {
+        printf("Error: Stream names cannot contain spaces.\nExitting.");
+        free(streams);
+        free(author);
+        return 1;
+    }
     addUser(author, streams, isRemovable);
 
     return 0;

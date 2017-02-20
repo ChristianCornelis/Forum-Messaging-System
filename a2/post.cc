@@ -15,7 +15,8 @@ class PostEntry
         printf("\nstream: ");
         char * stream = initString(1000);
         fgets(stream, 1000, stdin);
-
+        if (strcmp(stream, "\n") == 0)
+            return stream;
         if (strstr(stream, " ") != NULL)
         {
             strcpy(stream, " ");
@@ -133,10 +134,18 @@ class a
 
         /*getting user data*/
         char* data = pe.readInput(userName);
-        
+        /*if the stream name contained a space*/
         if (strcmp(data, " ") == 0)
         {
             printf("Error: Stream name cannot contain a space.\nExitting\n");
+            free(data);
+            free(userName);
+            return;
+        }
+        /*if the user entered the newline as the stream*/
+        else if (strcmp(data, "\n") == 0)
+        {
+            printf("Error: Stream name cannot be a newline.\nExitting\n");
             free(data);
             free(userName);
             return;
@@ -156,25 +165,12 @@ class a
             }
             k++;
 
-            printf("STREAM: %s\n", stream);
             while(data[k] != '\0')
             {
                 text[j] = data[k];
                 j++;
                 k++;
             }
-            /*char* stream = strtok(data, "\n");
-            char* text = "\n";
-            int a = (int) strlen(stream) +1;
-            int b = 0;
-            printf("a %d\n", a);
-            while (data[a] != '\0')
-            {
-                text[b] = data[a];
-            }
-            printf("|%s|\n", data);*/
-            printf("stream; %s\n text: %s\n", stream, text); 
-            /*char* text = strtok(NULL, "\0");*/
             char* time = pe.getDateTime();
 
             userPost* post = pe.formatEntry(userName, stream, time, text);
@@ -190,6 +186,7 @@ class a
         /*else, free variables and exit*/
         else
         {
+            printf("Error: Stream cannot be NULL.\nExitting.");
             free(data);
             free(userName);
         }
