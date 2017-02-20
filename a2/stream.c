@@ -1,9 +1,23 @@
+/***************************************************
+Christian Cornelis        ccorneli@mail.uoguelph.ca
+CIS*2750                  ID# 0939357
+February 19th, 2017       Assignment 2
+***************************************************/
+
 #include "stream.h"
 #include "helperFunctions.h"
 
 /*function to add a new posting to a specific stream*/
 void updateStream (struct userPost * st)
 {
+    DIR* dirPtr;
+    /*if messages folder does not exist, then create it*/
+    if (!(dirPtr=opendir("messages")))
+    {
+        mkdir("messages/", 0777);
+    }
+    free(dirPtr);
+
     /*creating fileNames for opening*/
     char* fileName = initString(255);
     strcpy(fileName, "messages/");
@@ -32,6 +46,8 @@ void updateStream (struct userPost * st)
         fclose(streamsUsers);
         fclose(streamData);
         fclose(stream);
+
+        updateMasterList(st->streamname);
     }
     /*else if user does not have permission to post in the stream*/
     else if (checkAuthorExists(st->username, fileName) == 0)
@@ -49,14 +65,12 @@ void updateStream (struct userPost * st)
 
         /*adding the size of the text post to the streamdata file*/
         FILE* streamData = fopen(fileName2, "a");
-        fprintf(streamData, "%zd\n", strlen(st->text));
+        fprintf(streamData, "%zd\n", strlen(st->text) + strlen(st->date) + strlen(st->username) + 16);
         fclose(streamData);
 
         printf("Post successfully added to the stream.\n");
 
     }
-    else
-        printf("suys");
     free(fileName);
     free(fileName2);
     free(fileName3);
@@ -120,6 +134,8 @@ void addUser(char * username, char * list, int isRemovable)
         /*if the author is not in the streams user file already, then add the author name to it*/
         if ((checkAuthorExists(username, fileName) == 0 || checkAuthorExists(username, fileName) == -1) && isRemovable == 0)
         {
+            if (checkAuthorExists(username, fileName) == -1)
+                updateMasterList(streamList[i]);
             FILE* fptr = fopen(fileName, "a");
             fprintf(fptr, "%s 0\n", username);
             fclose(fptr);
@@ -315,5 +331,31 @@ void destroyStruct(userPost* toDestroy)
     free(toDestroy->text);
     free(toDestroy);
 
+    return;
+}
+
+/*function to update the master stream list if a new stream is created*/
+void updateMasterList(char* stream)
+{
+    DIR* dirPtr;
+    /*if messages folder does not exist, then create it*/
+    if (!(dirPtr=opendir("messages")))
+    {
+        mkdir("messages/", 0777);
+    }
+    free(dirPtr);
+
+    FILE* fptr;
+
+    if (!(fptr = fopen("messages/streamList", "r")))
+    {
+        fptr = fopen("messages/streamList", "w");
+    }
+    else
+        fptr = fopen("messages/streamList", "a");
+
+    fprintf(fptr, "%s\n", stream);
+
+    fclose(fptr);
     return;
 }

@@ -1,3 +1,9 @@
+/***************************************************
+Christian Cornelis        ccorneli@mail.uoguelph.ca
+CIS*2750                  ID# 0939357
+February 19th, 2017       Assignment 2
+***************************************************/
+
 #include "stream.h"
 #include "helperFunctions.h"
 
@@ -5,10 +11,16 @@ class PostEntry
 {
     char* readInput(char* username)
     {
+        /*getting user input for stream*/
         printf("\nstream: ");
         char * stream = initString(1000);
-
         fgets(stream, 1000, stdin);
+
+        if (strstr(stream, " ") != NULL)
+        {
+            strcpy(stream, " ");
+            return stream;
+        }
         char* line = initString(500);
         char* text = initString(10000);
         strcpy(text, stream); 
@@ -16,10 +28,12 @@ class PostEntry
         char* filename = initString(1000);
 
         /*if messages folder does not exist, then create it*/
-        if (!opendir("messages"))
+        DIR* dirPtr;
+        if (!(dirPtr=opendir("messages")))
         {
             mkdir("messages/", 0777);
         }
+        free(dirPtr);
         strcpy(filename,"messages/");
         strcat(stream, "StreamUsers");
         strcat(filename, stream);
@@ -120,6 +134,13 @@ class a
         /*getting user data*/
         char* data = pe.readInput(userName);
         
+        if (strcmp(data, " ") == 0)
+        {
+            printf("Error: Stream name cannot contain a space.\nExitting\n");
+            free(data);
+            free(userName);
+            return;
+        }
         /*if the user has permission to post in the stream, then update the files necessary*/
         if (strcmp(data, "") != 0)
         {
@@ -130,11 +151,12 @@ class a
             char* text = initString(10000);
             while (data[k] != '\n')
             {
-                stream[k] = data[k];
+                stream[k] = data[k]; 
                 k++;
             }
             k++;
 
+            printf("STREAM: %s\n", stream);
             while(data[k] != '\0')
             {
                 text[j] = data[k];
@@ -151,7 +173,7 @@ class a
                 text[b] = data[a];
             }
             printf("|%s|\n", data);*/
-            printf("stream; %s\n text: %s\n", stream, text);
+            printf("stream; %s\n text: %s\n", stream, text); 
             /*char* text = strtok(NULL, "\0");*/
             char* time = pe.getDateTime();
 
@@ -159,7 +181,7 @@ class a
             pe.submitPost(post);
             free(stream);
             free(text);
-            free(data);
+            free(data); 
             free(time);
             free(userName);
 

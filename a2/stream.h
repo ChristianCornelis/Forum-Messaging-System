@@ -1,7 +1,7 @@
 /***************************************************
 Christian Cornelis        ccorneli@mail.uoguelph.ca
 CIS*2750                  ID# 0939357
-February 19th, 2016       Assignment 2
+February 19th, 2017       Assignment 2
 ***************************************************/
 
 #ifndef __CCORNELI_STREAM_H__
@@ -36,4 +36,7 @@ int checkAuthorExists(char* author, char* fileName);
 
 /*function to free all memory for a user post struct*/
 void destroyStruct(userPost* toDestroy);
+
+/*function to update the master stream list if a new stream is created*/
+void updateMasterList(char* stream);
 #endif
