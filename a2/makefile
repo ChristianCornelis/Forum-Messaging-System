@@ -1,3 +1,9 @@
+######################################################
+#Christian Cornelis        ccorneli@mail.uoguelph.ca
+#CIS*2750                  ID# 0939357
+#February 19th, 2017       Assignment 2
+######################################################
+
 all: a1 addAuthor post.c post
 
 a1: parser.c helperFunctions.c helperFunctions.h
@@ -22,6 +28,7 @@ post: post.o helperFunctions.h stream.h
 post.o: post.c helperFunctions.h stream.h
 	gcc -Wall -ansi -c post.c -g -o post.o
 
+view: view.py
+	chmod +x view.py
 clean:
-	rm *.o
-	
+	rm *.o libstream.a addauthor post a1 post.c

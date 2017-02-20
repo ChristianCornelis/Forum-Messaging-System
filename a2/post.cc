@@ -49,6 +49,16 @@ class PostEntry
             text = clearString(text, 10000);
             return text;
         }
+        /*else if the user is not permitted to add to the stream, then print an error message and don't accept user input*/
+        else if (checkAuthorExists(username, filename) == -1)
+        {
+            printf("Error: Invalid stream name: Stream does not exist.\nStream files created.\nTo post to this stream, please use the addauthor program to gain permission to post to this stream\nExitting.");
+            free(stream);
+            free(filename);
+            free(line);
+            text = clearString(text, 10000);
+            return text;
+        }
         /*prompting user for text and reading it in until CTRL + d is entered*/
         printf("enter text: ");
         while(fgets(line, 500, stdin) != NULL)
@@ -102,11 +112,10 @@ class PostEntry
     }   
 };
 
-class a
+class getPost
 {
     void getInfo(int argc, char** argv)
     {
-        printf("argc: %d\n", argc);
         int i;
         if (argc < 2)
         {
@@ -153,7 +162,6 @@ class a
         /*if the user has permission to post in the stream, then update the files necessary*/
         if (strcmp(data, "") != 0)
         {
-            printf("%s\n", data);
             int k = 0;
             int j = 0;
             char* stream = initString(1000);
@@ -173,6 +181,7 @@ class a
             }
             char* time = pe.getDateTime();
 
+            /*creating struct, submitting post, and freeing memory*/
             userPost* post = pe.formatEntry(userName, stream, time, text);
             pe.submitPost(post);
             free(stream);
@@ -186,7 +195,6 @@ class a
         /*else, free variables and exit*/
         else
         {
-            printf("Error: Stream cannot be NULL.\nExitting.");
             free(data);
             free(userName);
         }
@@ -196,12 +204,13 @@ class a
 int main(int argc, char const *argv[])
 {
     int i = 0;
-    class a myA;
+    class getPost myGetPost;
     int newArgc = argc;
+    /*copying args to a char** because my A1 couldn't do ending braces in main????*/
     char** newArgv = initArray(argc, 255);
     for (i = 0; i < argc; i++)
         strcpy(newArgv[i], argv[i]);
-    myA.getInfo(newArgc, newArgv);
+    myGetPost.getInfo(newArgc, newArgv);
     destroyArray(newArgv, argc);
 
 

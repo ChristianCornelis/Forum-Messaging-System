@@ -1,3 +1,9 @@
+/***************************************************
+Christian Cornelis        ccorneli@mail.uoguelph.ca
+CIS*2750                  ID# 0939357
+February 19th, 2017       Assignment 2
+***************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "helperFunctions.h"

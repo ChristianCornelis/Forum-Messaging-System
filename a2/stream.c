@@ -100,7 +100,7 @@ void addUser(char * username, char * list, int isRemovable)
             streamListCnt++;
             indivStream = clearString(indivStream, 300);
             k = 0;
-            j++;
+            
 
             if (list[j] == '\n')
                 j++;
@@ -135,30 +135,34 @@ void addUser(char * username, char * list, int isRemovable)
         if ((checkAuthorExists(username, fileName) == 0 || checkAuthorExists(username, fileName) == -1) && isRemovable == 0)
         {
             if (checkAuthorExists(username, fileName) == -1)
+            {
                 updateMasterList(streamList[i]);
+                char* fileName2 = initString(255);
+                char* fileName3 = initString(255);
+
+                strcpy(fileName2, "messages/");
+                strcat(fileName2, streamList[i]);
+                strcat(fileName2, "StreamData");
+
+                strcpy(fileName3, "messages/");
+                strcat(fileName3, streamList[i]);
+                strcat(fileName3, "Stream");
+                FILE* streamData = fopen(fileName2, "w");
+                FILE* stream = fopen(fileName3, "w");
+
+                fclose(streamData);
+                fclose(stream);
+                printf("%s was successfully added to the %s stream.\n", username, streamList[i]);
+
+                free(fileName2);
+                free(fileName3);
+            }
             FILE* fptr = fopen(fileName, "a");
             fprintf(fptr, "%s 0\n", username);
             fclose(fptr);
-
-            char* fileName2 = initString(255);
-            char* fileName3 = initString(255);
-
-            strcpy(fileName2, "messages/");
-            strcat(fileName2, streamList[i]);
-            strcat(fileName2, "StreamData");
-
-            strcpy(fileName3, "messages/");
-            strcat(fileName3, streamList[i]);
-            strcat(fileName3, "Stream");
-            FILE* streamData = fopen(fileName2, "w");
-            FILE* stream = fopen(fileName3, "w");
-
-            fclose(streamData);
-            fclose(stream);
             printf("%s was successfully added to the %s stream.\n", username, streamList[i]);
 
-            free(fileName2);
-            free(fileName3);
+
         }
         /*else if the author IS in the streams user file already and the author is to be removed*/
         else if (checkAuthorExists(username, fileName) == 1 && isRemovable == 1)
@@ -225,11 +229,13 @@ void removeUser(char * username, char * list)
 
     int g = 0;
 
+    DIR* dirPtr;
     /*if messages folder does not exist, then create it*/
-    if (!opendir("messages"))
+    if (!(dirPtr=opendir("messages")))
     {
         mkdir("messages/", 0777);
     }
+    free(dirPtr);
 
     for (g = 0; g < streamListCnt; g++)
     {

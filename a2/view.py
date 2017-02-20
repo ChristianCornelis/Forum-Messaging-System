@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 
+######################################################
+#Christian Cornelis        ccorneli@mail.uoguelph.ca
+#CIS*2750                  ID# 0939357
+#February 19th, 2017       Assignment 2
+######################################################
 
 import sys
 import os
@@ -36,18 +41,14 @@ def updatePostsRead(path, name, postsRead):
 #function that runs curses in order to be called multiple times with different streams if the user chooses to switch streams
 def runCurses(streamList, stream, username):
     string = "messages/" + stream + "StreamData"
-    print("stream: " + string)
     with open(string) as f:
         bytesList = f.readlines()
 
+    #stripping spaces at beginning and end of string
     bytesList = [i.strip() for i in bytesList]
 
     streamStr = "messages/" +stream + "Stream"
     dataFptr = open(streamStr, "r")
-
-    print(bytesList)
-    print(len(bytesList))
-
 
     streamUsers = []
     userFile = "messages/" + stream + "StreamUsers"
@@ -56,6 +57,8 @@ def runCurses(streamList, stream, username):
     streamUsers = [i.strip() for i in streamUsers]
     nameToCompare = ""
     toStart = -1
+    #getting the index that the messages should start to display at based on
+    #what messages the user has read
     for i in streamUsers:
         tokens = i.split(" ")
         nameToCompare = ""
@@ -65,6 +68,7 @@ def runCurses(streamList, stream, username):
         nameToCompare = nameToCompare.strip()
         if (nameToCompare and nameToCompare == username):
             toStart = int(tokens[len(tokens)-1])
+
     #init curses
     screen = curses.initscr()
     curses.noecho()
@@ -79,16 +83,20 @@ def runCurses(streamList, stream, username):
     x = 0
     y = 0
     postLines = []
+
+    #printing data from <stream>Stream file
     for i in range (0, len(bytesList)):
         if(i == 0):
             dataFptr.seek(0, 0)
         else:
             offset = 0
+            #using seek to offset where the posts are in the file
             for k in range(0, i):
-                offset += int(bytesList[k])+2
+                offset += int(bytesList[k])
             dataFptr.seek(offset, 0)
         postLines.append(y)
-        for j in range(0, int(bytesList[i])+2):
+        #printing post with correct formatting
+        for j in range(0, int(bytesList[i])):
             c = dataFptr.read(1)
             pad.addch(y, x, c)
             pad.refresh(padPos, 0, 0, 0, 23, 80)
@@ -107,8 +115,9 @@ def runCurses(streamList, stream, username):
     dataFptr.close()
 
     screen.refresh()
+
     #setting the start position for the pad
-    if (toStart == len(postLines)):
+    if (toStart >= len(postLines) or toStart == -1):
         padPos = 0
     else:
         padPos = postLines[toStart]
@@ -118,13 +127,14 @@ def runCurses(streamList, stream, username):
         for i in postLines:
             if pos >= int(i):
                 numRead += 1
-
+        #if the user will have seen an unread post upon initting the screen, update what has been read
         if numRead > toStart:
             updatePostsRead(userFile, username, numRead)
-    #while input != q
-    while(event != 113 and event != 115):
 
+    #while input != q OR s
+    while(event != 113 and event != 115):
         screen.refresh()
+        #printing menu
         pad.refresh(padPos, 0, 0, 0, 23, 80)
         screen.addstr(23, 0, "Up-pg up  Down-pg down  O-order toggle  M-mark all  S-stream  C-check for new  ")
         screen.refresh()
@@ -173,7 +183,7 @@ def runCurses(streamList, stream, username):
             screen.refresh()
             with open(string) as f:
                 bytesList = f.readlines()
-
+            #stripping off spacing from each element
             bytesList = [i.strip() for i in bytesList]
 
             streamStr = "messages/" +stream + "Stream"
@@ -181,16 +191,17 @@ def runCurses(streamList, stream, username):
             x = 0
             y = 0
             postLines = []
+            #printing out the stream using the <stream>StreamData file
             for i in range (0, len(bytesList)):
                 if(i == 0):
                     dataFptr.seek(0, 0)
                 else:
                     offset = 0
                     for k in range(0, i):
-                        offset += int(bytesList[k])+2
+                        offset += int(bytesList[k])
                     dataFptr.seek(offset, 0)
                 postLines.append(y)
-                for j in range(0, int(bytesList[i])+2):
+                for j in range(0, int(bytesList[i])):
                     c = dataFptr.read(1)
                     pad.addch(y, x, c)
                     pad.refresh(padPos, 0, 0, 0, 23, 80)
@@ -200,7 +211,6 @@ def runCurses(streamList, stream, username):
                     else:
                         x += 1
                     pad.refresh(padPos, 0, 0, 0, 23, 80)
-                    #screen.refresh()
                 y+= 1
                 x = 0
                 pad.addstr(y, x, "--------------------------------------------------------------------------------")
@@ -208,7 +218,8 @@ def runCurses(streamList, stream, username):
                 x = 0
                 pad.refresh(padPos, 0, 0, 0, 23, 80)
             dataFptr.close()
-            if (toStart == len(postLines) or toStart == -1):
+            #determining whether the number of posts seen by the user needs to be updated
+            if (toStart >= len(postLines) or toStart == -1):
                 padPos = 0
             else:
                 padPos = postLines[toStart]
@@ -218,19 +229,19 @@ def runCurses(streamList, stream, username):
                 for i in postLines:
                     if pos >= int(i):
                         numRead += 1
-
+                #updating the number of posts read
                 if numRead > toStart:
                     updatePostsRead(userFile, username, numRead)
 
             pad.refresh(padPos, 0, 0, 0, 23, 80)
             screen.addstr(23, 0, "Up-pg up  Down-pg down  O-order toggle  M-mark all  S-stream  C-check for new  ")
             screen.refresh()
-        #if the user selects 'm'
+
+        #if the user selects 'm', updating all posts to be read
         elif event == 109:
             length = len(postLines)
             updatePostsRead(userFile, username, length)
 
-            
         event = screen.getch()
 
     #cleaning up curses
@@ -241,16 +252,19 @@ def runCurses(streamList, stream, username):
 
     return event;
 
+#if incorrect number of args
 if (len(sys.argv) == 1):
     print("Error: Incorrect number of arguments.\nExitting.")
     exit()
 username = ""
+#building username
 for i in range (1, len(sys.argv)):
     username += (sys.argv[i])
     username += " "
 
 username = username.strip()
 userStreams = []
+#if the messages folder and the file needed exists
 if (os.path.isdir("messages")):
     if (os.path.isfile('messages/streamList') == True):
         with open('messages/streamList') as f:
@@ -272,7 +286,6 @@ if (os.path.isdir("messages")):
                 tokens = j.split(" ")
                 tokens = tokens[:-1]
                 toCompare = ""
-                print(tokens)
                 for k in tokens:
                     toCompare += k
                     toCompare+= " "
@@ -284,7 +297,11 @@ if (os.path.isdir("messages")):
         for i in userStreams:
             print (i.strip(), " ", end ="")
 
-        print("all")
+        if not userStreams:
+            print("Error: This user has access to no streams currently. Use the addauthor program to add a user to a stream.\nExitting")
+            exit()
+        else:
+            print("all")
     else:
         print("Error: No streams are present\nExitting.")
         exit()
@@ -295,7 +312,6 @@ else:
 
 stream = ""
 stream = input()
-print("|" + stream + "|")
 if (stream != 'all'):
     found = False
     for i in userStreams:
@@ -306,7 +322,9 @@ if (stream != 'all'):
         print("Error: The user does not have access to the " + stream + " stream, or the stream does not exist.\nExitting")
         exit()
 else:
-    print("all selected")
+    print("Error: All selected, however, this feature was not implemented due to starting the view program too late : )")
+    print("Exitting")
+    exit()
 
 #saving the terminal's current size
 rows, columns = os.popen('stty size', 'r').read().split()
@@ -314,14 +332,17 @@ rows, columns = os.popen('stty size', 'r').read().split()
 sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=24, cols=80))
 
 while (runCurses(userStreams, stream, username) != 113):
+    print("Select a new stream to choose from:")
     for i in userStreams:
         print (i.strip(), " ", end ="")
-
-    print("all")
+    if not userStreams:
+        print("Error: This user has access to no streams currently. Use the addauthor program to add a user to a stream.\nExitting")
+        exit()
+    else:
+        print("all")
 
     stream = ""
     stream = input()
-    print("|" + stream + "|")
     if (stream != 'all'):
         found = False
         for i in userStreams:
@@ -332,7 +353,9 @@ while (runCurses(userStreams, stream, username) != 113):
             print("Error: The user does not have access to the " + stream + " stream, or the stream does not exist.\nExitting")
             exit()
     else:
-        print("all selected")
+        print("Error: All selected, however, this feature was not implemented due to starting the view program too late : )")
+        print("Exitting")
+        exit()
 
 #resetting size of terminal
 sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=rows, cols=columns))
