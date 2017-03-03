@@ -1,2 +1,3 @@
 .h(text="Login",size=<3>).d()
 .i(name="username",value="Jeff Kaplan",text="Username",action="menu.php",id="test")
+.p(image="daveyBoi.jpeg",size=<1600>x<900)

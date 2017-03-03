@@ -101,7 +101,6 @@
 
 	if (isset($_POST['Next_post'])) //== "Next post")
 	{
-		echo ("IN DAT SHIT");
 		$offset = $offset+1;
 		echo ("OFFSET IS " . $_POST['offset']);
 		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll);
@@ -126,8 +125,6 @@
 	{
 		$markAll = 1;
 		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll);
-		$markAll = 0;
-		$returnedOffset = printPost(0, $output, $status, $username, $stream, $markAll);
 		$offset = $returnedOffset;
 	}
 	else {

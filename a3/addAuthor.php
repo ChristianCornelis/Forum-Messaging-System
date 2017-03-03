@@ -38,7 +38,7 @@
 				}
 				break;
 			case "Remove":
-				exec("./addauthor " . $_POST["streamInput"] ." " . file_get_contents("usernameData") . " -r", $output3, $status3);
+				exec("./addauthor " . $_POST["streamInput"] ." " . $username . " -r", $output3, $status3);
 
 				if ($status3)
 					echo('Exec() failed.');

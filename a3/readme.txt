@@ -23,14 +23,18 @@ EXECUTION:
 **********
 
 Addauthor:
-To run the addauthor program, type ./addauthor <username>
-To remove a user from a stream, run ./addauthor <username> -r
+To add an author to a stream, first login and then navigate to the 'Add/Remove Author' button and press it
+To remove a user from a stream, select 'Remove' on the Add author page instead of leaving the default 'Add' option checked
 Then, input the streams to add or remove a user to/from after being prompted to
+If a user is being added to multiple streams then the streams MUST be separated by commas and contain no spaces between them
+	Proper input would look like this: cars,trucks,vans
 
 Post:
-To post to a stream, run ./post <username>
-Then, input the stream to post to, and enter the text
-Use CTRL+D to exit the input for the text and complete the post
+To post to a stream, navigate to the 'Post' option from the menu.
+Then, imput the stream that you wish to add to and enter the post's text in the textarea.
+	Upon finishing typing in the post, click the 'Submit' button to add the post to the stream.
+	If the stream does not exist, then an appropriate error message will be outputted.
+	If the user is not subscribed to the stream theu are trying to post to an appropriate error message which will be outputted.
 
 View:
 -Run ./view.py <username> and select which stream to view from a list of streams outputted that  the user has access to.
@@ -48,26 +52,24 @@ Addauthor program:
             Correct input would be as follows: 'cars,trucks,vans'
 
 Post program:
--If the user tries to post to a stream that DOES NOT EXIST, then the stream files will be created BUT no info will be added to them
-    -The user is informed of this, and that in order to get permission to post to the stream, they must first use the addauthor program
+-If the user tries to post to a stream that DOES NOT EXIST, then an error message will be outputted telling the user to use the addauthor program before adding to the stream\
 -If the user tries to post to a stream that they do not have access to, then they will not be able to input any text and an error message will occur.
 -Posts can be no longer than 10000 characters in length.
 
 Viewing Program:
 -The UP and DOWN arrows are used to scroll throug messages
 -Messages are displayed starting from the most recent unread messaage
--If the terminal is in full screen (or half screen), then my program will NOT resize it to be 80 x 24
 -The 'O' option does not work.
 -Selecting 'all' will not do anything, as I didn't have time to complete it.
 -If a user is removed while they are viewing the program, the user will be able to view all messages from the stream that they were removed from
  until the next time the program is run.
--If a user has seen all posts in a stream, then the stream will begin viewing from the oldest post
--Please note: The user can view PAST the pad by 23 lines, if the user pushes the UP arrow, they will return to the messages
+-If a user has seen all posts in a stream, then the stream will begin viewing from the newest post
  
 Messages folder:
 -The messages folder will be created by my program if necessary.
--Please note, an additional file will be present called 'streamList'. This file is used by the viewing program in order 
- for it to know which streams have been created in order to check which streams a user is subscribed to.
+-Please note, an additional file will be present called 'streamList'. This file is used by the viewing program in order for it to know which streams have been created in order to check which streams a user is subscribed to.
 
 Configuration File:
 -The sizes in the image tag cannot be larger than 5 digits in length.
+-If multiple input-related tags are on the same line
+-

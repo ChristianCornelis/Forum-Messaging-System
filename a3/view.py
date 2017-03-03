@@ -39,13 +39,59 @@ def updatePostsRead(path, name, postsRead):
     return;
 
 #function that runs curses in order to be called multiple times with different streams if the user chooses to switch streams
-def printPost(username, stream, postOffset):
+def getAll(username, streams):
+	toReturn = []
+	for i in streams:
+		stream = str(i)
+		string = "messages/" + stream + "StreamData"
+		with open(string) as f:
+			bytesList = f.readlines()
+		if (len(bytesList) == 0):
+			print("Error: No posts to display")
+			sys.exit()
+		#stripping spaces at beginning and end of string
+		bytesList = [i.strip() for i in bytesList]
+		print(str(bytesList))
+		streamStr = "messages/" +stream + "Stream"
+		dataFptr = open(streamStr, "r")
+
+		
+		bytesCnt = 0
+		bytesListCnt = 0
+		toAdd = ""
+		lines = []
+		#for i in range (0, )
+		#printing post with correct formatting
+		for j in range(0, int(bytesList[len(bytesList)-1])):
+			c = dataFptr.read(1)
+			toAdd += c
+			bytesCnt += 1
+
+			if (c == '\n'):
+				#print("TO ADD " + str(toAdd))
+				lines.append(toAdd)
+				toAdd = ""
+
+			if (bytesCnt is int(bytesList[bytesListCnt])):
+				bytesListCnt+= 1
+				toReturn.append(lines)
+				lines = []
+		#print("TO RETURN")
+		#print(toReturn)
+		dataFptr.close()
+	toReturn.sort(key=lambda x:x[1])
+	print (toReturn)
+	print(len(toReturn))
+	return toReturn
+
+#function that runs curses in order to be called multiple times with different streams if the user chooses to switch streams
+def printPost(username, streams, postOffset):
 	string = "messages/" + stream + "StreamData"
 	with open(string) as f:
 		bytesList = f.readlines()
 	if (len(bytesList) == 0):
 		print("Error: No posts to display")
-		exit(1)
+		sys.exit()
 	#stripping spaces at beginning and end of string
 	bytesList = [i.strip() for i in bytesList]
 	print(str(bytesList))
@@ -158,8 +204,6 @@ def getStreams(username):
 			if not userStreams:
 				print("Error: This user has access to no streams currently. Use the addauthor program to add a user to a stream.")
 				exit()
-			else:
-				userStreams.append("all")
 	            #print("all")
 		else:
 			print("Error: No streams are present.")
@@ -173,12 +217,14 @@ def getStreams(username):
 def markAllAsRead(stream, username):
 	print("MARKING ALL AS READ")
 	string = "messages/" + stream + "StreamData"
+	print("DATA " + string)
 	with open(string) as f:
 		bytesList = f.readlines()
 	if (len(bytesList) == 0):
 		print("Error: No posts are present.")
-		exit(1)
+		sys.exit()
 	userFile = "messages/" + stream + "StreamUsers"
+	print("USERFILE " +userFile)
 	print("LEN " + str(len(bytesList)))
 	updatePostsRead(userFile, username, len(bytesList))
 
@@ -189,13 +235,36 @@ postOffset = int(sys.argv[3])
 print("OFFSET " + str(postOffset))
 if (stream == "*OUTPUT*"):
 	userStreams = getStreams(username)
+	userStreams.append("all")
 	for i in userStreams:
 		print (i + " ", end="")
 	print("")
 
+elif (stream == all):
+	streams = getStreams(username)
+	getAll(username, streams)
+
 elif (postOffset == 3141592654):
 	markAllAsRead(stream, username)
+	if (postOffset > 0):
+		postOffset = 0
+		print("*AT END*")
 
+	userStreams = getStreams(username)
+	if (stream != 'all'):
+		found = False
+		for i in userStreams:
+			if (stream == i):
+				found = True
+		#if the user doesn't have access to the stream, or the stream does not exist
+		if (not found):
+			print("Error: The user does not have access to the " + stream + " stream, or the stream does not exist.")
+			exit()
+		printPost(username, stream, postOffset)
+	else:
+		print("Error: All selected, however, this feature was not implemented due to starting the view program too late : )")
+		print("Exitting")
+		exit()
 else:
 	if (postOffset > 0):
 		postOffset = 0

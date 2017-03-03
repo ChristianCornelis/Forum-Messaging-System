@@ -19,7 +19,7 @@ int main(int argc, char const *argv[])
     int i = 2;
     int isRemovable = 0;
 
-    /*adding all parts of the userName to a string*/
+    /*adding all parts of the userName to a string**/
     while (i < argc)
     {
         if (strcmp(argv[i], "-r") == 0)
@@ -37,6 +37,7 @@ int main(int argc, char const *argv[])
         }
         i++;
     }
+
 
     /*mallocing a string to hold user input and initializing all characters to NULL*/
     char * streams = malloc(sizeof(char)*1000);
