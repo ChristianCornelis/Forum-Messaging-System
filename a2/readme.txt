@@ -51,6 +51,7 @@ Post program:
 -If the user tries to post to a stream that DOES NOT EXIST, then the stream files will be created BUT no info will be added to them
     -The user is informed of this, and that in order to get permission to post to the stream, they must first use the addauthor program
 -If the user tries to post to a stream that they do not have access to, then they will not be able to input any text and an error message will occur.
+-Posts can be no longer than 10000 characters in length.
 
 Viewing Program:
 -The UP and DOWN arrows are used to scroll throug messages
