@@ -30,62 +30,149 @@ int main(int argc, char const *argv[])
         char* token;
         char* text = NULL;
         char* size = NULL;
+        char* name = NULL;
+        char* link = NULL;
+        char* file = NULL;
+        char* action = NULL;
+        char* value = NULL;
+        char* image = NULL;
 
-        if (first == 1)
+        token = strtok(line, ")");
+
+        while (token != NULL)
         {
-            token = strtok(line, ")");
-            first = 0;
-        }
-        else
+            if (token[1] == 'h')
+            {
+                if (strstr(token, "size=") != NULL)
+                {
+                    size = getTagContents(token, "size=");
+                }
+                else if (strstr(token, "size=") == NULL)
+                {
+                    size = calloc(3, sizeof(char));
+                    strcpy(size, "3");
+                }
+                if (strstr(token, "text=") != NULL)
+                {
+                    text = getTagContents(token, "text=\"");
+                }
+                else if (strstr(token, "text=") == NULL)
+                {
+                    text = calloc(8, sizeof(char));
+                    strcpy(text, "HEADING");
+                }
+
+                printf("<h%s> ", size);
+                printf("%s", text);
+                printf(" </h%s>\n", size);
+                free(size);
+                free(text);
+            }
+            else if (token[1] == 't')
+            {
+                if (strstr(token, "text=") != NULL)
+                {
+                    text = getTagContents(token, "text=\"");
+                }
+                if (strstr(token, "file=") != NULL)
+                {
+                    text = getTagContents(token, "file=\"");
+                }
+                else if (strstr(token, "text=") == NULL && strstr(token, "file=") == NULL)
+                {
+                    text = calloc(15, sizeof(char));
+                    strcpy(text, "Default text");
+                }
+
+                printf("\n<p> %s </p>", text);
+                free(text);
+            }
+            else if (token[1] == 'b')
+            {
+                if (strstr(token, "name=") != NULL)
+                {
+                    name = getTagContents(token, "name=\"");
+                }
+                if (strstr(token, "link=") != NULL)
+                {
+                    link = getTagContents(token, "link=\"");
+                }
+
+                printf("\n<form action = %s>\n\t<input type = \"submit\" value = %s> \n</form>\n", link, name);
+                free(name);
+                free(link);
+            }
+            else if (token[1] == 'd')
+            {
+                printf("<hr> </hr>\n");
+            }
+            else if (token[1] == 'e')
+            {
+                if (strstr(token, "file=") != NULL)
+                {
+                    file = getTagContents(token, "file=\"");
+                }
+
+                printf("<?php\n\techo exec '%s';\n?>\n", file);
+
+                free(file);
+            }
+            else if (token[1] == 'i')
+            {
+                if (strstr(token, "action=") != NULL)
+                {
+                    action = getTagContents(token, "action=\"");
+                }
+
+                if (strstr(token, "value=") != NULL)
+                    value = getTagContents(token, "value=\"");
+
+                if (strstr(token, "text=") != NULL)
+                    text = getTagContents(token, "text=\"");
+
+                if (strstr(token, "name=") != NULL)
+                    name = getTagContents(token, "name=\"");
+
+                printf("<form action=\"%s\">\n\t%s:<br>\n\t<input type=\"text\" name = \"%s\" value = \"%s\"> <br> <br>", action, text, name, value);
+                printf("\n\t<input type = \"submit\" value = \"Submit\">\n</form>\n)");
+
+                free(action);
+                free(value);
+                free(text);
+                free(name);
+            }
+            else if (token[1] == 'l')
+            {
+                if (strstr(token, "text=") != NULL)
+                    text=getTagContents(token, "text=\"");
+                else
+                {
+                    text = calloc(5, sizeof(char));
+                    strcpy(text, "link");
+                }
+                if (strstr(token, "link=") != NULL)
+                    link = getTagContents(token, "link=\"");
+
+                printf("\n\t<a href = \"%s\"> %s </a>\n", link, text);
+
+                free(text);
+                free(link);
+            }
+            else if (token[1] == 'p')
+            {
+                if (strstr(token, "image=") != NULL)
+                    image = getTagContents(token, "image=\"");
+
+                if (strstr(token, "size=") != NULL)
+                    size = getTagContents(token, "size=");
+                else if (strstr(token, "size=") == NULL)
+                {
+                    size = calloc(10, sizeof(char));
+                }
+
+            }
+
             token = strtok(NULL, ")");
-
-        printf("LINE: %s\n", line);
-
-        if (token[1] == 'h')
-        {
-            if (strstr(token, "size=") != NULL)
-            {
-                size = getTagContents(token, "size=");
-            }
-            else if (strstr(token, "size=") == NULL)
-            {
-                size = calloc(3, sizeof(char));
-                strcpy(size, "3");
-            }
-            else if (strstr(token, "text=") != NULL)
-            {
-                text = getTagContents(token, "text=\"");
-            }
-            else if (strstr(token, "text=") == NULL)
-            {
-                text = calloc(8, sizeof(char));
-                strcpy(text, "HEADING");
-            }
-
-            printf("<h%s> ", size);
-            printf("%s", text);
-            printf(" </h%s>\n", size);
-            free(size);
-            free(text);
-        }
-        else if (token[1] == 't')
-        {
-            if (strstr(token, "text=") != NULL)
-            {
-                text = getTagContents(token, "text=\"");
-            }
-            else if (strstr(token, "file=") != NULL)
-            {
-                text = getTagContents(token, "file=\"");
-            }
-            else if (strstr(token, "text=") == NULL && strstr(token, "file=") == NULL)
-            {
-                text = calloc(15, sizeof(char));
-                strcpy(text, "Default text");
-            }
-
-            printf("\n<p> %s </p>", text);
-            free(text);
         }
         
     }
