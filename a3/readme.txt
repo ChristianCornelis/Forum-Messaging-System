@@ -68,3 +68,6 @@ Messages folder:
 -The messages folder will be created by my program if necessary.
 -Please note, an additional file will be present called 'streamList'. This file is used by the viewing program in order 
  for it to know which streams have been created in order to check which streams a user is subscribed to.
+
+Configuration File:
+-The sizes in the image tag cannot be larger than 5 digits in length.

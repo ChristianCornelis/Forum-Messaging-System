@@ -6,6 +6,7 @@ char* getTagContents(char* token, char* toFind);
 
 int main(int argc, char const *argv[])
 {
+    freopen("test.html" , "w", stdout);
     if (argc != 2)
     {
         printf("Error: No configuration file inputted.\nExitting.\n");
@@ -21,12 +22,9 @@ int main(int argc, char const *argv[])
     }
 
     char line[255];
-    int first = 1;
 
     while (fgets(line, 255, fptr) != NULL)
     {
-        int i;
-        int inTag = 0;
         char* token;
         char* text = NULL;
         char* size = NULL;
@@ -45,7 +43,7 @@ int main(int argc, char const *argv[])
             {
                 if (strstr(token, "size=") != NULL)
                 {
-                    size = getTagContents(token, "size=");
+                    size = getTagContents(token, "size=\"");
                 }
                 else if (strstr(token, "size=") == NULL)
                 {
@@ -167,9 +165,61 @@ int main(int argc, char const *argv[])
                     size = getTagContents(token, "size=");
                 else if (strstr(token, "size=") == NULL)
                 {
-                    size = calloc(10, sizeof(char));
+                    size = calloc(25, sizeof(char));
+                    strcpy(size, "<100><100>");
                 }
 
+                printf("SIZE %s\n", size);
+                char* width = calloc(25, sizeof(char));
+                char* height = calloc(25, sizeof(char));
+                int i = 0;
+                int j = 0;
+                int closeCnt = 0;
+
+                /*pulling out dimensions*/
+                for (i = 0; i < strlen(size); i++)
+                {
+                    if (size[i] == '>' && closeCnt == 2)
+                        break;
+                    else if (size[i] == '>')
+                    {
+                        closeCnt++;
+                        j = 0;
+                        continue;
+                    }
+
+                    if (size[i] != '<' && closeCnt == 0)
+                    {
+                        width[j] = size[i];
+                        j++;
+                    }
+                    else if (size[i] != '<' && closeCnt == 1)
+                    {
+                        height[j] = size[i];
+                        j++;
+                    }
+                }
+
+                printf("\t<img src = \"%s\" alt = \"image\" style = \"width:%spx; height:%spx;\">\n" , image, width, height);
+                free(size);
+                free(image);
+                free(width);
+                free(height);
+            }
+            else if (token[1] == 'r')
+            {
+                if (strstr(token, "action=") != NULL)
+                    action = getTagContents(token, "action=\"");
+                if (strstr(token, "name=") != NULL)
+                    name = getTagContents(token, "name=\"");
+                if (strstr(token, "value=") != NULL)
+                    value = getTagContents(token, "value=\"");
+
+                printf("<form action = \"%s\">\n\t<input type = \"radio\" name = \"%s\" value = \"%s\"> %s<br>\n</form>\n", action, name, value, value);
+
+                free(action);
+                free(name);
+                free(value);
             }
 
             token = strtok(NULL, ")");
@@ -188,7 +238,7 @@ char* getTagContents(char* token, char* toFind)
     int j = 0;
     int k = 0;
     int l = 0;
-
+    int closingCnt = 0;
     if (strcmp(toFind, "size=") == 0)
     {
         for (i = 0; i < strlen(token); i++)
@@ -200,7 +250,7 @@ char* getTagContents(char* token, char* toFind)
                 {
                     for (k = i+1; k < strlen(token); k++)
                     {
-                        if (token[k] == ',')
+                        if (token[k] == '>' && closingCnt == 2)
                             break;
                         toReturn[l] = token[k];
                         l++;   

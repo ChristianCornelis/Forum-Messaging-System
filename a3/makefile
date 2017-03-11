@@ -30,5 +30,8 @@ post.o: post.c helperFunctions.h stream.h
 
 view: view.py
 	chmod +x view.py
+
+config: configConverter.c
+	gcc  -Wall -ansi configConverter.c -o converter
 clean:
 	rm *.o libstream.a addauthor post a1 post.c
