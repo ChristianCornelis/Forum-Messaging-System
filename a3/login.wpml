@@ -1,2 +1,2 @@
-.b(name="Add/Remove Author",link="addauthor.php").b(name="Post", link="post.php")
-.i(name="Test",value="SUs",text="this is a test",action'"index.php")
+.b(name="Add/Remove_Author",link="test.html").b(name="Post", link="post.php")
+.i(name="usernameInput",value="Jeff Kaplan",text="Username",action="index.php")

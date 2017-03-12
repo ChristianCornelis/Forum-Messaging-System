@@ -37,8 +37,19 @@ int main(int argc, char *argv[])
         char* action = NULL;
         char* value = NULL;
         char* image = NULL;
-
+        int printForm = 0;
         token = strtok(line, ")");
+
+        if (strstr(line, ".i(") != NULL || strstr(line, ".b(") != NULL || strstr(line, ".r(") != NULL)
+        {
+          printForm = 1;
+          if (strstr(token, ".b(") != NULL)
+            printf("<form action = \"%s\">\n", (action = getTagContents(token, "link=\"")));
+          else
+            printf("<form action = \"%s\">\n", (action = getTagContents(token, "action=\"")));
+
+          free(action);
+        }
 
         while (token != NULL)
         {
@@ -99,7 +110,7 @@ int main(int argc, char *argv[])
                     link = getTagContents(token, "link=\"");
                 }
 
-                printf("\n<form action = %s>\n\t<input type = \"submit\" value = %s> \n</form>\n", link, name);
+                printf("\t<input type = \"submit\" value = %s> \n</form>\n", name);
                 free(name);
                 free(link);
             }
@@ -134,7 +145,7 @@ int main(int argc, char *argv[])
                 if (strstr(token, "name=") != NULL)
                     name = getTagContents(token, "name=\"");
 
-                printf("<form action=\"%s\">\n\t%s:<br>\n\t<input type=\"text\" name = \"%s\" value = \"%s\"> <br> <br>", action, text, name, value);
+                printf("\t%s:<br>\n\t<input type=\"text\" name = \"%s\" value = \"%s\"> <br> <br>", text, name, value);
                 printf("\n\t<input type = \"submit\" value = \"Submit\">\n</form>\n");
 
                 free(action);
@@ -172,7 +183,6 @@ int main(int argc, char *argv[])
                     strcpy(size, "<100><100>");
                 }
 
-                printf("SIZE %s\n", size);
                 char* width = calloc(25, sizeof(char));
                 char* height = calloc(25, sizeof(char));
                 int i = 0;
@@ -218,7 +228,7 @@ int main(int argc, char *argv[])
                 if (strstr(token, "value=") != NULL)
                     value = getTagContents(token, "value=\"");
 
-                printf("<form action = \"%s\">\n\t<input type = \"radio\" name = \"%s\" value = \"%s\"> %s<br>\n</form>\n", action, name, value, value);
+                printf("\t<input type = \"radio\" name = \"%s\" value = \"%s\"> %s<br>\n</form>\n", name, value, value);
 
                 free(action);
                 free(name);
@@ -227,7 +237,8 @@ int main(int argc, char *argv[])
 
             token = strtok(NULL, ")");
         }
-        
+        if (printForm == 1)
+          printf("</form>\n");
     }
 
     fclose(fptr);
@@ -256,7 +267,7 @@ char* getTagContents(char* token, char* toFind)
                         if (token[k] == '>' && closingCnt == 2)
                             break;
                         toReturn[l] = token[k];
-                        l++;   
+                        l++;
                     }
                     return toReturn;
                 }
@@ -276,7 +287,7 @@ char* getTagContents(char* token, char* toFind)
                     if (token[k] == '"')
                         break;
                     toReturn[l] = token[k];
-                    l++;   
+                    l++;
                 }
                 return toReturn;
             }
