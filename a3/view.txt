@@ -1,1 +1,0 @@
-.b(name="Add/Remove Author",link="addauthor.php").b(name="Post", link="post.php")

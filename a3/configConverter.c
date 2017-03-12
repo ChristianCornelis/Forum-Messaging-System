@@ -4,9 +4,8 @@
 
 char* getTagContents(char* token, char* toFind);
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
-    freopen("test.html" , "w", stdout);
     if (argc != 2)
     {
         printf("Error: No configuration file inputted.\nExitting.\n");
@@ -20,6 +19,10 @@ int main(int argc, char const *argv[])
         printf("Error: No such file.\nExitting\n");
         return 1;
     }
+    char* fileName = argv[1];
+    char* toOutput = strtok(fileName, ".");
+    strcat(toOutput, ".html");
+    freopen(toOutput , "w", stdout);
 
     char line[255];
 
@@ -132,7 +135,7 @@ int main(int argc, char const *argv[])
                     name = getTagContents(token, "name=\"");
 
                 printf("<form action=\"%s\">\n\t%s:<br>\n\t<input type=\"text\" name = \"%s\" value = \"%s\"> <br> <br>", action, text, name, value);
-                printf("\n\t<input type = \"submit\" value = \"Submit\">\n</form>\n)");
+                printf("\n\t<input type = \"submit\" value = \"Submit\">\n</form>\n");
 
                 free(action);
                 free(value);
