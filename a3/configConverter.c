@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* getTagContents(char* token, char* toFind);
+char* getTagContents(char* token, char* toFind, char tag);
 
 int main(int argc, char *argv[])
 {
@@ -22,8 +22,8 @@ int main(int argc, char *argv[])
     char* fileName = argv[1];
     char* toOutput = strtok(fileName, ".");
     strcat(toOutput, ".html");
-    freopen(toOutput , "w", stdout);
-
+    /*freopen(toOutput , "w", stdout);*/
+	printf("<html>\n<body>\n\n");
     char line[255];
 
     while (fgets(line, 255, fptr) != NULL)
@@ -44,9 +44,9 @@ int main(int argc, char *argv[])
         {
           printForm = 1;
           if (strstr(token, ".b(") != NULL)
-            printf("<form action = \"%s\">\n", (action = getTagContents(token, "link=\"")));
+            printf("<form action = \"%s\" method=\"post\">\n", (action = getTagContents(token, "link=\"", 'b')));
           else
-            printf("<form action = \"%s\">\n", (action = getTagContents(token, "action=\"")));
+            printf("<form action = \"%s\" method=\"post\">\n", (action = getTagContents(token, "action=\"", 'i')));
 
           free(action);
         }
@@ -55,18 +55,18 @@ int main(int argc, char *argv[])
         {
             if (token[1] == 'h')
             {
-                if (strstr(token, "size=") != NULL)
+                if (strstr(token, "size=<") != NULL)
                 {
-                    size = getTagContents(token, "size=\"");
+                    size = getTagContents(token, "size=<", 'h');
                 }
-                else if (strstr(token, "size=") == NULL)
+                else if (strstr(token, "size=<") == NULL)
                 {
                     size = calloc(3, sizeof(char));
                     strcpy(size, "3");
                 }
                 if (strstr(token, "text=") != NULL)
                 {
-                    text = getTagContents(token, "text=\"");
+                    text = getTagContents(token, "text=\"", 'h');
                 }
                 else if (strstr(token, "text=") == NULL)
                 {
@@ -74,9 +74,9 @@ int main(int argc, char *argv[])
                     strcpy(text, "HEADING");
                 }
 
-                printf("<h%s> ", size);
+                printf("<h%s ", size);
                 printf("%s", text);
-                printf(" </h%s>\n", size);
+                printf(" </h%s\n", size);
                 free(size);
                 free(text);
             }
@@ -84,11 +84,11 @@ int main(int argc, char *argv[])
             {
                 if (strstr(token, "text=") != NULL)
                 {
-                    text = getTagContents(token, "text=\"");
+                    text = getTagContents(token, "text=\"", 't');
                 }
                 if (strstr(token, "file=") != NULL)
                 {
-                    text = getTagContents(token, "file=\"");
+                    text = getTagContents(token, "file=\"", 't');
                 }
                 else if (strstr(token, "text=") == NULL && strstr(token, "file=") == NULL)
                 {
@@ -103,14 +103,14 @@ int main(int argc, char *argv[])
             {
                 if (strstr(token, "name=") != NULL)
                 {
-                    name = getTagContents(token, "name=\"");
+                    name = getTagContents(token, "name=\"", 'b');
                 }
                 if (strstr(token, "link=") != NULL)
                 {
-                    link = getTagContents(token, "link=\"");
+                    link = getTagContents(token, "link=\"", 'b');
                 }
 
-                printf("\t<input type = \"submit\" value = %s> \n</form>\n", name);
+                printf("\t<input type = \"submit\" value = \"%s\">\n", name);
                 free(name);
                 free(link);
             }
@@ -122,48 +122,59 @@ int main(int argc, char *argv[])
             {
                 if (strstr(token, "file=") != NULL)
                 {
-                    file = getTagContents(token, "file=\"");
+                    file = getTagContents(token, "file=\"", 'e');
                 }
 
-                printf("<?php\n\techo exec '%s';\n?>\n", file);
+                printf("<?php\n\techo (exec '%s');\n?>\n", file);
 
                 free(file);
             }
             else if (token[1] == 'i')
             {
-                if (strstr(token, "action=") != NULL)
+                char* subStr;
+                while(strstr(token, "name=\"") != NULL)
                 {
-                    action = getTagContents(token, "action=\"");
-                }
+                  /*if (subStr = strstr(token, "action=") != NULL)
+                  {
+                      action = getTagContents(token, "action=\"");
+                      token[subStr-token] = '@';
+                  }*/
 
-                if (strstr(token, "value=") != NULL)
-                    value = getTagContents(token, "value=\"");
+	              if ((subStr = strstr(token, "value=")) != NULL)
+	              {
+	                  value = getTagContents(token, "value=\"", 'i');
+	                  token[subStr-token] = '@';
+	              }
 
-                if (strstr(token, "text=") != NULL)
-                    text = getTagContents(token, "text=\"");
+	              if ((subStr = strstr(token, "text=")) != NULL)
+	              {
+	                  text = getTagContents(token, "text=\"", 'i');
+	                  token[subStr-token] = '@';
+	              }
 
-                if (strstr(token, "name=") != NULL)
-                    name = getTagContents(token, "name=\"");
+	              if ((subStr = strstr(token, "name=")) != NULL)
+	              {
+	                  name = getTagContents(token, "name=\"", 'i');
+	                  token[subStr-token] = '@';
+	              }
+	              printf("\t%s:<br>\n\t<input type=\"text\" name = \"%s\" value = \"%s\"> <br> <br>\n", text, name, value);
 
-                printf("\t%s:<br>\n\t<input type=\"text\" name = \"%s\" value = \"%s\"> <br> <br>", text, name, value);
-                printf("\n\t<input type = \"submit\" value = \"Submit\">\n</form>\n");
-
-                free(action);
-                free(value);
-                free(text);
-                free(name);
+	              free(value);
+	              free(text);
+	              free(name);
+              }
             }
             else if (token[1] == 'l')
             {
                 if (strstr(token, "text=") != NULL)
-                    text=getTagContents(token, "text=\"");
+                    text=getTagContents(token, "text=\"", 'l');
                 else
                 {
                     text = calloc(5, sizeof(char));
                     strcpy(text, "link");
                 }
                 if (strstr(token, "link=") != NULL)
-                    link = getTagContents(token, "link=\"");
+                    link = getTagContents(token, "link=\"", 'l');
 
                 printf("\n\t<a href = \"%s\"> %s </a>\n", link, text);
 
@@ -173,10 +184,10 @@ int main(int argc, char *argv[])
             else if (token[1] == 'p')
             {
                 if (strstr(token, "image=") != NULL)
-                    image = getTagContents(token, "image=\"");
+                    image = getTagContents(token, "image=\"", 'p');
 
                 if (strstr(token, "size=") != NULL)
-                    size = getTagContents(token, "size=");
+                    size = getTagContents(token, "size=", 'p');
                 else if (strstr(token, "size=") == NULL)
                 {
                     size = calloc(25, sizeof(char));
@@ -213,7 +224,7 @@ int main(int argc, char *argv[])
                     }
                 }
 
-                printf("\t<img src = \"%s\" alt = \"image\" style = \"width:%spx; height:%spx;\">\n" , image, width, height);
+                printf("\t<img src = \"%s\" alt = \"image\" style = \"width:%spx; height:%spx;\"> <br>\n" , image, width, height);
                 free(size);
                 free(image);
                 free(width);
@@ -221,31 +232,48 @@ int main(int argc, char *argv[])
             }
             else if (token[1] == 'r')
             {
-                if (strstr(token, "action=") != NULL)
-                    action = getTagContents(token, "action=\"");
-                if (strstr(token, "name=") != NULL)
-                    name = getTagContents(token, "name=\"");
-                if (strstr(token, "value=") != NULL)
-                    value = getTagContents(token, "value=\"");
+				char* subStr;
+				int firstLoop = 1;
+				while(strstr(token, "value=\"") != NULL)
+				{
+	                if ((subStr = strstr(token, "action=")) != NULL)
+	                    action = getTagContents(token, "action=\"", 'r');
+	                if ((subStr = strstr(token, "name=")) != NULL)
+	                    name = getTagContents(token, "name=\"", 'r');
+	                if ((subStr = strstr(token, "value=")) != NULL)
+					{
+	                    value = getTagContents(token, "value=\"", 'r');
+						token[subStr-token] = '@';
+					}
+					if (firstLoop == 1)
+					{
+	                	printf("\t<input type = \"radio\" name = \"%s\" value = \"%s\" checked = \"checked\"> %s<br>\n", name, value, value);
+						firstLoop = 0;
+					}
+					else
+						printf("\t<input type = \"radio\" name = \"%s\" value = \"%s\"> %s<br>\n", name, value, value);
 
-                printf("\t<input type = \"radio\" name = \"%s\" value = \"%s\"> %s<br>\n</form>\n", name, value, value);
-
-                free(action);
-                free(name);
-                free(value);
+	                free(action);
+	                free(name);
+	                free(value);
+				}
             }
 
             token = strtok(NULL, ")");
         }
+		if (printForm == 1 && (strstr(line, ".i(") != NULL || strstr(line, ".i(") != NULL))
+			printf("\n\t<input type = \"submit\" name = \"submit\" value = \"Submit\">\n");
         if (printForm == 1)
-          printf("</form>\n");
+      		printf("</form>\n");
     }
 
     fclose(fptr);
+	printf("</body>\n</html>\n");
+
     return 0;
 }
 
-char* getTagContents(char* token, char* toFind)
+char* getTagContents(char* token, char* toFind, char tag)
 {
     char* toReturn = calloc(255, sizeof(char));
     int i = 0;
@@ -253,7 +281,8 @@ char* getTagContents(char* token, char* toFind)
     int k = 0;
     int l = 0;
     int closingCnt = 0;
-    if (strcmp(toFind, "size=") == 0)
+    /*if looking for picture sizes*/
+    if (strcmp(toFind, "size=") == 0 && tag == 'p')
     {
         for (i = 0; i < strlen(token); i++)
         {
@@ -264,16 +293,46 @@ char* getTagContents(char* token, char* toFind)
                 {
                     for (k = i+1; k < strlen(token); k++)
                     {
-                        if (token[k] == '>' && closingCnt == 2)
+                        if (token[k] == '>' && closingCnt == 1)
                             break;
+                        else
+                            closingCnt++;
                         toReturn[l] = token[k];
                         l++;
                     }
                     return toReturn;
                 }
             }
+            else
+                j = 0;
         }
     }
+    /*else if looking for a heading size*/
+    else if (strcmp(toFind, "size=") == 0 && tag == 'h')
+    {
+        for (i = 0; i < strlen(token); i++)
+        {
+            if (token[i] == toFind[j])
+            {
+                j++;
+                if (j == strlen(toFind))
+                {
+                    for (k = i+1; k < strlen(token); k++)
+                    {
+                        if (token[k] == '>')
+                            break;
+                        else
+                          toReturn[l] = token[k];
+                        l++;
+                    }
+                    return toReturn;
+                }
+            }
+            else
+                j = 0;
+        }
+    }
+
 
     for (i = 0; i < strlen(token); i++)
     {
@@ -292,6 +351,8 @@ char* getTagContents(char* token, char* toFind)
                 return toReturn;
             }
         }
+        else
+            j = 0;
     }
 
     return toReturn;

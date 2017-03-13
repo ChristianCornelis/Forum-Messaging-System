@@ -1,8 +1,13 @@
+<?php
+		$cmd = './converter view.wpml';
+		exec($cmd, $output, $status);
 
-<form action = addauthor.php>
-	<input type = "submit" value = Add/Remove Author> 
-</form>
-
-<form action = post.php>
-	<input type = "submit" value = Post> 
-</form>
+		if ($status)
+				echo('Exec() failed');
+		else
+		{
+				foreach($output as $line)
+						echo $line;
+		}
+		
+ ?>

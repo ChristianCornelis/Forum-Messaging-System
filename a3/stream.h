@@ -29,7 +29,7 @@ void updateStream (struct userPost * st);
 void addUser(char * username, char * list, int isRemovable);
 
 /*function to remove a user from a stream*/
-void removeUser(char * username, char * list);
+void removeUser(char * username, char * stream);
 
 /*function to check if an author is already present in a stream's file*/
 int checkAuthorExists(char* author, char* fileName);

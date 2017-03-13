@@ -1,2 +1,2 @@
-.b(name="Add/Remove_Author",link="test.html").b(name="Post", link="post.php")
+.h(text="Login",size=<3>).d()
 .i(name="usernameInput",value="Jeff Kaplan",text="Username",action="index.php")

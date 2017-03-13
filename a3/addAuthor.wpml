@@ -1,0 +1,2 @@
+.h(text="Add Author",size=<3>).d()
+.i(name="streamInput",value="cars,trucks",text="Stream[s]").r(action="addAuthor.php",name="isRemovable",value="Add",value="Remove")

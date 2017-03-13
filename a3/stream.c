@@ -37,7 +37,7 @@ void updateStream (struct userPost * st)
     /*if the stream does not exist, make the files but do not add anything to them*/
     if (checkAuthorExists(st->username, fileName) == -1)
     {
-        printf("Error: Invalid stream name: Stream does not exist.\nStream files created.\nTo post to this stream, please use the addauthor program to gain permission to post to this stream\n");
+        printf("Error: Invalid stream name: Stream does not exist.<BR>Stream files created.<BR>To post to this stream, please use the addauthor program to gain permission to post to this stream\n");
 
         /*creating files and closing immediately*/
         FILE* streamsUsers = fopen(fileName, "w");
@@ -51,7 +51,7 @@ void updateStream (struct userPost * st)
     }
     /*else if user does not have permission to post in the stream*/
     else if (checkAuthorExists(st->username, fileName) == 0)
-        printf("Error: This user does not have permission to post in this stream.\nUse the addauthor program to gain permission to post to this stream.\n");
+        printf("Error: This user does not have permission to post in this stream.<BR>Use the addauthor program to gain permission to post to this stream.<BR>");
 
     /*else if the user does have permission to post in the stream*/
     else if (checkAuthorExists(st->username, fileName) == 1)
@@ -68,7 +68,7 @@ void updateStream (struct userPost * st)
         fprintf(streamData, "%zd\n", strlen(st->text) + strlen(st->date) + strlen(st->username) + 16);
         fclose(streamData);
 
-        printf("Post successfully added to the stream.\n");
+        printf("Post successfully added to the stream.<BR>");
 
     }
     free(fileName);
@@ -81,7 +81,7 @@ void updateStream (struct userPost * st)
 /*function to add a user to a list of streams*/
 void addUser(char * username, char * list, int isRemovable)
 {
-    int a = 0; 
+    int a = 0;
     char * indivStream = malloc(sizeof(char) *300);
     for (a = 0; a < 300; a++)
         indivStream[a] = '\0';
@@ -100,7 +100,7 @@ void addUser(char * username, char * list, int isRemovable)
             streamListCnt++;
             indivStream = clearString(indivStream, 300);
             k = 0;
-            
+
 
             if (list[j] == '\n')
                 j++;
@@ -152,7 +152,7 @@ void addUser(char * username, char * list, int isRemovable)
 
                 fclose(streamData);
                 fclose(stream);
-                printf("%s was successfully added to the %s stream.\n", username, streamList[i]);
+                printf("%s was successfully added to the %s stream.<BR>", username, streamList[i]);
 
                 free(fileName2);
                 free(fileName3);
@@ -160,22 +160,22 @@ void addUser(char * username, char * list, int isRemovable)
             FILE* fptr = fopen(fileName, "a");
             fprintf(fptr, "%s 0\n", username);
             fclose(fptr);
-            printf("%s was successfully added to the %s stream.\n", username, streamList[i]);
+            printf("%s was successfully added to the %s stream.<BR>", username, streamList[i]);
 
 
         }
         /*else if the author IS in the streams user file already and the author is to be removed*/
         else if (checkAuthorExists(username, fileName) == 1 && isRemovable == 1)
         {
-            removeUser(username, list);
-            printf("%s was successfully removed from the %s stream.\n", username, streamList[i]);
+            removeUser(username, streamList[i]);
+            printf("%s was successfully removed from the %s stream.<BR>", username, streamList[i]);
         }
         else if (checkAuthorExists(username, fileName) == 0 && isRemovable == 1)
-            printf("%s is not currently in the %s stream and cannot be removed from it.\n", username, streamList[i]);
+            printf("%s is not currently in the %s stream and cannot be removed from it.<BR>", username, streamList[i]);
         else if (checkAuthorExists(username, fileName) == -1 && isRemovable == 1)
-            printf("%s cannot be removed from the %s stream because it does not exist.\n", username, streamList[i]);
+            printf("%s cannot be removed from the %s stream because it does not exist.<BR>", username, streamList[i]);
         else
-            printf("%s is already in the %s stream.\n", username, streamList[i]);
+            printf("%s is already in the %s stream.<BR>", username, streamList[i]);
 
         /*clearing the fileName string to avoid issues with strcat
         fileName = clearString(fileName, 255);*/
@@ -185,50 +185,13 @@ void addUser(char * username, char * list, int isRemovable)
     /*freeing all malloc'd memory*/
     destroyArray(streamList, 50);
     free(username);
-    free(list);    
+    free(list);
     return;
 }
 
 /*function to remove a user from a stream*/
-void removeUser(char * username, char * list)
+void removeUser(char * username, char * stream)
 {
-    int a = 0;
-    char * indivStream = malloc(sizeof(char) *300);
-    for (a = 0; a < 300; a++)
-        indivStream[a] = '\0';
-    char** streamList = initArray(50, 500);
-    int streamListCnt = 0;
-    int j = 0;
-    int k = 0;
-
-    /*iterate through user input for stream list and break it up into the separate streams*/
-    while (list[j] != '\0')
-    {
-        /*if comma or null terminator is reached, then add the stream name to the list*/
-        if (list[j] == ',' || list[j] == '\n')
-        {
-            strcpy(streamList[streamListCnt], indivStream);
-            streamListCnt++;
-            indivStream = clearString(indivStream, 300);
-            k = 0;
-            j++;
-
-            if (list[j] == '\n')
-                j++;
-        }
-        else if (list[j] != ' ')
-        {
-            indivStream[k] = list[j];
-            k++;
-        }
-        j++;
-    }
-
-    /*freeing unneeded variables*/
-    free(indivStream);
-
-    int g = 0;
-
     DIR* dirPtr;
     /*if messages folder does not exist, then create it*/
     if (!(dirPtr=opendir("messages")))
@@ -237,56 +200,53 @@ void removeUser(char * username, char * list)
     }
     free(dirPtr);
 
-    for (g = 0; g < streamListCnt; g++)
+    char* fileName = initString(255);
+    strcpy(fileName, "messages/");
+    strcat(fileName, stream);
+    strcat(fileName, "StreamUsers");
+
+    FILE* fptr = fopen(fileName, "r");
+    char** authors = initArray(100, 300);
+    int authorsCnt = 0;
+    char line[255] = "";
+    char temp[255] = "";
+
+    /*parse the file and compare all author names in it to the removeable author's name*/
+    while (fgets(line, 255, fptr) != NULL)
     {
-        char* fileName = initString(255);
-        strcpy(fileName, "messages/");
-        strcat(fileName, streamList[g]);
-        strcat(fileName, "StreamUsers");
+        strcpy(temp, line);
 
-        FILE* fptr = fopen(fileName, "r");
-        char** authors = initArray(100, 300);
-        int authorsCnt = 0;
-        char line[255] = "";
-        char temp[255] = "";
+        int index = strlen(temp) -1;
+        while (temp[index] != ' ')
+            index--;
+        temp[index] = '\0';
+        char name[255] = "";
+        strcpy(name, temp);
 
-        /*parse the file and compare all author names in it to the removeable author's name*/
-        while (fgets(line, 255, fptr) != NULL)
+        /*if the name on the line is not the authors, add it to the array*/
+        if (strcmp(name, username) != 0 && strcmp(name, "\n") != 0)
         {
-            strcpy(temp, line);
-
-            int index = strlen(temp) -1;
-            while (temp[index] != ' ')
-                index--;
-            temp[index] = '\0';
-            char name[255] = "";
-            strcpy(name, temp);
-
-            /*if the name on the line is not the authors, add it to the array*/
-            if (strcmp(name, username) != 0 && strcmp(name, "\n") != 0)
-            {
-                strcpy(authors[authorsCnt], line);
-                authorsCnt++;
-            }
+            strcpy(authors[authorsCnt], line);
+            authorsCnt++;
         }
-
-        fclose(fptr);
-
-        /*reopening file and writing users back to the file before returning*/
-        fptr = fopen(fileName, "w");
-        int i;
-        for (i = 0; i < authorsCnt; i++)
-        {
-            if (strcmp(authors[i], "") != 0)
-                fprintf(fptr, "%s", authors[i]);
-        }
-
-        fclose(fptr);
-        free(fileName);
-        destroyArray(authors, 100);
     }
 
-    destroyArray(streamList, 50);
+    fclose(fptr);
+
+    /*reopening file and writing users back to the file before returning*/
+    fptr = fopen(fileName, "w");
+    int i;
+    for (i = 0; i < authorsCnt; i++)
+    {
+        if (strcmp(authors[i], "") != 0)
+            fprintf(fptr, "%s", authors[i]);
+    }
+
+    fclose(fptr);
+    free(fileName);
+    destroyArray(authors, 100);
+
+
     return;
 }
 

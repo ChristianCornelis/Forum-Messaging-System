@@ -1,7 +1,7 @@
 /***************************************************
 Christian Cornelis        ccorneli@mail.uoguelph.ca
 CIS*2750                  ID# 0939357
-February 19th, 2017       Assignment 2
+March 17th, 2017          Assignment 2
 ***************************************************/
 
 #include <stdio.h>
@@ -11,32 +11,12 @@ February 19th, 2017       Assignment 2
 
 int main(int argc, char const *argv[])
 {
-    if (argc < 2)
-    {
-        printf("Incorrect number of arguments.\nExitting\n");
-        return 1;
-    }
-    else if (argc == 2 && strcmp(argv[1], "-r") == 0)
-    {
-        printf("Error: An author ID must be inputted to be removed.\nExitting\n");
-        return 1;
-    }
-
-    int j = 0;
-    for (j = 0; j < argc; j++)
-    {
-        if ((strcmp(argv[j], "-r") == 0) && (j != 1 && j != argc-1))
-        {
-            printf("Error: The -r flag can only be before or after a username.\nExitting.\n");
-            exit(1);
-        }
-    }
 
     int a;
     char* author = malloc(sizeof(char)*300);
     for (a = 0; a < 300; a++)
         author[a] = '\0';
-    int i = 1;
+    int i = 2;
     int isRemovable = 0;
 
     /*adding all parts of the userName to a string*/
@@ -63,19 +43,19 @@ int main(int argc, char const *argv[])
     for (a = 0; a < 1000; a++)
         streams[a] = '\0';
 
-    printf("list streams: ");
+    strcpy(streams, argv[1]);
+	strcat(streams, "\n");
     /*getting user-inputted streams*/
-    fgets(streams, 1000, stdin);
     if (strcmp(streams, "\n") == 0)
     {
-        printf("Error: Invalid stream name.\nExitting");
+        printf("Error: Invalid stream name.<BR>Exitting");
         free(streams);
         free(author);
         return 1;
     }
     else if (strstr(streams, " ") != NULL)
     {
-        printf("Error: Stream names cannot contain spaces.\nExitting.");
+        printf("Error: Stream names cannot contain spaces.<BR>Exitting.");
         free(streams);
         free(author);
         return 1;
@@ -84,4 +64,3 @@ int main(int argc, char const *argv[])
 
     return 0;
 }
-
