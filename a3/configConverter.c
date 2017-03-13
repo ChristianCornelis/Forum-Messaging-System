@@ -225,7 +225,7 @@ int main(int argc, char *argv[])
                 }
 
                 printf("\t<img src = \"%s\" alt = \"image\" style = \"width:%spx; height:%spx;\"> <br>\n" , image, width, height);
-                free(size);
+                free(size); 
                 free(image);
                 free(width);
                 free(height);

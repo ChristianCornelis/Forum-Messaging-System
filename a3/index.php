@@ -1,5 +1,5 @@
 <?php
-    $cmd = './converter login.wpml';
+    $cmd = './converter config/login.wpml';
     exec($cmd, $output, $status);
 
     if ($status)

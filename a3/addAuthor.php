@@ -1,5 +1,5 @@
 <?php
-	$cmd = './converter addAuthor.wpml';
+	$cmd = './converter config/addAuthor.wpml';
 	exec($cmd, $output, $status);
 
 	if ($status)

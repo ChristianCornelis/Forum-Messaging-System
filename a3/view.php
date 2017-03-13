@@ -1,5 +1,5 @@
 <?php
-		$cmd = './converter view.wpml';
+		$cmd = './converter config/view.wpml';
 		exec($cmd, $output, $status);
 
 		if ($status)
@@ -9,5 +9,5 @@
 				foreach($output as $line)
 						echo $line;
 		}
-		
+
  ?>
