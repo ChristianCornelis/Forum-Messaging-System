@@ -34,4 +34,4 @@ view: view.py
 config: configConverter.c
 	gcc  -Wall -ansi configConverter.c -o converter
 clean:
-	rm *.o libstream.a addauthor post a1 post.c
+	rm *.o libstream.a addauthor post converter a1 post.c
