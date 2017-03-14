@@ -134,11 +134,6 @@ int main(int argc, char *argv[])
                 char* subStr;
                 while(strstr(token, "name=\"") != NULL)
                 {
-                  /*if (subStr = strstr(token, "action=") != NULL)
-                  {
-                      action = getTagContents(token, "action=\"");
-                      token[subStr-token] = '@';
-                  }*/
 
 	              if ((subStr = strstr(token, "value=")) != NULL)
 	              {
@@ -192,7 +187,7 @@ int main(int argc, char *argv[])
                 else if (strstr(token, "size=") == NULL)
                 {
                     size = calloc(25, sizeof(char));
-                    strcpy(size, "<100><100>");
+                    strcpy(size, "<100>x<100>");
                 }
 
                 char* width = calloc(25, sizeof(char));
@@ -210,6 +205,7 @@ int main(int argc, char *argv[])
                     {
                         closeCnt++;
                         j = 0;
+						i++;
                         continue;
                     }
 
@@ -259,6 +255,10 @@ int main(int argc, char *argv[])
 	                free(value);
 				}
             }
+			else if (token[1] == 'a')
+			{
+
+			}
 
             token = strtok(NULL, ")");
         }
@@ -296,8 +296,13 @@ char* getTagContents(char* token, char* toFind, char tag)
                     {
                         if (token[k] == '>' && closingCnt == 1)
                             break;
-                        else
-                            closingCnt++;
+						else if (token[k] == '>' && closingCnt == 0)
+						{
+							toReturn[l] = token[k];
+							l++;
+							closingCnt++;
+							k++;
+						}
                         toReturn[l] = token[k];
                         l++;
                     }
