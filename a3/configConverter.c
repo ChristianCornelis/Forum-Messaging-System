@@ -157,6 +157,7 @@ int main(int argc, char *argv[])
 	                  name = getTagContents(token, "name=\"", 'i');
 	                  token[subStr-token] = '@';
 	              }
+
 	              printf("\t%s:<br>\n\t<input type=\"text\" name = \"%s\" value = \"%s\"> <br> <br>\n", text, name, value);
 
 	              free(value);
@@ -225,7 +226,7 @@ int main(int argc, char *argv[])
                 }
 
                 printf("\t<img src = \"%s\" alt = \"image\" style = \"width:%spx; height:%spx;\"> <br>\n" , image, width, height);
-                free(size); 
+                free(size);
                 free(image);
                 free(width);
                 free(height);

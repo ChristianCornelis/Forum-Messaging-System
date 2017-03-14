@@ -11,14 +11,15 @@
     }
 	if (isset($_POST["submit"]))
 	{
-		echo "YES";
+
 		$username = $_POST["usernameInput"];
 		$fptr = fopen("usernameData", "w");
 		fwrite($fptr, $username);
 		fclose($fptr);
-
-		header("location: view.php");
-		//file_put_contents("usernameData", $username);
+		if (file_exists("messages/"))
+			header("location: view.php");
+		else
+			header("location: addAuthor.php");
 	}
 
 ?>
