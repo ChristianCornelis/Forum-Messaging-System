@@ -3,9 +3,9 @@
 	$fptr = fopen("usernameData", "r");
 	$username = fgets($fptr);
 	fclose($fptr);
-	
+
 	//generating HTML code for webpage
-	$cmd = './converter config/view.wpml';
+	$cmd = './converter config/menu.wpml';
 	exec($cmd, $output, $status);
 	//if exec unsuccessful
 	if ($status)

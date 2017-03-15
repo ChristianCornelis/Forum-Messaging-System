@@ -1,0 +1,120 @@
+    numRead = 0
+    if (toStart < len(postLines) and pos > postLines[toStart]):
+        for i in postLines:
+            if pos >= int(i):
+                numRead += 1
+        #if the user will have seen an unread post upon initting the screen, update what has been read
+        if numRead > toStart:
+            updatePostsRead(userFile, username, numRead)
+
+    #while input != q OR s
+    while(event != 113 and event != 115):
+
+        #printing menu)
+        #if the user presses the down arow key
+        elif event == curses.KEY_DOWN:
+            if padPos < y:
+                padPos += 23
+                if padPos > y:
+                    padPos = y
+                pos = padPos + 23
+                numRead = 0
+                if (toStart < len(postLines) and pos > postLines[toStart]):
+                    for i in postLines:
+                        if pos >= int(i):
+                            numRead += 1
+
+                    if numRead > toStart:
+                        updatePostsRead(userFile, username, numRead)
+                pad.refresh(padPos, 0, 0, 0, 23, 80)
+                screen.addstr(23, 0, "Up-pg up  Down-pg down  O-order toggle  M-mark all  S-stream  C-check for new  ")
+        #else if the user presses 'c'
+        elif event == 99:
+            #getting the position to start the posts at
+            userFile = "messages/" + stream + "StreamUsers"
+            with open(userFile) as f:
+                streamUsers = f.readlines()
+            streamUsers = [i.strip() for i in streamUsers]
+            nameToCompare = ""
+            toStart = -1
+            for i in streamUsers:
+                nameToCompare = ""
+                tokens = i.split(" ")
+                for j in range(0, len(tokens)-1):
+                    nameToCompare += " "
+                    nameToCompare += tokens[j]
+                nameToCompare = nameToCompare.strip()
+                if (nameToCompare and nameToCompare == username):
+                    toStart = int(tokens[len(tokens)-1])
+            pad.clear()
+            screen.refresh()
+            with open(string) as f:
+                bytesList = f.readlines()
+            #stripping off spacing from each element
+            bytesList = [i.strip() for i in bytesList]
+
+            streamStr = "messages/" +stream + "Stream"
+            dataFptr = open(streamStr, "r")
+            x = 0
+            y = 0
+            postLines = []
+            #printing out the stream using the <stream>StreamData file
+            for i in range (0, len(bytesList)):
+                if(i == 0):
+                    dataFptr.seek(0, 0)
+                else:
+                    offset = 0
+                    for k in range(0, i):
+                        offset += int(bytesList[k])
+                    dataFptr.seek(offset, 0)
+                postLines.append(y)
+                for j in range(0, int(bytesList[i])):
+                    c = dataFptr.read(1)
+                    pad.addch(y, x, c)
+                    pad.refresh(padPos, 0, 0, 0, 23, 80)
+                    if c == '\n':
+                        y += 1
+                        x = 0
+                    else:
+                        x += 1
+                    pad.refresh(padPos, 0, 0, 0, 23, 80)
+                y+= 1
+                x = 0
+                pad.addstr(y, x, "--------------------------------------------------------------------------------")
+                y+= 1
+                x = 0
+                pad.refresh(padPos, 0, 0, 0, 23, 80)
+            dataFptr.close()
+            #determining whether the number of posts seen by the user needs to be updated
+            if (toStart >= len(postLines) or toStart == -1):
+                padPos = 0
+            else:
+                padPos = postLines[toStart]
+            pos = padPos + 23
+            numRead = 0
+            if (toStart < len(postLines) and pos > postLines[toStart]):
+                for i in postLines:
+                    if pos >= int(i):
+                        numRead += 1
+                #updating the number of posts read
+                if numRead > toStart:
+                    updatePostsRead(userFile, username, numRead)
+
+            pad.refresh(padPos, 0, 0, 0, 23, 80)
+            screen.addstr(23, 0, "Up-pg up  Down-pg down  O-order toggle  M-mark all  S-stream  C-check for new  ")
+            screen.refresh()
+
+        #if the user selects 'm', updating all posts to be read
+        elif event == 109:
+            length = len(postLines)
+            updatePostsRead(userFile, username, length)
+
+        event = screen.getch()
+
+    #cleaning up curses
+    curses.nocbreak()
+    screen.keypad(0)
+    curses.echo()
+    curses.endwin()
+
+    return event;

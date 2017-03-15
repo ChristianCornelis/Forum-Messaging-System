@@ -1,5 +1,3 @@
 .h(text="Viewing", size=<2>).d()
-.b(name="Add/Remove Author", link="addAuthor.php")
-.b(name="Post", link="post.php")
-.i(name="streamInput",value="cars",text="Enter a stream to display",action="view.php").t(text="Stream options for this user:")
-.b(name="Return", link="index.php")
+.b(name="Mark all as read", link="view.php").b(name="Switch streams", link="view.php").b(name="Order toggle", link="view.php").b(name="Previous post", link="view.php").b(name="Next post", link="view.php")
+.b(name="Return", link="menu.php")

@@ -77,7 +77,7 @@ def printPost(username, stream):
 
     print("START " + str(toStart))
     #printing data from <stream>Stream file
-    
+
     if(toStart == 0):
         dataFptr.seek(0, 0)
     else:
@@ -148,7 +148,7 @@ def getStreams(username):
 	return userStreams
 stream = sys.argv[1]
 username = sys.argv[2]
-#postNum = sys.argv[3]
+postOffset = sys.argv[3]
 if (stream == "*OUTPUT*"):
 	userStreams = getStreams(username)
 	for i in userStreams:

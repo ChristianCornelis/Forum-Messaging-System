@@ -16,8 +16,12 @@
 		$fptr = fopen("usernameData", "w");
 		fwrite($fptr, $username);
 		fclose($fptr);
+		//initializing offset for viewing
+		$fptr2 = fopen("viewData", "w");
+		fwrite($fptr2, "0");
+		fclose($fptr2);
 		if (file_exists("messages/"))
-			header("location: view.php");
+			header("location: menu.php");
 		else
 			header("location: addAuthor.php");
 	}

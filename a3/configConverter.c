@@ -270,7 +270,7 @@ int main(int argc, char *argv[])
 		if (printForm == 1 && (strstr(line, ".i(") != NULL || strstr(line, ".i(") != NULL))
 			printf("\n\t<input type = \"submit\" name = \"submit\" value = \"Submit\">\n");
         if (printForm == 1)
-      		printf("</form>\n");
+      		printf("</form> <br>\n");
     }
 
     fclose(fptr);
