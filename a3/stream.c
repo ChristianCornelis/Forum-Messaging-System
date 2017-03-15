@@ -56,6 +56,17 @@ void updateStream (struct userPost * st)
     /*else if the user does have permission to post in the stream*/
     else if (checkAuthorExists(st->username, fileName) == 1)
     {
+        FILE* dataStream = fopen(fileName2, "r");
+        char line[255];
+        int totalChars = 0;
+        while (fgets(line, 255, dataStream) != NULL)
+        {
+            char* toAdd = strtok(line, "\n");
+            totalChars = atoi(toAdd);
+            printf("ADDING %d\n", atoi(toAdd));
+        }
+        fclose(dataStream);
+        printf("SUM SO FAR: %d\n", totalChars);
         /*adding user post to the stream file*/
         FILE* stream = fopen(fileName3, "a");
         fprintf(stream, "Sender: %s\n", st->username);
@@ -65,7 +76,8 @@ void updateStream (struct userPost * st)
 
         /*adding the size of the text post to the streamdata file*/
         FILE* streamData = fopen(fileName2, "a");
-        fprintf(streamData, "%zd\n", strlen(st->text) + strlen(st->date) + strlen(st->username) + 16);
+        fprintf(streamData, "%d\n", (totalChars + ((int) (strlen(st->text) + strlen(st->date) + strlen(st->username)) + 16)));
+        printf("%d\n", (totalChars + ((int) (strlen(st->text) + strlen(st->date) + strlen(st->username)) + 16)));
         fclose(streamData);
 
         printf("Post successfully added to the stream.<BR>");

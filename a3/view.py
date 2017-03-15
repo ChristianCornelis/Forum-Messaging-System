@@ -72,14 +72,14 @@ def printPost(username, stream):
         if (nameToCompare and nameToCompare == username):
             toStart = int(tokens[(len(tokens)-1)])
     initToStart = toStart
+    print("BYTES " + str(bytesList))
     if (toStart == len(bytesList)):
         toStart = 0
     elif (toStart == 0):
         toStart = 0
-
-    print("START " + str(toStart))
+    print("TOSTART: " + str(toStart))
     #printing data from <stream>Stream file
-
+    offset = 0
     if(toStart == 0):
         dataFptr.seek(0, 0)
     else:
@@ -88,10 +88,17 @@ def printPost(username, stream):
         for k in range(0, toStart):
             offset += int(bytesList[k])
         dataFptr.seek(offset, 0)
-        print("OFFSET " + str(offset))
+    print("OFFSET " + str(offset))
     postPtr = open("postData", "w")
+    endInd = 0
+    if (offset is not 0):
+        endInd = int(bytesList[toStart])-offset
+    else:
+        endInd = int(bytesList[0])#int(bytesList[len(bytesList)-1])
+    print("END INd " + str(endInd))
+
     #printing post with correct formatting
-    for j in range(0, int(bytesList[toStart])):
+    for j in range(0, endInd):
         c = dataFptr.read(1)
         print(c, end="")
         postPtr.write(c)

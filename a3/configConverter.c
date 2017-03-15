@@ -37,18 +37,24 @@ int main(int argc, char *argv[])
         char* action = NULL;
         char* value = NULL;
         char* image = NULL;
+        char* id = NULL;
         int printForm = 0;
         token = strtok(line, ")");
 
         if (strstr(line, ".i(") != NULL || strstr(line, ".b(") != NULL || strstr(line, ".r(") != NULL)
         {
-          printForm = 1;
-          if (strstr(token, ".b(") != NULL)
-            printf("<form action = \"%s\" method=\"post\">\n", (action = getTagContents(token, "link=\"", 'b')));
-          else
-            printf("<form action = \"%s\" method=\"post\">\n", (action = getTagContents(token, "action=\"", 'i')));
+            printForm = 1;
+            if (strstr(token, ".i") != NULL && strstr(token, "id=\"") != NULL)
+            {
+                printf("<form id=\"%s\" action = \"%s\" method=\"post\">\n", (id = getTagContents(token, "id=\"", 'i')),(action = getTagContents(token, "action=\"", 'b')));
+                free(id);
+            }
+            else if (strstr(token, ".b(") != NULL)
+                printf("<form action = \"%s\" method=\"post\">\n", (action = getTagContents(token, "link=\"", 'b')));
+            else
+                printf("<form action = \"%s\" method=\"post\">\n", (action = getTagContents(token, "action=\"", 'i')));
 
-          free(action);
+            free(action);
         }
 
         while (token != NULL)

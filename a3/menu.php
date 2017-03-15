@@ -1,8 +1,10 @@
 <?php
 	//grabbing username
-	$fptr = fopen("usernameData", "r");
+	/*$fptr = fopen("usernameData", "r");
 	$username = fgets($fptr);
-	fclose($fptr);
+	fclose($fptr);*/
+
+	echo("AAA" . $_POST["username"]);
 
 	//generating HTML code for webpage
 	$cmd = './converter config/menu.wpml';

@@ -13,6 +13,9 @@
 	{
 
 		$username = $_POST["usernameInput"];
+        echo ("<form=\"test\" method =\"post\">");
+        echo("\t<input type=\"hidden\" name=\"username\" value=\"" . $username . "\">");
+        echo("</form>");
 		$fptr = fopen("usernameData", "w");
 		fwrite($fptr, $username);
 		fclose($fptr);
