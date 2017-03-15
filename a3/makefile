@@ -4,7 +4,7 @@
 #February 19th, 2017       Assignment 2
 ######################################################
 
-all: a1 addAuthor post.c post
+all: a1 addAuthor post.c post config
 
 a1: parser.c helperFunctions.c helperFunctions.h
 	gcc -Wall -ansi parser.c helperFunctions.c -g -o a1

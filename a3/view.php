@@ -17,10 +17,10 @@
 			{
 				echo $line;
 				//checking if all user's subscribed streams should be outputted
-				if (strstr($line, "Stream options for this user:") != NULL)
+				if (strstr($line, "Post:") != NULL)
 				{
 					//outputting user's streams
-					$cmd2 = './view.py *OUTPUT* ' . escapeshellarg($username) . ' 0';
+					$cmd2 = './view.py  ' .escapeshellarg($stream) escapeshellarg($username) . ' 0';
 					exec($cmd2, $output2, $status2);
 
 					if ($status2)

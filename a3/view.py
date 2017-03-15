@@ -43,7 +43,9 @@ def printPost(username, stream):
     string = "messages/" + stream + "StreamData"
     with open(string) as f:
         bytesList = f.readlines()
-
+    if (len(bytesList) == 0):
+        print("Error: No posts to display")
+        exit(1)
     #stripping spaces at beginning and end of string
     bytesList = [i.strip() for i in bytesList]
 
@@ -73,7 +75,7 @@ def printPost(username, stream):
     if (toStart == len(bytesList)):
         toStart = 0
     elif (toStart == 0):
-        toStart = 1
+        toStart = 0
 
     print("START " + str(toStart))
     #printing data from <stream>Stream file
@@ -87,10 +89,13 @@ def printPost(username, stream):
             offset += int(bytesList[k])
         dataFptr.seek(offset, 0)
         print("OFFSET " + str(offset))
+    postPtr = open("postData", "w")
     #printing post with correct formatting
     for j in range(0, int(bytesList[toStart])):
         c = dataFptr.read(1)
         print(c, end="")
+        postPtr.write(c)
+    postPtr.close()
     if (initToStart is not len(bytesList)):
         updatePostsRead(userFile, username, toStart+1)
     dataFptr.close()

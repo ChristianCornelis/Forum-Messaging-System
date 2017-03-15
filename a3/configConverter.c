@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+ 
 char* getTagContents(char* token, char* toFind, char tag);
 
 int main(int argc, char *argv[])
 {
     if (argc != 2)
-    {
+    { 
         printf("Error: No configuration file inputted.\nExitting.\n");
         return 1;
     }
