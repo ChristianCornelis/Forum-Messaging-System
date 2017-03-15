@@ -1,3 +1,3 @@
 .h(text="Post",size=<3>).d()
-.i(name="streamInput",value="Overwatch",text="Stream[s]",name="textInput",value="Enter post content here",text="Text", action="post.php")
+.i(name="streamInput",value="Overwatch",text="Stream", action="post.php").i(name="textInput",value="Enter post content here",text="Text", textArea="True")
 .b(name="Return", link="view.php")

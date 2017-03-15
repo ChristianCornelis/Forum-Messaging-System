@@ -152,8 +152,13 @@ int main(int argc, char *argv[])
 	                  name = getTagContents(token, "name=\"", 'i');
 	                  token[subStr-token] = '@';
 	              }
-
-	              printf("\t%s:<br>\n\t<input type=\"text\" name = \"%s\" value = \"%s\"> <br> <br>\n", text, name, value);
+				  /*if the input field should be a text area and not a text input*/
+				  if (strstr(token, "textArea=\"True\"") != NULL)
+				  {
+					  printf("\t%s:<br>\n\t<textarea rows=\"5\" cols=\"60\" name=\"%s\">%s</textarea><br>", text, name, value);
+				  }
+				  else
+	              	printf("\t%s:<br>\n\t<input type=\"text\" name = \"%s\" value = \"%s\"> <br> <br>\n", text, name, value);
 
 	              free(value);
 	              free(text);

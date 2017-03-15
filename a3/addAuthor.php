@@ -15,7 +15,7 @@
 	{
 		$fptr = fopen("usernameData", "r");
 		$username = fgets($fptr);
-		fclose($Sfptr);
+		fclose($fptr);
 		switch($_POST["isRemovable"])
 		{
 			case "Add":

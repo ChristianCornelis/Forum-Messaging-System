@@ -1,5 +1,5 @@
 .h(text="Viewing", size=<2>).d()
 .b(name="Add/Remove Author", link="addAuthor.php")
 .b(name="Post", link="post.php")
-.i(name="streamInput",value="cars,trucks,fruit",text="Enter stream or streams to display",action="view.php")
+.i(name="streamInput",value="cars",text="Enter a stream to display",action="view.php").t(text="Stream options for this user:")
 .b(name="Return", link="index.php")
