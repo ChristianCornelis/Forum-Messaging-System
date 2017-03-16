@@ -169,10 +169,11 @@ void addUser(char * username, char * list, int isRemovable)
                 free(fileName2);
                 free(fileName3);
             }
+			else
+				printf("%s was successfully added to the %s stream.<BR>", username, streamList[i]);
             FILE* fptr = fopen(fileName, "a");
             fprintf(fptr, "%s 0\n", username);
             fclose(fptr);
-            printf("%s was successfully added to the %s stream.<BR>", username, streamList[i]);
 
 
         }
@@ -193,7 +194,7 @@ void addUser(char * username, char * list, int isRemovable)
         fileName = clearString(fileName, 255);*/
         free(fileName);
     }
-
+	
     /*freeing all malloc'd memory*/
     destroyArray(streamList, 50);
     free(username);

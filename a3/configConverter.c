@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
- 
+
 char* getTagContents(char* token, char* toFind, char tag);
 
 int main(int argc, char *argv[])
 {
     if (argc != 2)
-    { 
+    {
         printf("Error: No configuration file inputted.\nExitting.\n");
         return 1;
     }
@@ -41,18 +41,18 @@ int main(int argc, char *argv[])
         int printForm = 0;
         token = strtok(line, ")");
 
-        if (strstr(line, ".i(") != NULL || strstr(line, ".b(") != NULL || strstr(line, ".r(") != NULL)
+        if (strstr(line, ".i(") != NULL || strstr(line, ".b(") != NULL || strstr(line, ".r(") != NULL || strstr(line, ".q(") != NULL)
         {
             printForm = 1;
-            if (strstr(token, ".i") != NULL && strstr(token, "id=\"") != NULL)
+            if (strstr(line, ".i") != NULL && strstr(line, "id=\"") != NULL)
             {
-                printf("<form id=\"%s\" action = \"%s\" method=\"post\">\n", (id = getTagContents(token, "id=\"", 'i')),(action = getTagContents(token, "action=\"", 'b')));
+                printf("<form id=\"%s\" action = \"%s\" method=\"post\">\n", (id = getTagContents(line, "id=\"", 'i')),(action = getTagContents(line, "action=\"", 'i')));
                 free(id);
             }
-            else if (strstr(token, ".b(") != NULL)
-                printf("<form action = \"%s\" method=\"post\">\n", (action = getTagContents(token, "link=\"", 'b')));
+            else if (strstr(line, ".b(") != NULL)
+                printf("<form action = \"%s\" method=\"post\">\n", (action = getTagContents(line, "link=\"", 'b')));
             else
-                printf("<form action = \"%s\" method=\"post\">\n", (action = getTagContents(token, "action=\"", 'i')));
+                printf("<form action = \"%s\" method=\"post\">\n", (action = getTagContents(line, "action=\"", 'i')));
 
             free(action);
         }
@@ -266,9 +266,22 @@ int main(int argc, char *argv[])
 	                free(value);
 				}
             }
-			else if (token[1] == 'a')
+			else if (token[1] == 'q')
 			{
+				char* subStr;
+				if ((subStr = strstr(token, "value=")) != NULL)
+				{
+					value = getTagContents(token, "value=\"", 'i');
+					token[subStr-token] = '@';
+				}
 
+				if ((subStr = strstr(token, "name=")) != NULL)
+				{
+					name = getTagContents(token, "name=\"", 'i');
+					token[subStr-token] = '@';
+				}
+
+				printf("\n\t<input type=\"hidden\" name = \"%s\" value=\"%s\">\n", name, value);
 			}
 
             token = strtok(NULL, ")");
@@ -276,7 +289,7 @@ int main(int argc, char *argv[])
 		if (printForm == 1 && (strstr(line, ".i(") != NULL || strstr(line, ".i(") != NULL))
 			printf("\n\t<input type = \"submit\" name = \"submit\" value = \"Submit\">\n");
         if (printForm == 1)
-      		printf("</form> <br>\n");
+      		printf("</form>\n");
     }
 
     fclose(fptr);

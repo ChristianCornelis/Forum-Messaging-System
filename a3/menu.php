@@ -3,8 +3,8 @@
 	/*$fptr = fopen("usernameData", "r");
 	$username = fgets($fptr);
 	fclose($fptr);*/
-
-	echo("AAA" . $_POST["username"]);
+	$username = $_POST["username"];
+	echo("Currently logged in as: " . $username);
 
 	//generating HTML code for webpage
 	$cmd = './converter config/menu.wpml';
@@ -17,10 +17,11 @@
 		//echoing HTML to screen
 		foreach($output as $line)
 		{
-			echo $line;
+
 			//checking if all user's subscribed streams should be outputted
 			if (strstr($line, "Stream options for this user:") != NULL)
 			{
+				echo $line;
 				//outputting user's streams
 				$cmd2 = './view.py *OUTPUT* ' . escapeshellarg($username) . ' 0';
 				exec($cmd2, $output2, $status2);
@@ -34,13 +35,22 @@
 				}
 				echo "<br><br>";
 			}
+			//else check if a hidden field should be filled
+			else if (strstr($line, "ENTER USERNAME HERE") != NULL)
+			{
+				echo (str_replace("ENTER USERNAME HERE", $username, $line));
+			}
+			//else output the line
+			else
+			{
+				echo $line;
+			}
 		}
 	}
 
 	//if submit button to go to the viewing program is pushed
 	if (isset($_POST["submit"]))
 	{
-		echo "IN";
 		$stream = $_POST["streamInput"];
 		$fptr3 = fopen("streamData", "w");
 		fwrite($fptr3, $stream);

@@ -1,4 +1,6 @@
 <?php
+	$username = $_POST["username"];
+	echo("Currently logged in as: " . $username);
 	$cmd = './converter config/post.wpml';
 	exec($cmd, $output, $status);
 
@@ -7,7 +9,14 @@
 	else
 	{
 		foreach($output as $line)
-			echo $line;
+		{
+			if (strstr($line, "ENTER USERNAME HERE") != NULL)
+			{
+				echo (str_replace("ENTER USERNAME HERE", $username, $line));
+			}
+			else
+				echo $line;
+		}
 	}
 
 	if (isset($_POST["submit"]))
