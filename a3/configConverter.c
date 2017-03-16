@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
         char* value = NULL;
         char* image = NULL;
         char* id = NULL;
-        int printForm = 0;
+        int printForm = 0; 
         token = strtok(line, ")");
 
         if (strstr(line, ".i(") != NULL || strstr(line, ".b(") != NULL || strstr(line, ".r(") != NULL || strstr(line, ".q(") != NULL)

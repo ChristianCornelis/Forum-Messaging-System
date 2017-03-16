@@ -21,9 +21,6 @@
 
 	if (isset($_POST["submit"]))
 	{
-		$fptr = fopen("usernameData", "r");
-		$username = fgets($fptr);
-		fclose($fptr);
 
 		if ($_POST["streamInput"] == " ")
 			echo "Error: Stream name cannot be a space.";

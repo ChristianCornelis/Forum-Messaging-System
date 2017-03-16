@@ -1,9 +1,9 @@
 <?php
 	//grabbing username
-	$fptr = fopen("usernameData", "r");
-	$username = fgets($fptr);
-	fclose($fptr);
-	
+	$username = $_POST['username'];
+	$stream = $_POST['streamInput'];
+	echo ("Currently logged in as: " . $username);
+	echo("<BR> Currently viewing the " . $stream . " stream");
 	//generating HTML code for webpage
 	$cmd = './converter config/view.wpml';
 	exec($cmd, $output, $status);
@@ -20,7 +20,7 @@
 				if (strstr($line, "Post:") != NULL)
 				{
 					//outputting user's streams
-					$cmd2 = './view.py  ' .escapeshellarg($stream) escapeshellarg($username) . ' 0';
+					$cmd2 = './view.py  ' .escapeshellarg($stream) . " " .escapeshellarg($username) . ' 0';
 					exec($cmd2, $output2, $status2);
 
 					if ($status2)
