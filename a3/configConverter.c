@@ -3,7 +3,7 @@
 #include <string.h>
 
 char* getTagContents(char* token, char* toFind, char tag);
-
+ 
 int main(int argc, char *argv[])
 {
     if (argc != 2)

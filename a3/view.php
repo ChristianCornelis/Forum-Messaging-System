@@ -14,7 +14,7 @@
 	//if exec unsuccessful
 
 
-	if ($_POST['Next_post'] == "Next post")
+	if (isset($_POST['Next_post'])) //== "Next post")
 	{
 		echo ("IN DAT SHIT");
 		$offset = $offset+1;
@@ -32,7 +32,7 @@
 				{
 					echo $line;
 					//outputting the appropriate post
-					$cmd2 = './view.py  ' .escapeshellarg($stream) . " " .escapeshellarg($username) . ' 0';
+					$cmd2 = './view.py  ' .escapeshellarg($stream) . " " .escapeshellarg($username) . ' ' . $offset;
 					exec($cmd2, $output2, $status2);
 
 					if ($status2)
@@ -40,7 +40,15 @@
 					else
 					{
 						foreach($output2 as $line2)
-							echo $line2;
+						{
+							if (strstr($line2, "AT END") != NULL)
+							{
+								$offset = 0;
+								echo("OFFSET RESET<BR>");
+							}
+							else
+								echo $line2;
+						}
 					}
 					echo "<br><br>";
 				}
@@ -67,7 +75,7 @@
 		}
 	}
 
-	else if ($_POST['Previous_post'] == "Previous post")
+	else if (isset($_POST['Previous_post']))// == "Previous post")
 	{
 		$offset = $offset - 1;
 		if ($status)
@@ -82,7 +90,7 @@
 				{
 					echo $line;
 					//outputting the appropriate post
-					$cmd2 = './view.py  ' .escapeshellarg($stream) . " " .escapeshellarg($username) . ' 0';
+					$cmd2 = './view.py  ' .escapeshellarg($stream) . " " .escapeshellarg($username) . ' ' . $offset;
 					exec($cmd2, $output2, $status2);
 
 					if ($status2)
@@ -90,7 +98,13 @@
 					else
 					{
 						foreach($output2 as $line2)
+						{
+							if (strstr($line2, "*AT BEGINNING*") != NULL)
+							{
+								$offset = $offset + 1;
+							}
 							echo $line2;
+						}
 					}
 					echo "<br><br>";
 				}

@@ -72,12 +72,14 @@ def printPost(username, stream, postOffset):
 		if (nameToCompare and nameToCompare == username):
 			toStart = int(tokens[(len(tokens)-1)])
 	initToStart = toStart
-	if ((toStart - postOffset) >= 0):
+	if (toStart == len(bytesList)):
+		toStart = toStart-1
+	if ((toStart+postOffset) is 0):
+		print("*AT BEGINNING*")
+	elif ((toStart - postOffset) >= 0):
 		toStart = toStart+postOffset
 	print("BYTES " + str(bytesList))
-	if (toStart == len(bytesList)):
-		toStart = 0
-	elif (toStart == 0):
+	if (toStart == 0):
 		toStart = 0
 	print("TOSTART: " + str(toStart))
 	#printing data from <stream>Stream file
@@ -169,6 +171,7 @@ postOffset = int(sys.argv[3])
 
 if (postOffset > 0):
 	postOffset = 0
+	print("*AT END*")
 print("OFFSET " + str(postOffset))
 if (stream == "*OUTPUT*"):
 	userStreams = getStreams(username)
