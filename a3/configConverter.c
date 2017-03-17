@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
         char* value = NULL;
         char* image = NULL;
         char* id = NULL;
-        int printForm = 0; 
+        int printForm = 0;
         token = strtok(line, ")");
 
         if (strstr(line, ".i(") != NULL || strstr(line, ".b(") != NULL || strstr(line, ".r(") != NULL || strstr(line, ".q(") != NULL)
@@ -115,8 +115,15 @@ int main(int argc, char *argv[])
                 {
                     link = getTagContents(token, "link=\"", 'b');
                 }
-
-                printf("\t<input type = \"submit\" value = \"%s\">\n", name);
+				char name2[255];
+				strcpy(name2, name);
+				int l = 0;
+				for (l = 0; l < strlen(name2); l++)
+				{
+					if (name2[l] == ' ')
+						name2[l] = '_';
+				}
+                printf("\t<input type = \"submit\" value = \"%s\" name = \"%s\">\n", name, name2);
                 free(name);
                 free(link);
             }
@@ -282,6 +289,8 @@ int main(int argc, char *argv[])
 				}
 
 				printf("\n\t<input type=\"hidden\" name = \"%s\" value=\"%s\">\n", name, value);
+				free(name);
+				free(value);
 			}
 
             token = strtok(NULL, ")");

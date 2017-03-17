@@ -4,6 +4,7 @@
 	$username = fgets($fptr);
 	fclose($fptr);*/
 	$username = $_POST["username"];
+	$offset = 0;
 	echo("Currently logged in as: " . $username);
 
 	//generating HTML code for webpage
@@ -40,6 +41,10 @@
 			{
 				echo (str_replace("ENTER USERNAME HERE", $username, $line));
 			}
+			else if (strstr($line, "ENTER OFFSET HERE") != NULL)
+			{
+				echo (str_replace("ENTER OFFSET HERE", $offset, $line));
+			}
 			//else output the line
 			else
 			{
@@ -48,13 +53,13 @@
 		}
 	}
 
-	//if submit button to go to the viewing program is pushed
+	/*//if submit button to go to the viewing program is pushed
 	if (isset($_POST["submit"]))
 	{
 		$stream = $_POST["streamInput"];
 		$fptr3 = fopen("streamData", "w");
 		fwrite($fptr3, $stream);
 		fclose($fptr3);
-	}
+	}*/
 
  ?>

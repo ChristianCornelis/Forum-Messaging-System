@@ -39,74 +39,79 @@ def updatePostsRead(path, name, postsRead):
     return;
 
 #function that runs curses in order to be called multiple times with different streams if the user chooses to switch streams
-def printPost(username, stream):
-    string = "messages/" + stream + "StreamData"
-    with open(string) as f:
-        bytesList = f.readlines()
-    if (len(bytesList) == 0):
-        print("Error: No posts to display")
-        exit(1)
-    #stripping spaces at beginning and end of string
-    bytesList = [i.strip() for i in bytesList]
+def printPost(username, stream, postOffset):
+	string = "messages/" + stream + "StreamData"
+	with open(string) as f:
+		bytesList = f.readlines()
+	if (len(bytesList) == 0):
+		print("Error: No posts to display")
+		exit(1)
+	#stripping spaces at beginning and end of string
+	bytesList = [i.strip() for i in bytesList]
 
-    streamStr = "messages/" +stream + "Stream"
-    dataFptr = open(streamStr, "r")
+	streamStr = "messages/" +stream + "Stream"
+	dataFptr = open(streamStr, "r")
 
-    streamUsers = []
-    userFile = "messages/" + stream + "StreamUsers"
-    with open(userFile) as f:
-        streamUsers = f.readlines()
-    streamUsers = [i.strip() for i in streamUsers]
-    nameToCompare = ""
-    toStart = -1
-    #getting the index that the messages should start to display at based on
-    #what messages the user has read
-    for a in streamUsers:
-        tokens = ""
-        tokens = a.split(" ")
-        nameToCompare = ""
-        for j in range(0, len(tokens)-1):
-            nameToCompare += " "
-            nameToCompare += tokens[j]
-        nameToCompare = nameToCompare.strip()
-        if (nameToCompare and nameToCompare == username):
-            toStart = int(tokens[(len(tokens)-1)])
-    initToStart = toStart
-    print("BYTES " + str(bytesList))
-    if (toStart == len(bytesList)):
-        toStart = 0
-    elif (toStart == 0):
-        toStart = 0
-    print("TOSTART: " + str(toStart))
-    #printing data from <stream>Stream file
-    offset = 0
-    if(toStart == 0):
-        dataFptr.seek(0, 0)
-    else:
-        offset = 0
-        #using seek to offset where the posts are in the file
-        for k in range(0, toStart):
-            offset += int(bytesList[k])
-        dataFptr.seek(offset, 0)
-    print("OFFSET " + str(offset))
-    postPtr = open("postData", "w")
-    endInd = 0
-    if (offset is not 0):
-        endInd = int(bytesList[toStart])-offset
-    else:
-        endInd = int(bytesList[0])#int(bytesList[len(bytesList)-1])
-    print("END INd " + str(endInd))
+	streamUsers = []
+	userFile = "messages/" + stream + "StreamUsers"
+	with open(userFile) as f:
+		streamUsers = f.readlines()
+	streamUsers = [i.strip() for i in streamUsers]
+	nameToCompare = ""
+	toStart = -1
+	#getting the index that the messages should start to display at based on
+	#what messages the user has read
+	for a in streamUsers:
+		tokens = ""
+		tokens = a.split(" ")
+		nameToCompare = ""
+		for j in range(0, len(tokens)-1):
+			nameToCompare += " "
+			nameToCompare += tokens[j]
+		nameToCompare = nameToCompare.strip()
+		if (nameToCompare and nameToCompare == username):
+			toStart = int(tokens[(len(tokens)-1)])
+	initToStart = toStart
+	if ((toStart - postOffset) >= 0):
+		toStart = toStart+postOffset
+	print("BYTES " + str(bytesList))
+	if (toStart == len(bytesList)):
+		toStart = 0
+	elif (toStart == 0):
+		toStart = 0
+	print("TOSTART: " + str(toStart))
+	#printing data from <stream>Stream file
+	offset = 0
+	if(toStart == 0):
+		dataFptr.seek(0, 0)
+	else:
+		offset = 0
+		#using seek to offset where the posts are in the file
+		for k in range(0, toStart):
+			offset = int(bytesList[k])
+		dataFptr.seek(offset, 0)
+	print("OFFSET " + str(offset))
+	postPtr = open("postData", "w")
+	endInd = 0
+	if (offset is not 0):
+		endInd = int(bytesList[toStart])-offset
+	else:
+		endInd = int(bytesList[0])#int(bytesList[len(bytesList)-1])
+	print("END INd " + str(endInd))
 
-    #printing post with correct formatting
-    for j in range(0, endInd):
-        c = dataFptr.read(1)
-        print(c, end="")
-        postPtr.write(c)
-    postPtr.close()
-    if (initToStart is not len(bytesList)):
-        updatePostsRead(userFile, username, toStart+1)
-    dataFptr.close()
-    return
+	#printing post with correct formatting
+	for j in range(0, endInd):
+		c = dataFptr.read(1)
+		if (c == '\n'):
+			print("<br>")
+		else:
+			print(c, end="")
+		postPtr.write(c)
+	postPtr.close()
+	if (initToStart is not len(bytesList)):
+		updatePostsRead(userFile, username, toStart+1)
+	dataFptr.close()
+	return
 
 def getStreams(username):
 	userStreams = []
@@ -160,7 +165,11 @@ def getStreams(username):
 	return userStreams
 stream = sys.argv[1]
 username = sys.argv[2]
-postOffset = sys.argv[3]
+postOffset = int(sys.argv[3])
+
+if (postOffset > 0):
+	postOffset = 0
+print("OFFSET " + str(postOffset))
 if (stream == "*OUTPUT*"):
 	userStreams = getStreams(username)
 	for i in userStreams:
@@ -178,7 +187,7 @@ else:
         if (not found):
             print("Error: The user does not have access to the " + stream + " stream, or the stream does not exist.")
             exit()
-        printPost(username, stream)
+        printPost(username, stream, postOffset)
     else:
         print("Error: All selected, however, this feature was not implemented due to starting the view program too late : )")
         print("Exitting")
