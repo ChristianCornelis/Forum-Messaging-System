@@ -3,7 +3,7 @@
 #include <string.h>
 
 char* getTagContents(char* token, char* toFind, char tag);
- 
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -88,21 +88,35 @@ int main(int argc, char *argv[])
             }
             else if (token[1] == 't')
             {
+                int filePrnt = 0;
+                char toPrint[100000];
                 if (strstr(token, "text=") != NULL)
                 {
                     text = getTagContents(token, "text=\"", 't');
                 }
                 if (strstr(token, "file=") != NULL)
                 {
+                  filePrnt = 1;
                     text = getTagContents(token, "file=\"", 't');
+                    char line[255];
+                    FILE* fptr = fopen(text, "r");
+                    while (fgets(line, 255, fptr) != NULL)
+                    {
+                      strcat(toPrint, line);
+                    }
+                    fclose(fptr);
                 }
                 else if (strstr(token, "text=") == NULL && strstr(token, "file=") == NULL)
                 {
                     text = calloc(15, sizeof(char));
                     strcpy(text, "Default text");
                 }
-
-                printf("\n<p> %s </p>", text);
+                if (filePrnt == 1)
+                {
+                  printf("\n<p> %s </p>", toPrint);
+                }
+                else
+                  printf("\n<p> %s </p>", text);
                 free(text);
             }
             else if (token[1] == 'b')
@@ -137,7 +151,7 @@ int main(int argc, char *argv[])
                 {
                     file = getTagContents(token, "file=\"", 'e');
                 }
-                
+
                 printf("<?php\n\techo (exec '%s');\n?>\n", file);
 
                 free(file);

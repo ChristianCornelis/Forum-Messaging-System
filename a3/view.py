@@ -40,49 +40,54 @@ def updatePostsRead(path, name, postsRead):
 
 #function that runs curses in order to be called multiple times with different streams if the user chooses to switch streams
 def getAll(username, streams):
-	toReturn = []
-	for i in streams:
-		stream = str(i)
-		string = "messages/" + stream + "StreamData"
-		with open(string) as f:
-			bytesList = f.readlines()
-		if (len(bytesList) == 0):
-			print("Error: No posts to display")
-			sys.exit()
+    toReturn = []
+    for i in streams:
+        #print(i)
+        stream = str(i)
+        string = "messages/" + stream + "StreamData"
+        with open(string) as f:
+            bytesList = f.readlines()
+        if (len(bytesList) == 0):
+            continue
 		#stripping spaces at beginning and end of string
-		bytesList = [i.strip() for i in bytesList]
-		print(str(bytesList))
-		streamStr = "messages/" +stream + "Stream"
-		dataFptr = open(streamStr, "r")
+        bytesList = [i.strip() for i in bytesList]
+        #print(str(bytesList))
+        streamStr = "messages/" +stream + "Stream"
+        dataFptr = open(streamStr, "r")
 
-		
-		bytesCnt = 0
-		bytesListCnt = 0
-		toAdd = ""
-		lines = []
+
+        bytesListCnt = 0
+        toAdd = ""
+        lines = []
+        a = 0
 		#for i in range (0, )
 		#printing post with correct formatting
-		for j in range(0, int(bytesList[len(bytesList)-1])):
-			c = dataFptr.read(1)
-			toAdd += c
-			bytesCnt += 1
+        #print("UPPER BOUND")
+        #print(str(bytesList[len(bytesList)-1]))
+        for j in range(0, (int(bytesList[len(bytesList)-1])+1)):
+            c = dataFptr.read(1)
 
-			if (c == '\n'):
-				#print("TO ADD " + str(toAdd))
-				lines.append(toAdd)
-				toAdd = ""
-
-			if (bytesCnt is int(bytesList[bytesListCnt])):
-				bytesListCnt+= 1
-				toReturn.append(lines)
-				lines = []
-		#print("TO RETURN")
-		#print(toReturn)
-		dataFptr.close()
-	toReturn.sort(key=lambda x:x[1])
-	print (toReturn)
-	print(len(toReturn))
-	return toReturn
+            if (c == '\n'):
+                toAdd+="<br>"
+                lines.append(toAdd)
+                toAdd = ""
+            else:
+                toAdd += c
+            #print("J is " + str(j) + "BYTES[BYTESCNT] is " + str(bytesList[bytesListCnt]))
+            if (j == int(bytesList[bytesListCnt])):
+                bytesListCnt+= 1
+                toReturn.append(lines)
+                lines = []
+                #print("BYTESLISTCNT IS " + str(bytesListCnt))
+            a = j
+        #print("CNT IS " + str(a))
+        #print("TO RETURN")
+        #print(toReturn)
+        dataFptr.close()
+    toReturn.sort(key=lambda x:x[1])
+    #print (toReturn)
+    #print(len(toReturn))
+    return toReturn
 
 #function that runs curses in order to be called multiple times with different streams if the user chooses to switch streams
 def printPost(username, streams, postOffset):
@@ -240,9 +245,18 @@ if (stream == "*OUTPUT*"):
 		print (i + " ", end="")
 	print("")
 
-elif (stream == all):
-	streams = getStreams(username)
-	getAll(username, streams)
+elif (stream == 'all'):
+    #print("IN HERE")
+    streams = getStreams(username)
+    posts = getAll(username, streams)
+    if (postOffset <= -1):
+        postOffset = 0;
+        print("*AT ALL BEGNINNING*")
+    if (postOffset > len(posts)-1):
+        postOffset = len(posts)-1
+        print("*AT ALL END*")
+    for i in posts[postOffset]:
+        print(i,end="")
 
 elif (postOffset == 3141592654):
 	markAllAsRead(stream, username)

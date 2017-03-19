@@ -7,6 +7,7 @@
 		else
 		{
 			$toDecrement = 0;
+			$toIncrement = 0;
 			//echoing HTML to screen
 			foreach($output as $line)
 			{
@@ -20,7 +21,7 @@
 						//outputting the appropriate post
 						$cmd2 = './view.py  ' .escapeshellarg($stream) . " " .escapeshellarg($username) . ' ' . $postOffset;
 					}
-					else
+					else if (strcmp($stream, "all") != 0)
 					{
 						//marking all as read
 						$cmd2 = './view.py ' .escapeshellarg($stream) . ' ' . escapeshellarg($username) . ' 3141592654';
@@ -44,6 +45,17 @@
 								$postOffset = $postOffset + 1;
 								$toDecrement = 1;
 							}
+							else if (strstr($line2, "*AT ALL BEGNINNING*") != NULL)
+							{
+								$postOffset = 0;
+							}
+							else if (strstr($line2, "*AT ALL END*") != NULL)
+							{
+								echo ("IN ALL END");
+								//$postOffset = $postOffset - 1;
+								//$toIncrement = 1;
+								$postOffset = 0;
+							}
 							else
 								echo $line2;
 						}
@@ -63,13 +75,19 @@
 				}
 				else if (strstr($line, "ENTER OFFSET HERE") != NULL)
 				{
-					if ($toDecrement == 0)
+					if ($toDecrement == 0 && $toIncrement == 0)
 						echo (str_replace("ENTER OFFSET HERE", $postOffset, $line));
-					else
+					else if ($toIncrement == 0 && $toDecrement == 1)
 					{
 						$postOffset = $postOffset -1;
 						echo (str_replace("ENTER OFFSET HERE", $postOffset, $line));
 						$postOffset = $postOffset + 1;
+					}
+					else if ($toIncrement == 1 && $toDecrement == 0)
+					{
+						$postOffset = $postOffset +1;
+						echo (str_replace("ENTER OFFSET HERE", $postOffset, $line));
+						$postOffset = $postOffset - 1;
 					}
 				}
 				//else output the line

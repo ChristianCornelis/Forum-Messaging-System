@@ -45,6 +45,8 @@ NOTES AND ISSUES:
 
 -Usernames can contain spaces for all programs, but streams CAN NOT
 
+WPML Converter
+-Any text that does not match what a tag is expected to contain WILL NOT be copied, it will be discarded
 Addauthor program:
 -Stream names cannot contains spaces or just be a newline
     -Furthermore, the user cannot enter spaces after the commas when entering multiple stream names:
@@ -57,10 +59,10 @@ Post program:
 -Posts can be no longer than 10000 characters in length.
 
 Viewing Program:
--The UP and DOWN arrows are used to scroll throug messages
 -Messages are displayed starting from the most recent unread messaage
 -The 'O' option does not work.
--Selecting 'all' will not do anything, as I didn't have time to complete it.
+-If the user selects 'all', then the program will work. However, if they reach the last post, the program will iterate to the FIRST post in order of dates if 'Next' is hit
+	-All WILL NOT update the read count for posts
 -If a user is removed while they are viewing the program, the user will be able to view all messages from the stream that they were removed from
  until the next time the program is run.
 -If a user has seen all posts in a stream, then the stream will begin viewing from the newest post
@@ -71,5 +73,5 @@ Messages folder:
 
 Configuration File:
 -The sizes in the image tag cannot be larger than 5 digits in length.
--If multiple input-related tags are on the same line
+-If multiple input-related tags are on the same line they will be put into the same HTML form
 -
