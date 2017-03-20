@@ -1,0 +1,5 @@
+.h(text="Viewing Menu", size=<2>).d()
+.i(name="streamInput",value="cars",text="Enter a stream to display in the viewing program",action="view.php",id="test").t(text="Stream options for this user:").q(name="username",value="ENTER USERNAME HERE").q(name="offset",value="ENTER OFFSET HERE")
+.d()
+.b(name="Return", link="menu.php").q(name="username",value="ENTER USERNAME HERE")
+.b(name="Logout", link="index.php", break="true")

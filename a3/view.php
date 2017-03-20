@@ -47,7 +47,7 @@
 							else if (strstr($line2, "*AT BEGINNING*") != NULL)
 							{
 								$postOffset = $postOffset + 1;
-								$toDecrement = 1;
+								//$toDecrement = 1;
 							}
 							else if (strstr($line2, "*AT ALL BEGNINNING*") != NULL)
 							{
@@ -57,7 +57,7 @@
 							{
 								//$postOffset = $postOffset - 1;
 								//$toIncrement = 1;
-								$postOffset = 0;
+								$postOffset = $postOffset-1;
 							}
 							else
 								echo $line2;
@@ -82,9 +82,9 @@
 						echo (str_replace("ENTER OFFSET HERE", $postOffset, $line));
 					else if ($toIncrement == 0 && $toDecrement == 1)
 					{
-						$postOffset = $postOffset -1;
+						//$postOffset = $postOffset -1;
 						echo (str_replace("ENTER OFFSET HERE", $postOffset, $line));
-						$postOffset = $postOffset + 1;
+						//$postOffset = $postOffset + 1;
 					}
 					else if ($toIncrement == 1 && $toDecrement == 0)
 					{

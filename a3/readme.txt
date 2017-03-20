@@ -1,7 +1,7 @@
 /***************************************************
 Christian Cornelis        ccorneli@mail.uoguelph.ca
 CIS*2750                  ID# 0939357
-February 19th, 2017       Assignment 2
+March 19th, 2017          Assignment 3
 ***************************************************/
 
 COMPILATION
@@ -42,14 +42,17 @@ Post:
 	-If the user is not subscribed to the stream theu are trying to post to an appropriate error message which will be outputted.
 
 View:
--From the main menu, input a stream name in the text box that matches a name outputted underneath the input box. The streams listed below are all of the streams a user can view.
-	-Once a stream is inputted, hit the 'Submit' button to view the stream.
+-From the main menu, select the 'View Posts' button
+-Next, input a stream from the list of streams that the user is able to access, which is found below the text input
+-Once a stream name has been entered, hit submit to go to a viewing page
+
 
 
 NOTES AND ISSUES:
 *****************
 -Upon initial login, the messages folder will not be present. It will be automatically created when the user adds themselves to a stream.
 	-If the user tries to post to a stream or view a stream that they do not belong to, or if there are no streams in existence yet, appropriate messages will be displayed as this happens.
+-On any page, the 'Return' button will take the user to the main menu, and the 'Logout' button will take them to the login screen
 
 -Usernames can contain spaces for all programs, but streams CAN NOT
 
@@ -72,24 +75,35 @@ Post program:
 
 Viewing Program:
 -Messages are displayed starting from the most recent unread messaage
+-Long messages that contain a lot of newlines will cause the viewing program to act funny and start printing past the end of a stream.
+	-Long posts without newlines will not have this problem
+	-This problem does not occur when viewing all streams that a user is subscribed to
 -The 'Order Toggle' option does not work.
--If the user selects 'all', then the program will work. However, if they reach the last post, the program will iterate to the FIRST post in order of dates if 'Next' is hit
-	-All WILL NOT update the read count for posts
+-All WILL NOT update the read count for posts
+	-If a user hits 'Check for new posts' while viewing all streams then the oldest post will be displayed. Since all doesn't keep track of how many posts a user has read I thought that this was an appropriate way to handle it
 -If a user is removed while they are viewing the program, an appropriate message will be outputted
 -If a user has seen all posts in a stream, then the stream will begin viewing from the newest post
 -If a user is viewing all streams at once (they've inputted 'all' as the stream), and they select 'Mark all as read', each post in all subscribed streams will be marked as read and the  newest post will be displayed
- 
+ -If the user navigates to the oldest post in a stream and hits 'Next post', the second oldest post will be skipped.
+ 	-This is a very minor bug that I'm positive is caused by a small counter issue.
+ -The 'Return to main menu' button will take you to the main menu, and the 'Switch streams' button will return you to the view menu
+
 Messages folder:
 -The messages folder will be created by my program if necessary.
 -Please note, an additional file will be present called 'streamList'. This file is used by the viewing program in order for it to know which streams have been created in order to check which streams a user is subscribed to.
 
 Configuration File:
+-Tags MUST contain the values that they are supposed to, otherwise a seg fault will occur.
+	-This does not apply to tags that have default values for input if it is not present
 -The sizes in the image tag cannot be larger than 5 digits in length.
 -If multiple input-related tags are on the same line they will be put into the same HTML form
+	-NOTE that if multiple input tags are present on a line (.i, .r, .b), then the FIRST action listed will be the action associated with that form
 -When using the .e tag, DO NOT include './' in the name of the executable if it is located in the local directory.
 	-This is because my program will search for the executable in the local directory, and if it finds it, will concatenate './' onto the front of it and run it.
 	-This is not an issue if the executable is located in the user or system bin folders, as it will run fine since the './' is not concatenated onto the executable name
 
+-.t tag
+	-Text inside a t flag is printed inside an HTML <p>, or paragraph tag
 -.i tag
 	-It is possible to have multiple inputs inside the same .i tag
 	-This will output all of the appropriate input fields inside one form with one submit button
@@ -111,4 +125,5 @@ Configuration File:
 	-To have multiple radio buttons inside a list of radio buttons, simply list multiple values inside the tag. This will produce  a multiple radio buttons inside the same form
 	-Example: .r(action="addAuthor.php",name="isRemovable",value="Add",value="Remove") would produce 2 radio buttons, 'Add', and 'Remove'
 	-The first value listed will be selected by default.
+	-Will not output any buttons, the .b flag would have to be used.
 

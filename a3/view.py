@@ -3,7 +3,7 @@
 ######################################################
 #Christian Cornelis        ccorneli@mail.uoguelph.ca
 #CIS*2750                  ID# 0939357
-#February 19th, 2017       Assignment 2
+#March 19th, 2017          Assignment 3
 ######################################################
 
 import sys
@@ -125,7 +125,7 @@ def printPost(username, stream, postOffset):
 	initToStart = toStart
 	toStart -= 1
 	#printing for the PHP to see that the first post will be outputted
-	if ((toStart+postOffset) is 0):
+	if ((toStart+postOffset) <= 0):
 		print("*AT BEGINNING*")
 	if ((toStart + postOffset) >= 0):
 		toStart = toStart+postOffset

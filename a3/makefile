@@ -1,7 +1,7 @@
 ######################################################
 #Christian Cornelis        ccorneli@mail.uoguelph.ca
 #CIS*2750                  ID# 0939357
-#February 19th, 2017       Assignment 2
+#March 19th, 2017          Assignment 3
 ######################################################
 
 all: a1 addAuthor post.c post converter view

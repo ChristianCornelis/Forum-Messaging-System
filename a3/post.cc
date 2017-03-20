@@ -97,7 +97,8 @@ class getPost
 		strcpy(stream, argv[1]);
 		strcpy(userName, argv[2]);
 		strcpy(text, argv[3]);
-		strcat(text, "\n");
+        if (text[strlen(text)-1] != '\n')
+		  strcat(text, "\n");
 
         class PostEntry pe;
 
@@ -156,7 +157,7 @@ int main(int argc, char const *argv[])
     class getPost myGetPost;
     int newArgc = argc;
     /*copying args to a char** because my A1 couldn't do ending braces in main????*/
-    char** newArgv = initArray(argc, 255);
+    char** newArgv = initArray(argc, 10000);
     for (i = 0; i < argc; i++)
         strcpy(newArgv[i], argv[i]);
     myGetPost.getInfo(newArgc, newArgv);

@@ -162,30 +162,25 @@ int main(int argc, char *argv[])
                 strcpy(sysBinName, "/bin/");
                 strcat(binName, file);
                 strcat(sysBinName, file);
-                printf("BIN NAME %s\nSYS NAME %s\n", binName, sysBinName);
 
                 if ((fptr = fopen(file, "r")) != NULL)
                 {
                     char toRun[255];
                     strcpy(toRun, "./");
                     strcat(toRun, file);
-                    printf("CHECKING LOCAL");
                     system(toRun);
                     fclose(fptr);
                 }
                 else if ((fptr=fopen(binName, "r")) != NULL)
                 {
-                    printf("CHECKING BIN");
                     system(binName);
                     fclose(fptr);
                 }
                 else if ((fptr=fopen(sysBinName, "r")) != NULL)
                 {
-                    printf("CHECKING SYSTEM BIN");
                     system(sysBinName);
                     fclose(fptr);
                 }
-                /*printf("<?php\n\techo (exec '%s');\n?>\n", file);*/
 
                 free(file);
             }
