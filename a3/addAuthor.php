@@ -26,26 +26,41 @@
 		switch($_POST["isRemovable"])
 		{
 			case "Add":
-				exec("./addauthor " . $_POST["streamInput"] ." " . $username, $output2, $status2);
-
-				if ($status2)
-					echo('Exec() failed.');
+				if (strstr($_POST['streamInput'], " ") != NULL)
+					echo("Error: No spaces can be present in the streams list.");
+				else if (strcmp($_POST['streamInput'], "") == 0)
+					echo("Error: Stream input cannot be left blank.");
 				else
 				{
-					foreach ($output2 as $line2) {
-						echo $line2;
+					exec("./addauthor " . $_POST["streamInput"] ." " . $username, $output2, $status2);
+
+					if ($status2)
+						echo('Exec() failed.');
+					else
+					{
+						foreach ($output2 as $line2) {
+							echo $line2;
+						}
 					}
 				}
 				break;
-			case "Remove":
-				exec("./addauthor " . $_POST["streamInput"] ." " . $username . " -r", $output3, $status3);
 
-				if ($status3)
-					echo('Exec() failed.');
+			case "Remove":
+				if (strstr($_POST['streamInput'], " ") != NULL)
+					echo("Error: No spaces can be present in the streams list.");
+				else if (strcmp($_POST['streamInput'], "") == 0)
+					echo("Error: Stream input cannot be left blank.");
 				else
 				{
-					foreach ($output3 as $line3) {
-						echo $line3;
+					exec("./addauthor " . $_POST["streamInput"] ." " . $username . " -r", $output3, $status3);
+
+					if ($status3)
+						echo('Exec() failed.');
+					else
+					{
+						foreach ($output3 as $line3) {
+							echo $line3;
+						}
 					}
 				}
 				break;

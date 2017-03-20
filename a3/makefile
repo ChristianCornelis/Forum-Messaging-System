@@ -4,7 +4,7 @@
 #February 19th, 2017       Assignment 2
 ######################################################
 
-all: a1 addAuthor post.c post config
+all: a1 addAuthor post.c post converter view
 
 a1: parser.c helperFunctions.c helperFunctions.h
 	gcc -Wall -ansi parser.c helperFunctions.c -g -o a1
@@ -31,7 +31,7 @@ post.o: post.c helperFunctions.h stream.h
 view: view.py
 	chmod +x view.py
 
-config: configConverter.c
+converter: configConverter.c
 	gcc  -Wall -ansi configConverter.c -o converter
 clean:
 	rm *.o libstream.a addauthor post converter a1 post.c

@@ -27,6 +27,11 @@
 						$cmd2 = './view.py ' .escapeshellarg($stream) . ' ' . escapeshellarg($username) . ' 3141592654';
 						$postOffset = 0;
 					}
+					else if (strcmp($stream, "all") == 0 && $markAll == 1)
+					{
+						echo("IN TEST");
+						$cmd2 = './view.py ' .escapeshellarg($stream) . ' ' . escapeshellarg($username) . ' 98765432109';
+					}
 					exec($cmd2, $output2, $status2);
 
 					if ($status2)
@@ -38,7 +43,6 @@
 							if (strstr($line2, "*AT END*") != NULL)
 							{
 								$postOffset = 0;
-								echo("OFFSET RESET<BR>");
 							}
 							else if (strstr($line2, "*AT BEGINNING*") != NULL)
 							{
@@ -51,7 +55,6 @@
 							}
 							else if (strstr($line2, "*AT ALL END*") != NULL)
 							{
-								echo ("IN ALL END");
 								//$postOffset = $postOffset - 1;
 								//$toIncrement = 1;
 								$postOffset = 0;
@@ -109,7 +112,6 @@
 	//outputting the current user and stream to inform the user
 	echo ("Currently logged in as: " . $username);
 	echo("<BR> Currently viewing the " . $stream . " stream");
-	echo("<BR> Offset is " . $offset);
 
 	//generating HTML code for webpage
 	$cmd = './converter config/view.wpml';
@@ -120,7 +122,6 @@
 	if (isset($_POST['Next_post'])) //== "Next post")
 	{
 		$offset = $offset+1;
-		echo ("OFFSET IS " . $_POST['offset']);
 		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll);
 
 		if ($returnedOffset == 0)

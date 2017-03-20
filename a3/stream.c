@@ -63,12 +63,11 @@ void updateStream (struct userPost * st)
         {
             char* toAdd = strtok(line, "\n");
             totalChars = atoi(toAdd);
-            printf("ADDING %d\n", atoi(toAdd));
         }
         fclose(dataStream);
-        printf("SUM SO FAR: %d\n", totalChars);
         /*adding user post to the stream file*/
         FILE* stream = fopen(fileName3, "a");
+	    fprintf(stream,"Stream: %s\n", st->streamname);
         fprintf(stream, "Sender: %s\n", st->username);
         fprintf(stream, "Data: %s\n", st->date);
         fprintf(stream, "%s", st->text);
@@ -76,8 +75,7 @@ void updateStream (struct userPost * st)
 
         /*adding the size of the text post to the streamdata file*/
         FILE* streamData = fopen(fileName2, "a");
-        fprintf(streamData, "%d\n", (totalChars + ((int) (strlen(st->text) + strlen(st->date) + strlen(st->username)) + 16)));
-        printf("%d\n", (totalChars + ((int) (strlen(st->text) + strlen(st->date) + strlen(st->username)) + 16)));
+        fprintf(streamData, "%d\n", (totalChars + ((int) (strlen(st->text) + strlen(st->date) + strlen(st->username) + strlen(st->streamname))+ 25)));
         fclose(streamData);
 
         printf("Post successfully added to the stream.<BR>");

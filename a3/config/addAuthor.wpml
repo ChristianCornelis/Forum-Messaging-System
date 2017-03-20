@@ -1,3 +1,4 @@
 .h(text="Add Author",size=<3>).d()
 .i(name="streamInput",value="cars,trucks",text="Stream[s]").r(action="addAuthor.php",name="isRemovable",value="Add",value="Remove").q(name="username",value="ENTER USERNAME HERE")
 .b(name="Return", link="menu.php").q(name="username",value="ENTER USERNAME HERE")
+.b(name="Logout", link="index.php", break="true")

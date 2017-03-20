@@ -84,13 +84,13 @@ def getAll(username, streams):
         #print("TO RETURN")
         #print(toReturn)
         dataFptr.close()
-    toReturn.sort(key=lambda x:x[1])
+    toReturn.sort(key=lambda x:x[2])
     #print (toReturn)
     #print(len(toReturn))
     return toReturn
 
-#function that runs curses in order to be called multiple times with different streams if the user chooses to switch streams
-def printPost(username, streams, postOffset):
+#function that prints out a post based on offset and the point that a user has read up to
+def printPost(username, stream, postOffset):
 	string = "messages/" + stream + "StreamData"
 	with open(string) as f:
 		bytesList = f.readlines()
@@ -99,7 +99,6 @@ def printPost(username, streams, postOffset):
 		sys.exit()
 	#stripping spaces at beginning and end of string
 	bytesList = [i.strip() for i in bytesList]
-	print(str(bytesList))
 	streamStr = "messages/" +stream + "Stream"
 	dataFptr = open(streamStr, "r")
 
@@ -110,6 +109,7 @@ def printPost(username, streams, postOffset):
 	streamUsers = [i.strip() for i in streamUsers]
 	nameToCompare = ""
 	toStart = -1
+
 	#getting the index that the messages should start to display at based on
 	#what messages the user has read
 	for a in streamUsers:
@@ -124,19 +124,15 @@ def printPost(username, streams, postOffset):
 			toStart = int(tokens[(len(tokens)-1)])
 	initToStart = toStart
 	toStart -= 1
+	#printing for the PHP to see that the first post will be outputted
 	if ((toStart+postOffset) is 0):
 		print("*AT BEGINNING*")
 	if ((toStart + postOffset) >= 0):
 		toStart = toStart+postOffset
-	print("BYTE LEN " + str(len(bytesList)))
-	print("TOSTART AT START " + str(toStart))
 	if (toStart == int(len(bytesList))):
 		toStart = toStart-1
-		print("IN 1")
 	elif (toStart < len(bytesList)-1 and postOffset is 0):
 		toStart += 1
-		print("IN 2")
-	print("TOSTART: " + str(toStart))
 	#printing data from <stream>Stream file
 	offset = 0
 	if(toStart == 0):
@@ -147,14 +143,12 @@ def printPost(username, streams, postOffset):
 		for k in range(0, toStart):
 			offset = int(bytesList[k])
 		dataFptr.seek(offset, 0)
-	print("OFFSET " + str(offset))
 	postPtr = open("postData", "w")
 	endInd = 0
 	if (offset is not 0):
 		endInd = int(bytesList[toStart])-offset
 	else:
-		endInd = int(bytesList[0])#int(bytesList[len(bytesList)-1])
-	print("END INd " + str(endInd))
+		endInd = int(bytesList[0])
 
 	#printing post with correct formatting
 	for j in range(0, endInd):
@@ -170,6 +164,7 @@ def printPost(username, streams, postOffset):
 	dataFptr.close()
 	return
 
+#function to return all streams that a user is subscribed to
 def getStreams(username):
 	userStreams = []
 	#if the messages folder and the file needed exists
@@ -202,13 +197,10 @@ def getStreams(username):
 					if (toCompare and username == toCompare):
 						userStreams.append(i)
 
-			#for i in userStreams:
-				#print (i.strip(), " ", end ="")
-
 			#if userStreams is empty
 			if not userStreams:
 				print("Error: This user has access to no streams currently. Use the addauthor program to add a user to a stream.")
-				exit()
+				sys.exit()
 	            #print("all")
 		else:
 			print("Error: No streams are present.")
@@ -216,36 +208,32 @@ def getStreams(username):
 
 	else:
 		print("Error: No streams are present.")
-		exit()
+		sys.exit()
 	return userStreams
 
 def markAllAsRead(stream, username):
-	print("MARKING ALL AS READ")
 	string = "messages/" + stream + "StreamData"
-	print("DATA " + string)
 	with open(string) as f:
 		bytesList = f.readlines()
 	if (len(bytesList) == 0):
 		print("Error: No posts are present.")
 		sys.exit()
 	userFile = "messages/" + stream + "StreamUsers"
-	print("USERFILE " +userFile)
-	print("LEN " + str(len(bytesList)))
 	updatePostsRead(userFile, username, len(bytesList))
 
 stream = sys.argv[1]
 username = sys.argv[2]
 postOffset = int(sys.argv[3])
 
-print("OFFSET " + str(postOffset))
+#if getting all streams a user can access
 if (stream == "*OUTPUT*"):
 	userStreams = getStreams(username)
 	userStreams.append("all")
 	for i in userStreams:
 		print (i + " ", end="")
 	print("")
-
-elif (stream == 'all'):
+#else if viewing all streams
+elif (stream == 'all' and postOffset != 98765432109):
     #print("IN HERE")
     streams = getStreams(username)
     posts = getAll(username, streams)
@@ -257,7 +245,17 @@ elif (stream == 'all'):
         print("*AT ALL END*")
     for i in posts[postOffset]:
         print(i,end="")
-
+#else if viewing all and marking all as read
+elif(stream == 'all' and postOffset == 98765432109):
+	streams = getStreams(username)
+	posts = getAll(username, streams)
+	for i in streams:
+		markAllAsRead(i, username)
+	postOffset = 0
+	print("*AT ALL END*")
+	for i in posts[postOffset]:
+		print(i,end="")
+#else if viewing a normal stream and marking all as read
 elif (postOffset == 3141592654):
 	markAllAsRead(stream, username)
 	if (postOffset > 0):
@@ -265,37 +263,28 @@ elif (postOffset == 3141592654):
 		print("*AT END*")
 
 	userStreams = getStreams(username)
-	if (stream != 'all'):
-		found = False
-		for i in userStreams:
-			if (stream == i):
-				found = True
-		#if the user doesn't have access to the stream, or the stream does not exist
-		if (not found):
-			print("Error: The user does not have access to the " + stream + " stream, or the stream does not exist.")
-			exit()
-		printPost(username, stream, postOffset)
-	else:
-		print("Error: All selected, however, this feature was not implemented due to starting the view program too late : )")
-		print("Exitting")
-		exit()
+	found = False
+	for i in userStreams:
+		if (stream == i):
+			found = True
+	#if the user doesn't have access to the stream, or the stream does not exist
+	if (not found):
+		print("Error: The user does not have access to the " + stream + " stream, or the stream does not exist.")
+		sys.exit()
+	printPost(username, stream, postOffset)
+	#else, just print the post relative to the offset
 else:
 	if (postOffset > 0):
 		postOffset = 0
 		print("*AT END*")
 
 	userStreams = getStreams(username)
-	if (stream != 'all'):
-		found = False
-		for i in userStreams:
-			if (stream == i):
-				found = True
-		#if the user doesn't have access to the stream, or the stream does not exist
-		if (not found):
-			print("Error: The user does not have access to the " + stream + " stream, or the stream does not exist.")
-			exit()
-		printPost(username, stream, postOffset)
-	else:
-		print("Error: All selected, however, this feature was not implemented due to starting the view program too late : )")
-		print("Exitting")
-		exit()
+	found = False
+	for i in userStreams:
+		if (stream == i):
+			found = True
+	#if the user doesn't have access to the stream, or the stream does not exist
+	if (not found):
+		print("Error: The user does not have access to the " + stream + " stream, or the stream does not exist.")
+		sys.exit()
+	printPost(username, stream, postOffset)

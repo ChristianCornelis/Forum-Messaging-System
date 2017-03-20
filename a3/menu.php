@@ -4,6 +4,11 @@
 	$username = fgets($fptr);
 	fclose($fptr);*/
 	$username = $_POST["username"];
+
+	if (strcmp($username, "") == 0)
+		$username= 'Guest User';
+	else if (strcmp($username, " ") == 0)
+		$username = 'Guest User';
 	$offset = 0;
 	echo("Currently logged in as: " . $username);
 
@@ -34,7 +39,7 @@
 						foreach($output2 as $line2)
 								echo $line2;
 				}
-				echo "<br><br>";
+				echo "<br>";
 			}
 			//else check if a hidden field should be filled
 			else if (strstr($line, "ENTER USERNAME HERE") != NULL)

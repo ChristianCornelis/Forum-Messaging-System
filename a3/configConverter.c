@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
                 else if (strstr(token, "size=<") == NULL)
                 {
                     size = calloc(3, sizeof(char));
-                    strcpy(size, "3");
+                    strcpy(size, "3>");
                 }
                 if (strstr(token, "text=") != NULL)
                 {
@@ -147,12 +147,45 @@ int main(int argc, char *argv[])
             }
             else if (token[1] == 'e')
             {
-                if (strstr(token, "file=") != NULL)
+                if (strstr(token, "exe=") != NULL)
                 {
-                    file = getTagContents(token, "file=\"", 'e');
+                    /*file = calloc(255, sizeof(char));
+                    strcpy(file, "./");*/
+                    file = getTagContents(token, "exe=\"", 'e');
                 }
+                printf("FILE %s\n", file);
+                FILE* fptr = NULL;
+                /*char* binName = calloc(255, sizeof(char));*/
+                char binName[255];
+                char sysBinName[255];
+                strcpy(binName, "/usr/local/bin/");
+                strcpy(sysBinName, "/bin/");
+                strcat(binName, file);
+                strcat(sysBinName, file);
+                printf("BIN NAME %s\nSYS NAME %s\n", binName, sysBinName);
 
-                printf("<?php\n\techo (exec '%s');\n?>\n", file);
+                if ((fptr = fopen(file, "r")) != NULL)
+                {
+                    char toRun[255];
+                    strcpy(toRun, "./");
+                    strcat(toRun, file);
+                    printf("CHECKING LOCAL");
+                    system(toRun);
+                    fclose(fptr);
+                }
+                else if ((fptr=fopen(binName, "r")) != NULL)
+                {
+                    printf("CHECKING BIN");
+                    system(binName);
+                    fclose(fptr);
+                }
+                else if ((fptr=fopen(sysBinName, "r")) != NULL)
+                {
+                    printf("CHECKING SYSTEM BIN");
+                    system(sysBinName);
+                    fclose(fptr);
+                }
+                /*printf("<?php\n\techo (exec '%s');\n?>\n", file);*/
 
                 free(file);
             }
@@ -180,8 +213,9 @@ int main(int argc, char *argv[])
 	                  token[subStr-token] = '@';
 	              }
 				  /*if the input field should be a text area and not a text input*/
-				  if (strstr(token, "textArea=\"True\"") != NULL)
+				  if ((subStr = strstr(token, "textArea=\"True\"")) != NULL)
 				  {
+                      token[subStr-token] = '@';
 					  printf("\t%s:<br>\n\t<textarea rows=\"5\" cols=\"60\" name=\"%s\">%s</textarea><br>", text, name, value);
 				  }
 				  else
