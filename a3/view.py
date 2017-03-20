@@ -143,7 +143,7 @@ def printPost(username, stream, postOffset):
 		for k in range(0, toStart):
 			offset = int(bytesList[k])
 		dataFptr.seek(offset, 0)
-	postPtr = open("postData", "w")
+	#postPtr = open("postData", "w")
 	endInd = 0
 	if (offset is not 0):
 		endInd = int(bytesList[toStart])-offset
@@ -157,8 +157,8 @@ def printPost(username, stream, postOffset):
 			print("<br>")
 		else:
 			print(c, end="")
-		postPtr.write(c)
-	postPtr.close()
+		#postPtr.write(c)
+	#postPtr.close()
 	if (initToStart is not len(bytesList)):
 		updatePostsRead(userFile, username, toStart+1)
 	dataFptr.close()

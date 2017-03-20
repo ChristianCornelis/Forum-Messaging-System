@@ -114,7 +114,7 @@
 	echo("<BR> Currently viewing the " . $stream . " stream");
 
 	//generating HTML code for webpage
-	$cmd = './converter config/view.wpml';
+	$cmd = './converter view.wpml';
 	exec($cmd, $output, $status);
 	//if exec unsuccessful
 

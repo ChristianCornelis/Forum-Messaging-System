@@ -2,7 +2,7 @@
 	$username = $_POST["username"];
 	echo("Currently logged in as: " . $username);
 
-	$cmd = './converter config/addAuthor.wpml';
+	$cmd = './converter addAuthor.wpml';
 	exec($cmd, $output, $status);
 
 	if ($status)

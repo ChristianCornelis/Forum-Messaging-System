@@ -1,7 +1,7 @@
 <?php
 	$username = $_POST["username"];
 	echo("Currently logged in as: " . $username);
-	$cmd = './converter config/post.wpml';
+	$cmd = './converter post.wpml';
 	exec($cmd, $output, $status);
 
 	if ($status)

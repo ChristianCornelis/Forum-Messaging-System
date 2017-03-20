@@ -5,7 +5,7 @@
 	echo("Currently logged in as: " . $username);
 
 	//generating HTML code for webpage
-	$cmd = './converter config/viewMenu.wpml';
+	$cmd = './converter viewMenu.wpml';
 	exec($cmd, $output, $status);
 	//if exec unsuccessful
 	if ($status)
