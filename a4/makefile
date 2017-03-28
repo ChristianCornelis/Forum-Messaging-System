@@ -4,7 +4,7 @@
 #March 19th, 2017          Assignment 3
 ######################################################
 
-all: a1 addAuthor post.c post converter view
+all: a1 addAuthor post.c post converter view db
 
 a1: parser.c helperFunctions.c helperFunctions.h
 	gcc -Wall -ansi parser.c helperFunctions.c -g -o a1
@@ -32,7 +32,7 @@ view: view.py
 	chmod +x view.py
 
 converter: configConverter.c
-	gcc  -Wall -ansi configConverter.c -o converter
+	gcc  -Wall -ansi configConverter.c -o -g converter
 clean:
 	rm *.o libstream.a addauthor post converter a1 post.c test.tar
 cleanStreams:
@@ -49,4 +49,8 @@ tar:
 
 scp:
 	scp test.tar ccorneli@2750web.socs.uoguelph.ca:/srv/www/ccorneli
+db: db.o
+	gcc db.o -o db -lmysqlclient -L/usr/lib/x86_64-linux-gnu/
 
+db.o: db.c db.h
+	gcc -Wall -ansi -g db.c -o db.o -c
