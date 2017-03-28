@@ -1,0 +1,6 @@
+.h(text="Main Menu", size=<2>).d()
+.b(name="Add/Remove Author", link="addAuthor.php").q(name="username",value="ENTER USERNAME HERE")
+.b(name="Post", link="post.php").q(name="username",value="ENTER USERNAME HERE")
+.b(name="View Posts", link="viewMenu.php").q(name="username",value="ENTER USERNAME HERE")
+.d()
+.b(name="Logout", link="index.php", break="true")

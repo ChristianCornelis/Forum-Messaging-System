@@ -1,0 +1,4 @@
+.h(text="Post",size=<3>).d()
+.i(name="streamInput",value="cars",text="Stream", action="post.php").i(name="textInput",value="Enter post content here",text="Text", textArea="True").q(name="username",value="ENTER USERNAME HERE")
+.b(name="Return", link="menu.php").q(name="username",value="ENTER USERNAME HERE")
+.b(name="Logout", link="index.php")
