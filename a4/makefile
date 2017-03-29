@@ -48,7 +48,7 @@ tar:
 	tar cf test.tar *.php *.py *.c *.cc *.txt *.wpml *.h makefile
 
 scp:
-	scp test.tar ccorneli@2750web.socs.uoguelph.ca:/srv/www/ccorneli
+	scp /home/christian/Documents/cis2750/a4 ccorneli@2750web.socs.uoguelph.ca:/srv/www/ccorneli
 db: db.o
 	gcc db.o -o db -lmysqlclient -L/usr/lib/x86_64-linux-gnu/
 
