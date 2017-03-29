@@ -61,7 +61,10 @@ int main(int argc, char const *argv[])
         free(author);
         return 1;
     }
-    addUser(author, streams, isRemovable);
+    if (isRemovable == 0)
+        addUser(author, streams, isRemovable);
+    else
+        removeUser(author, streams);
 
     return 0;
 }

@@ -32,7 +32,7 @@ view: view.py
 	chmod +x view.py
 
 converter: configConverter.c
-	gcc  -Wall -ansi configConverter.c -o -g converter
+	gcc  -Wall -ansi -g configConverter.c -o converter
 clean:
 	rm *.o libstream.a addauthor post converter a1 post.c test.tar
 cleanStreams:
