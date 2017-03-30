@@ -19,17 +19,11 @@ if (stream == "*OUTPUT*"):
 	subprocess.call(['./db', 'output', username])
 #else if viewing all streams
 elif (stream == 'all' and postOffset != 98765432109):
-    #print("IN HERE")
-    streams = getStreams(username)
-    posts = getAll(username, streams)
-    if (postOffset <= -1):
-        postOffset = 0;
-        print("*AT ALL BEGNINNING*")
-    if (postOffset > len(posts)-1):
-        postOffset = len(posts)-1
-        print("*AT ALL END*")
-    for i in posts[postOffset]:
-        print(i,end="")
+	if (postOffset <= -1):
+		postOffset = 0;
+		print("*AT ALL BEGNINNING*")
+	print("OFFSET IS " + str(postOffset))
+	subprocess.call(['./db', 'viewAll', 'all', username, str(postOffset)])
 #else if viewing all and marking all as read
 elif(stream == 'all' and postOffset == 98765432109):
 	streams = getStreams(username)

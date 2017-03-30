@@ -23,7 +23,7 @@
 					}
 					else if (strcmp($stream, "all") != 0)
 					{
-						//marking all as read select * from post table where streamname in (select stream from authors where name = 'INSERT_NAME_HERE')
+						//marking all as read
 						$cmd2 = './view.py ' .escapeshellarg($stream) . ' ' . escapeshellarg($username) . ' 3141592654';
 						$postOffset = 0;
 					}
@@ -52,10 +52,13 @@
 							else if (strstr($line2, "*AT ALL BEGNINNING*") != NULL)
 							{
 								$postOffset = 0;
+								echo (str_replace("*AT ALL BEGNINNING*", "", $line2));
 							}
 							else if (strstr($line2, "*AT ALL END*") != NULL)
 							{
 								$postOffset = $postOffset-1;
+								echo $line2;
+								echo (str_replace("*AT ALL END*", "", $line2));
 							}
 							else
 								echo $line2;

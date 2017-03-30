@@ -534,6 +534,9 @@ int main(int argc, char const *argv[])
 			}
 			postCnt++;
 		}
+
+		if (postCnt == 0)
+			printf("This user has access to no posts.");
 		query = clearQuery(query);
 	}
 	else if (strcmp(argv[1], "output") == 0)
@@ -567,6 +570,58 @@ int main(int argc, char const *argv[])
 			printf("This user has access to no posts.");
 		else
 			printf("all");
+	}
+	else if (strcmp(argv[1], "viewAll") == 0)
+	{
+		printf("IN VIEW ALL\n");
+		if (argc != 5)
+		{
+			printf("Error: Incorrect number of arguments.\n<BR>Exitting.\n<BR>");
+			return 0;
+		}
+
+		strcpy(stream, argv[2]);
+		strcpy(author, argv[3]);
+		int offset = atoi(argv[4]);
+
+		sprintf(query, "select * from posts where stream in (select stream from authors where name = '%s')", author);
+		if(mysql_query(&mysql, query))
+			handleError("Failed selecting from posts table with subquery to authors table.\nEither table does not exist!\n",&mysql);
+
+		if (!(res = mysql_store_result(&mysql)))
+			handleError("Store failed.",&mysql);
+
+		int numRows = (int) mysql_num_rows(res);
+
+		printf("NUM ROWS IS %d\n", numRows);
+		if (offset > numRows-1)
+		{
+			offset = numRows-1;
+			printf("*AT ALL END*");
+		}
+
+		int postCnt = 0;
+		while ((row = mysql_fetch_row(res))) 
+		{
+			if (postCnt == offset)
+			{
+				char textCpy[12000];
+				strcpy(textCpy, row[2]);
+				int j;
+				for (j = 0; j < strlen(textCpy); j++)
+				{
+					if (textCpy[j] == '\n')
+						printf("<BR>");
+					else
+						printf("%c", textCpy[j]);
+				}
+			}
+			postCnt++;
+		}
+		query = clearQuery(query);
+
+		if (postCnt == 0)
+			printf("This user has access to no posts.");
 	}
 
 	/*closing connection to database*/
