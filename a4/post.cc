@@ -11,39 +11,14 @@ class PostEntry
 {
     char* readInput(char* stream, char* username)
     {
-        char* filename = initString(1000);
 		char* text = initString(100);
-        /*if messages folder does not exist, then create it*/
-        DIR* dirPtr;
-        if (!(dirPtr=opendir("messages")))
-        {
-            mkdir("messages/", 0777);
-        }
-
-        free(dirPtr);
-        strcpy(filename,"messages/");
-		strcat(filename, stream);
-        strcat(filename, "StreamUsers");
-
-        /*if the user is not permitted to add to the stream, then print an error message and don't accept user input*/
-        if (checkAuthorExists(username, filename) == 0)
-        {
-            printf("Error: This user does not have permission to post in this stream.<BR>Use the addauthor program to gain permission to post to this stream.<BR>");
-            free(filename);
-            text = clearString(text, 100);
-            return text;
-        }
-        /*else if the user is not permitted to add to the stream, then print an error message and don't accept user input*/
-        else if (checkAuthorExists(username, filename) == -1)
-        {
-            printf("Error: Invalid stream name: Stream does not exist<BR>To post to this stream, please use the addauthor program to first create it. <BR>");
-            free(filename);
-            text = clearString(text, 100);
-            return text;
-        }
-        /*if the user is permitted to post to the stream then return an arbitrary value to represent that*/
-        strcpy(text, "a");
-        free(filename);
+        
+        if (strstr(stream, " ") != NULL)
+            strcpy(stream, " ");
+        else if (strcmp(stream, "\n") == 0)
+            strcpy(text, "\n");
+        else
+            strcpy(text, "a");
 
         return text;
     }
@@ -124,8 +99,8 @@ class getPost
             free(userName);
             return;
         }
-        /*if the user has permission to post in the stream, then update the files necessary*/
-        if (strcmp(data, "") != 0)
+        /*if the stream is formatted correctly*/
+        else
         {
             char* time = pe.getDateTime();
 
@@ -140,17 +115,10 @@ class getPost
 
             destroyStruct(post);
         }
-        /*else, free variables and exit*/
-        else
-        {
-            free(data);
-            free(userName);
-			free(stream);
-			free(text);
-        }
         return;
     }
 };
+
 int main(int argc, char const *argv[])
 {
     int i = 0;

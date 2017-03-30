@@ -29,7 +29,6 @@
 					}
 					else if (strcmp($stream, "all") == 0 && $markAll == 1)
 					{
-						echo("IN TEST");
 						$cmd2 = './view.py ' .escapeshellarg($stream) . ' ' . escapeshellarg($username) . ' 98765432109';
 					}
 					exec($cmd2, $output2, $status2);

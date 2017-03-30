@@ -10,81 +10,44 @@ February 19th, 2017       Assignment 2
 /*function to add a new posting to a specific stream*/
 void updateStream (struct userPost * st)
 {
-    DIR* dirPtr;
-    /*if messages folder does not exist, then create it*/
-    if (!(dirPtr=opendir("messages")))
-    {
-        mkdir("messages/", 0777);
-    }
-    free(dirPtr);
+    char* username = initString(100);
+    char* stream = initString(100);
+    char* text = initString(11000);
+    char streamInfo[255];
+    char senderInfo[255];
+    char dateInfo[255];
 
-    /*creating fileNames for opening*/
-    char* fileName = initString(255);
-    strcpy(fileName, "messages/");
-    strcat(fileName, st->streamname);
-    strcat(fileName, "StreamUsers");
+    strcpy(stream, st->streamname);
+    strcpy(username, "\"");
+    strcat(username, st->username);
+    strcat(username, "\"");
+    sprintf(streamInfo,"Stream: %s\n", st->streamname);
+    sprintf(senderInfo, "Sender: %s\n", st->username);
+    sprintf(dateInfo, "Date: %s\n", st->date);
 
-    char* fileName2 = initString(255);
-    strcpy(fileName2, "messages/");
-    strcat(fileName2, st->streamname);
-    strcat(fileName2, "StreamData");
+    strcpy(text, "\"");
+    strcat(text, streamInfo);
+    strcat(text, senderInfo);
+    strcat(text, dateInfo);
+    strcat(text, st->text);
+    strcat(text, "\"");
 
-    char* fileName3 = initString(255);
-    strcpy(fileName3, "messages/");
-    strcat(fileName3, st->streamname);
-    strcat(fileName3, "Stream");
+    char command[12000];
+    strcpy(command, "./db post ");
+    strcat(command, username);
+    strcat(command, " ");
+    strcat(command, stream);
+    strcat(command, " ");
+    strcat(command, text);
 
-    /*if the stream does not exist, make the files but do not add anything to them*/
-    if (checkAuthorExists(st->username, fileName) == -1)
-    {
-        printf("Error: Invalid stream name: Stream does not exist.<BR>Stream files created.<BR>To post to this stream, please use the addauthor program to gain permission to post to this stream\n");
-
-        /*creating files and closing immediately*/
-        FILE* streamsUsers = fopen(fileName, "w");
-        FILE* streamData = fopen(fileName2, "w");
-        FILE* stream = fopen(fileName3, "w");
-        fclose(streamsUsers);
-        fclose(streamData);
-        fclose(stream);
-
-        updateMasterList(st->streamname);
-    }
-    /*else if user does not have permission to post in the stream*/
-    else if (checkAuthorExists(st->username, fileName) == 0)
-        printf("Error: This user does not have permission to post in this stream.<BR>Use the addauthor program to gain permission to post to this stream.<BR>");
-
-    /*else if the user does have permission to post in the stream*/
-    else if (checkAuthorExists(st->username, fileName) == 1)
-    {
-        FILE* dataStream = fopen(fileName2, "r");
-        char line[255];
-        int totalChars = 0;
-        while (fgets(line, 255, dataStream) != NULL)
-        {
-            char* toAdd = strtok(line, "\n");
-            totalChars = atoi(toAdd);
-        }
-        fclose(dataStream);
-        /*adding user post to the stream file*/
-        FILE* stream = fopen(fileName3, "a");
-	    fprintf(stream,"Stream: %s\n", st->streamname);
-        fprintf(stream, "Sender: %s\n", st->username);
-        fprintf(stream, "Data: %s\n", st->date);
-        fprintf(stream, "%s", st->text);
-        fclose(stream);
-
-        /*adding the size of the text post to the streamdata file*/
-        FILE* streamData = fopen(fileName2, "a");
-        fprintf(streamData, "%d\n", (totalChars + ((int) (strlen(st->text) + strlen(st->date) + strlen(st->username) + strlen(st->streamname))+ 25)));
-        fclose(streamData);
-
-        printf("Post successfully added to the stream.<BR>");
-
-    }
-    free(fileName);
-    free(fileName2);
-    free(fileName3);
-
+    printf("COMMAND IS %s\n", command);
+    system(command);
+    printf("Post successfully added to the stream.<BR>");
+ 
+    free(username);
+    free(stream);
+    free(text);
+    
     return;
 }
 
