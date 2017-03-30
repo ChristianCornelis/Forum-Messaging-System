@@ -41,11 +41,16 @@
 						{
 							if (strstr($line2, "*AT END*") != NULL)
 							{
-								$postOffset = 0;
+								$postOffset = $postOffset-1;
+								echo "FOund the end<BR>";
 							}
 							else if (strstr($line2, "*AT BEGINNING*") != NULL)
 							{
 								$postOffset = $postOffset + 1;
+								echo (str_replace("*AT BEGINNING*", "", $line2));
+								echo "|||||||";
+								//echo $line2;
+								//echo ("|||||||");
 								//$toDecrement = 1;
 							}
 							else if (strstr($line2, "*AT ALL BEGNINNING*") != NULL)

@@ -32,6 +32,7 @@ class PostEntry
         toReturn->date          = initString(300);
         toReturn->text          = initString(10000);
 
+        
         /*copying strings to struct*/
         strcpy(toReturn->username, username);
         strcpy(toReturn->streamname, streamname);

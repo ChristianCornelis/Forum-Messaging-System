@@ -328,7 +328,7 @@ int main(int argc, char const *argv[])
 		strcat(query, "'");
 
 		if(mysql_query(&mysql, query)){
-			handleError("Failed selecting from authors table\nThe table does not exist!\n",&mysql);
+			handleError("This user does not have access to any streams.<BR>\n",&mysql);
 		}
 		if (!(res = mysql_store_result(&mysql)))
 		{
@@ -337,10 +337,15 @@ int main(int argc, char const *argv[])
 
 		/*saving the current number of posts read*/
 		int curPost = -1;
+		int found = 0;
 		while ((row = mysql_fetch_row(res)))
 		{
+			found = 1;
 			curPost = atoi(row[2]);
 		}
+
+		if (found == 0)
+			handleError("Error: This user does not have access to this stream.", &mysql);
 		printf("CURPOST IS %d\n", curPost);
 		query = clearQuery(query);
 
@@ -376,7 +381,20 @@ int main(int argc, char const *argv[])
 
 		printf("NUM POSTS IS %d\n", numPosts);
 		int oldCount = curPost;
+
 		curPost += offset;
+
+		if (curPost < 0)
+		{
+			printf("Found the beginning<BR>");
+			printf("*AT BEGINNING*");
+			curPost = 0;
+		}
+		else if (curPost > numPosts-1)
+		{
+			curPost = numPosts -1;
+			/*printf("*AT END*");*/
+		}
 		strcpy(query, "select * from posts where stream='");
 		strcat(query, stream);
 		strcat(query,"'");
@@ -424,6 +442,32 @@ int main(int argc, char const *argv[])
 
 	}
 
+	else if (strcmp(argv[1], "-authors") == 0)
+	{
+		strcpy(query, "select * from authors order by name");
+	
+		if(mysql_query(&mysql, query)){
+			handleError("fail select 2",&mysql);
+		}
+
+		/*
+			Store results from query into res structure.
+		*/
+		if (!(res = mysql_store_result(&mysql))){
+			handleError("fail store 2",&mysql);
+		}
+
+		/*
+			print all results
+		*/
+		while ((row = mysql_fetch_row(res))) {
+			for (i=0; i < mysql_num_fields(res); i++){
+				printf("%s ", row[i]);
+			}
+			printf("\n");
+		}
+	}
+
 	/*closing connection to database*/
 	free(query);
 	mysql_close(&mysql);
@@ -436,7 +480,7 @@ int main(int argc, char const *argv[])
 void handleError (char* msg, MYSQL *mysql)
 {
 	printf("%s\n%s\n", msg, mysql_error(mysql));
-	exit(1);
+	exit(0);
 }
 
 /*function to clear the query*/

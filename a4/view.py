@@ -62,9 +62,13 @@ elif (postOffset == 3141592654):
 	printPost(username, stream, postOffset)
 	#else, just print the post relative to the offset
 else:
-	if (postOffset > 0):
+	if (postOffset >= 0):
 		postOffset = 0
+		print("FINDING THAT YUNG END")
 		print("*AT END*")
-	print ("USERNAME IS " + username)
-	process = subprocess.check_output(['./db' , 'view', username, stream, str(postOffset)])
-	print(process)
+	#print ("USERNAME IS " + username)
+	command = './db' + ' view ' + username + ' ' + stream + ' ' + str(postOffset)
+
+	process = subprocess.call(['./db', 'view', username, stream, str(postOffset)])
+	#print(subprocess.check_output(['./db' , 'view', username, stream, str(postOffset)]))
+
