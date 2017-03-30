@@ -98,7 +98,7 @@ int main(int argc, char const *argv[])
 		strcat(query, author);
 		strcat(query, "','");
 		strcat(query, stream);
-		strcat(query, "',0)");
+		strcat(query, "',1)");
 
 		printf("trying to add to table with query: %s\n", query);
 		/*add author and handle if errors occur*/
@@ -341,7 +341,7 @@ int main(int argc, char const *argv[])
 		{
 			curPost = atoi(row[2]);
 		}
-
+		printf("CURPOST IS %d\n", curPost);
 		query = clearQuery(query);
 
 		strcpy(query, "select * from posts where stream='");
@@ -377,13 +377,11 @@ int main(int argc, char const *argv[])
 		printf("NUM POSTS IS %d\n", numPosts);
 
 		curPost += offset;
-		strcpy(query, "select * from posts where name='");
-		strcat(query, author);
-		strcat(query, "' and stream='");
+		strcpy(query, "select * from posts where stream='");
 		strcat(query, stream);
 		strcat(query,"'");
 
-		printf("QUERY IS %s\n", query);
+		printf("CURPOST W OFFSET IS %d\n", curPost);
 		if(mysql_query(&mysql, query)){
 			handleError("Failed selecting from posts table\nThe table does not exist!\n",&mysql);
 		}
@@ -394,7 +392,7 @@ int main(int argc, char const *argv[])
 
 		int postCnt = 0;
 		while ((row = mysql_fetch_row(res))) {
-			if (postCnt == offset)
+			if (postCnt == curPost)
 			{
 				char textCpy[12000];
 				strcpy(textCpy, row[2]);
