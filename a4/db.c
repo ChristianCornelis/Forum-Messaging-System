@@ -49,7 +49,6 @@ int main(int argc, char const *argv[])
 	if (!mysql_real_connect(&mysql, HOSTNAME, USERNAME, PASSWORD, DATABASE, 0, NULL, 0))
 		handleError("Error: Connection to host unsuccessful.", &mysql);
 
-	printf("Connection to host successful\n");
 	if (adding)
 	{
 		printf("Creating table if it does not exist\n");
@@ -98,7 +97,7 @@ int main(int argc, char const *argv[])
 		strcat(query, author);
 		strcat(query, "','");
 		strcat(query, stream);
-		strcat(query, "',1)");
+		strcat(query, "',0)");
 
 		printf("trying to add to table with query: %s\n", query);
 		/*add author and handle if errors occur*/
@@ -220,12 +219,12 @@ int main(int argc, char const *argv[])
 			handleError("This user does not have access to this stream.\n<BR>Use addauthor to gain permission to post to streams.\n<BR>", &mysql);
 		}
 
-		while ((row = mysql_fetch_row(res))) {
+		/*while ((row = mysql_fetch_row(res))) {
 			for (i=0; i < mysql_num_fields(res); i++){
 				printf("%s ", row[i]);
 			}
 			printf("\n");
-		}
+		}*/
 		query = clearQuery(query);
 
 		strcpy(query, "create table if not exists posts (name char(255),stream char(255),text varchar(10000), date_time datetime)");
@@ -427,7 +426,7 @@ int main(int argc, char const *argv[])
 		}
 		query = clearQuery(query);
 
-		if (oldCount < numPosts)
+		if (oldCount < numPosts && (oldCount +offset >= oldCount))
 		{
 			strcpy(query, "update authors set last_post_read = 1 + authors.last_post_read where name='");
 			strcat(query, author);
@@ -467,12 +466,113 @@ int main(int argc, char const *argv[])
 			printf("\n");
 		}
 	}
+	/*marking all posts in a stream as read*/
+	else if (strcmp(argv[1], "markAll") == 0)
+	{	
+		/*checking that correct number of arguments are present*/
+		if (argc != 4)
+		{
+			printf("Error: Incorrect number of arguments.<BR>\nExitting.\n<BR>");
+			return 0;
+		}
+
+		/*copying author and stream from arguments*/
+		strcpy(author, argv[2]);
+		strcpy(stream, argv[3]);
+
+		/*building query to get total number of posts in a stream*/
+		strcpy(query, "select * from posts where stream='");
+		strcat(query, stream);
+		strcat(query, "'");
+
+		/*checking if query was successful or not*/
+		if(mysql_query(&mysql, query))
+			handleError("Failed selecting from authors table\nThe table does not exist!\n",&mysql);
+
+		/*storing results*/
+		if (!(res = mysql_store_result(&mysql)))
+			handleError("Store failed.",&mysql);
+
+		int numPosts = -1;
+		numPosts = (int) mysql_num_rows(res);
+
+		/*making query for updating all posts read*/
+		sprintf(query, "update authors set last_post_read = %d where name='%s' and stream='%s'", numPosts, author, stream);
+
+		/*checking if query was successful or not*/
+		if(mysql_query(&mysql, query))
+			handleError("Failed to mark all posts as read in the post table!\n",&mysql);
+		
+		query = clearQuery(query);
+		/*printing the most recent post now*/
+		strcpy(query, "select * from posts where stream='");
+		strcat(query, stream);
+		strcat(query,"'");
+
+		if(mysql_query(&mysql, query)){
+			handleError("Failed selecting from posts table\nThe table does not exist!\n",&mysql);
+		}
+		if (!(res = mysql_store_result(&mysql)))
+		{
+			handleError("fail store 2",&mysql);
+		}
+
+		int postCnt = 0;
+		while ((row = mysql_fetch_row(res))) {
+			if (postCnt == numPosts-1)
+			{
+				char textCpy[12000];
+				strcpy(textCpy, row[2]);
+				int j;
+				for (j = 0; j < strlen(textCpy); j++)
+				{
+					if (textCpy[j] == '\n')
+						printf("<BR>");
+					else
+						printf("%c", textCpy[j]);
+				}
+			}
+			postCnt++;
+		}
+		query = clearQuery(query);
+	}
+	else if (strcmp(argv[1], "output") == 0)
+	{
+		if (argc != 3)
+		{
+			printf("Error: Incorrect number of arguments\n<BR>Exitting.<BR>\n");
+			return 0;
+		}
+
+		strcpy(author, argv[2]);
+
+		sprintf(query, "select * from authors where name='%s'", author);
+
+		if(mysql_query(&mysql, query)){
+			handleError("Failed selecting from authors table\nThe table does not exist!\n",&mysql);
+		}
+		if (!(res = mysql_store_result(&mysql)))
+		{
+			handleError("Store failed.",&mysql);
+		}
+
+		int cnt = 0;
+		while ((row = mysql_fetch_row(res)))
+		{
+			printf("%s ", row[1]);
+			cnt++;
+		}
+
+		if (cnt == 0)
+			printf("This user has access to no posts.");
+		else
+			printf("all");
+	}
 
 	/*closing connection to database*/
 	free(query);
 	mysql_close(&mysql);
 
-	printf("Finished!\n");
 	return 0;
 }
 

@@ -7,7 +7,7 @@
 #include <string.h>
 
 /*defines*/
-#define MAX_QUERY 512
+#define MAX_QUERY 12000
 #define HOSTNAME  "dursley.socs.uoguelph.ca"
 #define USERNAME  "ccorneli"
 #define PASSWORD  "0939357"

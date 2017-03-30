@@ -32,12 +32,29 @@ class PostEntry
         toReturn->date          = initString(300);
         toReturn->text          = initString(10000);
 
-        
+        char textCpy[12000];
+        int j;
+        int k = 0;
+
+        for (j = 0; j < strlen(text); j++)
+        {
+            if (text[j] == '\'')
+            {
+                textCpy[k] = '\'';
+                textCpy[k+1] = '\'';
+                k += 2;
+            }
+            else
+            {
+                textCpy[k] = text[j];
+                k++;
+            }
+        }
         /*copying strings to struct*/
         strcpy(toReturn->username, username);
         strcpy(toReturn->streamname, streamname);
         strcpy(toReturn->date, date);
-        strcpy(toReturn->text, text);
+        strcpy(toReturn->text, textCpy);
 
         if (toReturn)
             return toReturn;

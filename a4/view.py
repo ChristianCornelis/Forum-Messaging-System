@@ -16,10 +16,7 @@ postOffset = int(sys.argv[3])
 
 #if getting all streams a user can access
 if (stream == "*OUTPUT*"):
-	userStreams.append("all")
-	for i in userStreams:
-		print (i + " ", end="")
-	print("")
+	subprocess.call(['./db', 'output', username])
 #else if viewing all streams
 elif (stream == 'all' and postOffset != 98765432109):
     #print("IN HERE")
@@ -45,30 +42,19 @@ elif(stream == 'all' and postOffset == 98765432109):
 		print(i,end="")
 #else if viewing a normal stream and marking all as read
 elif (postOffset == 3141592654):
-	markAllAsRead(stream, username)
-	if (postOffset > 0):
+	if (postOffset >= 0):
 		postOffset = 0
 		print("*AT END*")
 
-	userStreams = getStreams(username)
-	found = False
-	for i in userStreams:
-		if (stream == i):
-			found = True
-	#if the user doesn't have access to the stream, or the stream does not exist
-	if (not found):
-		print("Error: The user does not have access to the " + stream + " stream, or the stream does not exist.")
-		sys.exit()
-	printPost(username, stream, postOffset)
+	subprocess.call(['./db' , 'markAll', username, stream])
+
+	
 	#else, just print the post relative to the offset
 else:
 	if (postOffset >= 0):
 		postOffset = 0
 		print("FINDING THAT YUNG END")
 		print("*AT END*")
-	#print ("USERNAME IS " + username)
-	command = './db' + ' view ' + username + ' ' + stream + ' ' + str(postOffset)
 
 	process = subprocess.call(['./db', 'view', username, stream, str(postOffset)])
-	#print(subprocess.check_output(['./db' , 'view', username, stream, str(postOffset)]))
 
