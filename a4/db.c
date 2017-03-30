@@ -375,7 +375,7 @@ int main(int argc, char const *argv[])
 		}*/
 
 		printf("NUM POSTS IS %d\n", numPosts);
-
+		int oldCount = curPost;
 		curPost += offset;
 		strcpy(query, "select * from posts where stream='");
 		strcat(query, stream);
@@ -396,12 +396,32 @@ int main(int argc, char const *argv[])
 			{
 				char textCpy[12000];
 				strcpy(textCpy, row[2]);
-				printf("%s ", textCpy);
-				printf("\n");
+				int j;
+				for (j = 0; j < strlen(textCpy); j++)
+				{
+					if (textCpy[j] == '\n')
+						printf("<BR>");
+					else
+						printf("%c", textCpy[j]);
+				}
 			}
 			postCnt++;
 		}
 		query = clearQuery(query);
+
+		if (oldCount < numPosts)
+		{
+			strcpy(query, "update authors set last_post_read = 1 + authors.last_post_read where name='");
+			strcat(query, author);
+			strcat(query, "' and stream = '");
+			strcat(query, stream);
+			strcat(query, "'");
+
+			if(mysql_query(&mysql, query)){
+				handleError("Failed selecting from posts table\nThe table does not exist!\n",&mysql);
+			}
+		}
+
 	}
 
 	/*closing connection to database*/
