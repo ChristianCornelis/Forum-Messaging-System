@@ -24,9 +24,9 @@ int main(int argc, char *argv[])
     strcat(toOutput, ".html");
     /*freopen(toOutput , "w", stdout);*/
 	printf("<html>\n<body>\n\n");
-    char line[255];
+    char line[500];
 
-    while (fgets(line, 255, fptr) != NULL)
+    while (fgets(line, 500, fptr) != NULL)
     {
         char* token;
         char* text = NULL;
@@ -330,7 +330,6 @@ int main(int argc, char *argv[])
 					name = getTagContents(token, "name=\"", 'i');
 					token[subStr-token] = '@';
 				}
-
 				printf("\n\t<input type=\"hidden\" name = \"%s\" value=\"%s\">\n", name, value);
 				free(name);
 				free(value);

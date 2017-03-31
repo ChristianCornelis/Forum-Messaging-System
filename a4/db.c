@@ -476,6 +476,7 @@ int main(int argc, char const *argv[])
 			return 0;
 		}
 
+		printf("*AT END*");
 		/*copying author and stream from arguments*/
 		strcpy(author, argv[2]);
 		strcpy(stream, argv[3]);
@@ -622,6 +623,86 @@ int main(int argc, char const *argv[])
 
 		if (postCnt == 0)
 			printf("This user has access to no posts.");
+	}
+	else if (strcmp(argv[1], "allMarkAll") == 0)
+	{
+		/*checking that correct number of arguments are present*/
+		if (argc != 4)
+		{
+			printf("Error: Incorrect number of arguments.<BR>\nExitting.\n<BR>");
+			return 0;
+		}
+
+		printf("*AT END*");
+		/*copying author and stream from arguments*/
+		strcpy(author, argv[2]);
+		strcpy(stream, argv[3]);
+
+		sprintf(query, "select * from authors where name='%s'", author);
+		if(mysql_query(&mysql, query))
+			handleError("Failed selecting from author table.\nThe table does not exist!\n",&mysql);
+
+		/*storing results*/
+		if (!(res = mysql_store_result(&mysql)))
+			handleError("Store failed.",&mysql);
+
+		while ((row = mysql_fetch_row(res))) {
+			char stream[255];
+			strcpy(stream, row[1]);
+
+			query = clearQuery(query);
+
+			sprintf(query, "select * from posts where stream='%s'", stream);
+			if(mysql_query(&mysql, query))
+				handleError("Failed selecting from posts table.\nThe table does not exist!\n",&mysql);
+
+			/*storing results*/
+			if (!(res = mysql_store_result(&mysql)))
+				handleError("Store failed.",&mysql);
+
+			int numPosts = -1;
+			numPosts = (int) mysql_num_rows(res);
+
+			query = clearQuery(query);
+			sprintf(query, "update authors set last_post_read = %d where name='%s' and stream='%s'", numPosts, author, stream);
+
+			/*checking if query was successful or not*/
+			if(mysql_query(&mysql, query))
+				handleError("Failed to mark all posts as read in the post table!\n",&mysql);
+		}
+
+		/*printing out last post now*/
+		sprintf(query, "select * from posts where stream in (select stream from authors where name = '%s')", author);
+		if(mysql_query(&mysql, query))
+			handleError("Failed selecting from posts table with subquery to authors table.\nEither table does not exist!\n",&mysql);
+
+		if (!(res = mysql_store_result(&mysql)))
+			handleError("Store failed.",&mysql);
+
+		int numRows = (int) mysql_num_rows(res);
+
+		offset = numRows-1;
+		
+
+		int postCnt = 0;
+		while ((row = mysql_fetch_row(res))) 
+		{
+			if (postCnt == offset)
+			{
+				char textCpy[12000];
+				strcpy(textCpy, row[2]);
+				int j;
+				for (j = 0; j < strlen(textCpy); j++)
+				{
+					if (textCpy[j] == '\n')
+						printf("<BR>");
+					else
+						printf("%c", textCpy[j]);
+				}
+			}
+			postCnt++;
+		}
+		query = clearQuery(query);
 	}
 
 	/*closing connection to database*/

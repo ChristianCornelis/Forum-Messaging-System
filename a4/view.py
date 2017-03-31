@@ -26,21 +26,16 @@ elif (stream == 'all' and postOffset != 98765432109):
 	subprocess.call(['./db', 'viewAll', 'all', username, str(postOffset)])
 #else if viewing all and marking all as read
 elif(stream == 'all' and postOffset == 98765432109):
-	streams = getStreams(username)
-	posts = getAll(username, streams)
-	for i in streams:
-		markAllAsRead(i, username)
-	postOffset = 0
 	print("*AT ALL END*")
-	for i in posts[postOffset]:
-		print(i,end="")
+	postOffset = 0
+	subprocess.call(['./db', 'view', username, stream, str(postOffset)])
 #else if viewing a normal stream and marking all as read
 elif (postOffset == 3141592654):
 	if (postOffset >= 0):
 		postOffset = 0
 		print("*AT END*")
 
-	subprocess.call(['./db' , 'markAll', username, stream])
+	subprocess.call(['./db' , 'allMarkAll', username, stream])
 
 	
 	#else, just print the post relative to the offset

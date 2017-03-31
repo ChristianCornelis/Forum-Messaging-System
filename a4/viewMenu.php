@@ -2,6 +2,7 @@
 
 	$username = $_POST["username"];
 	$offset = 0;
+	$orderBy = 'name';
 	echo("Currently logged in as: " . $username);
 
 	//generating HTML code for webpage
@@ -41,6 +42,10 @@
 			else if (strstr($line, "ENTER OFFSET HERE") != NULL)
 			{
 				echo (str_replace("ENTER OFFSET HERE", $offset, $line));
+			}
+			else if (strstr($line, "ENTER ORDER HERE") != NULL)
+			{
+				echo (str_replace("ENTER ORDER HERE", "date", $line));
 			}
 			//else output the line
 			else

@@ -1,6 +1,6 @@
 <?php
 	//function to print out a post by calling on the viewing program
-	function printPost($postOffset, $output, $status, $username, $stream, $markAll)
+	function printPost($postOffset, $output, $status, $username, $stream, $markAll, $orderBy)
 	{
 		if ($status)
 			echo('Exec() failed');
@@ -21,12 +21,14 @@
 						//outputting the appropriate post
 						$cmd2 = './view.py  ' .escapeshellarg($stream) . " " .escapeshellarg($username) . ' ' . $postOffset;
 					}
+					/*if marking all as read with any stream but all*/
 					else if (strcmp($stream, "all") != 0)
 					{
 						//marking all as read
 						$cmd2 = './view.py ' .escapeshellarg($stream) . ' ' . escapeshellarg($username) . ' 3141592654';
 						$postOffset = 0;
 					}
+					//if marking all as read with all streams
 					else if (strcmp($stream, "all") == 0 && $markAll == 1)
 					{
 						$cmd2 = './view.py ' .escapeshellarg($stream) . ' ' . escapeshellarg($username) . ' 98765432109';
@@ -42,6 +44,7 @@
 							if (strstr($line2, "*AT END*") != NULL)
 							{
 								$postOffset = $postOffset-1;
+								echo (str_replace("*AT END*", "", $line2));
 								echo "FOund the end<BR>";
 							}
 							else if (strstr($line2, "*AT BEGINNING*") != NULL)
@@ -71,6 +74,10 @@
 				else if (strstr($line, "ENTER USERNAME HERE") != NULL)
 				{
 					echo (str_replace("ENTER USERNAME HERE", $username, $line));
+				}
+				else if (strstr($line, "ENTER ORDER HERE") != NULL)
+				{
+					echo (str_replace("ENTER ORDER HERE",  $orderBy, $line));
 				}
 				//else check if a hidden field should be filled
 				else if (strstr($line, "ENTER STREAM HERE") != NULL)
@@ -111,6 +118,8 @@
 	$offset = $_POST['offset'];
 	$markAll = 0;
 	$returnedOffset = 0;
+	$orderBy = $_POST['order'];
+	echo "Currently ordering by " . $orderBy;
 	//outputting the current user and stream to inform the user
 	echo ("Currently logged in as: " . $username);
 	echo("<BR> Currently viewing the " . $stream . " stream");
@@ -124,7 +133,7 @@
 	if (isset($_POST['Next_post'])) //== "Next post")
 	{
 		$offset = $offset+1;
-		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll);
+		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll, $orderBy);
 
 		if ($returnedOffset == 0)
 			$offset = 0;
@@ -133,23 +142,30 @@
 	else if (isset($_POST['Previous_post']))// == "Previous post")
 	{
 		$offset = $offset - 1;
-		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll);
+		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll, $orderBy);
 		$offset = $returnedOffset;
 	}
 	else if (isset($_POST['Check_for_new_posts']))
 	{
 		$offset = 0;
-		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll);
+		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll, $orderBy);
 		$offset = $returnedOffset;
 	}
 	else if (isset($_POST['Mark_all_as_read']))
 	{
 		$markAll = 1;
-		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll);
+		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll, $orderBy);
 		$offset = $returnedOffset;
 	}
+	else if (isset($_POST['Order_toggle']))
+	{
+		if (strcmp($orderBy, "name") == 0)
+			$orderBy = "date";
+		else
+			$orderBy = "name";
+	}
 	else {
-		$returnedOffset = printPost(0, $output, $status, $username, $stream, $markAll);
+		$returnedOffset = printPost(0, $output, $status, $username, $stream, $markAll, $orderBy);
 		$offset = $returnedOffset;
 	}
 
