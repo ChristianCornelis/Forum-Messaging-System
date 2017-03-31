@@ -647,9 +647,9 @@ int main(int argc, char const *argv[])
 			handleError("Store failed.",&mysql);
 
 		while ((row = mysql_fetch_row(res))) {
-			char stream[255];
 			strcpy(stream, row[1]);
 
+			MYSQL_RES * res2;
 			query = clearQuery(query);
 
 			sprintf(query, "select * from posts where stream='%s'", stream);
@@ -657,11 +657,11 @@ int main(int argc, char const *argv[])
 				handleError("Failed selecting from posts table.\nThe table does not exist!\n",&mysql);
 
 			/*storing results*/
-			if (!(res = mysql_store_result(&mysql)))
+			if (!(res2 = mysql_store_result(&mysql)))
 				handleError("Store failed.",&mysql);
 
 			int numPosts = -1;
-			numPosts = (int) mysql_num_rows(res);
+			numPosts = (int) mysql_num_rows(res2);
 
 			query = clearQuery(query);
 			sprintf(query, "update authors set last_post_read = %d where name='%s' and stream='%s'", numPosts, author, stream);
@@ -671,6 +671,7 @@ int main(int argc, char const *argv[])
 				handleError("Failed to mark all posts as read in the post table!\n",&mysql);
 		}
 
+		query = clearQuery(query);
 		/*printing out last post now*/
 		sprintf(query, "select * from posts where stream in (select stream from authors where name = '%s')", author);
 		if(mysql_query(&mysql, query))
@@ -681,7 +682,7 @@ int main(int argc, char const *argv[])
 
 		int numRows = (int) mysql_num_rows(res);
 
-		offset = numRows-1;
+		int offset = numRows-1;
 		
 
 		int postCnt = 0;
