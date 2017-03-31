@@ -45,7 +45,6 @@
 							{
 								$postOffset = $postOffset-1;
 								echo (str_replace("*AT END*", "", $line2));
-								echo "FOund the end<BR>";
 							}
 							else if (strstr($line2, "*AT BEGINNING*") != NULL)
 							{
@@ -60,7 +59,7 @@
 							else if (strstr($line2, "*AT ALL END*") != NULL)
 							{
 								$postOffset = $postOffset-1;
-								echo $line2;
+								//echo $line2;
 								echo (str_replace("*AT ALL END*", "", $line2));
 							}
 							else
@@ -163,6 +162,8 @@
 			$orderBy = "date";
 		else
 			$orderBy = "name";
+
+		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll, $orderBy);
 	}
 	else {
 		$returnedOffset = printPost(0, $output, $status, $username, $stream, $markAll, $orderBy);

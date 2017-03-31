@@ -26,7 +26,7 @@ elif (stream == 'all' and postOffset != 98765432109):
 	subprocess.call(['./db', 'viewAll', 'all', username, str(postOffset)])
 #else if viewing all and marking all as read
 elif(stream == 'all' and postOffset == 98765432109):
-	print("*AT ALL END*")
+	print("*AT ALL BEGNINNING*")
 	postOffset = 0
 	subprocess.call(['./db', 'allMarkAll', username, stream])
 #else if viewing a normal stream and marking all as read
@@ -42,7 +42,6 @@ elif (postOffset == 3141592654):
 else:
 	if (postOffset >= 0):
 		postOffset = 0
-		print("FINDING THAT YUNG END")
 		print("*AT END*")
 
 	process = subprocess.call(['./db', 'view', username, stream, str(postOffset)])

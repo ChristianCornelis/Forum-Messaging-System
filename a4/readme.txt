@@ -19,7 +19,7 @@ make clean
 
 EXECUTION:
 **********
-This entire program should be run on the CIS*2750 web server.\
+This entire program should be run on the CIS*2750 web server.
 
 Login:
 Login with a username of your choice at the login screen and hit 'Submit' to move to the main menu.
@@ -50,11 +50,12 @@ View:
 
 NOTES AND ISSUES:
 *****************
--Upon initial login, the messages folder will not be present. It will be automatically created when the user adds themselves to a stream.
-	-If the user tries to post to a stream or view a stream that they do not belong to, or if there are no streams in existence yet, appropriate messages will be displayed as this happens.
+-If the user tries to post to a stream or view a stream that they do not belong to, or if there are no streams in existence yet, appropriate messages will be displayed as this happens.
 -On any page, the 'Return' button will take the user to the main menu, and the 'Logout' button will take them to the login screen
 
 -Usernames can contain spaces for all programs, but streams CAN NOT
+-Both usernames and streams CAN NOT contain single quotes (apostrophes -> ')
+-If a post contains an apostrophe it will be sanitized so that it does not cause a mySQL error
 
 WPML Converter (converter)
 -Any text that does not match what a tag is expected to contain WILL NOT be copied, it will be discarded
@@ -81,49 +82,45 @@ Viewing Program:
 -The 'Order Toggle' option does not work.
 -All WILL NOT update the read count for posts
 	-If a user hits 'Check for new posts' while viewing all streams then the oldest post will be displayed. Since all doesn't keep track of how many posts a user has read I thought that this was an appropriate way to handle it
+	-If a user hits 'Mark all as read' while viewing all streams then all posts will be marked for all streams that a user is subcribed to, and the oldest post will be displayed, since it would have been very difficult to keep track of the number of posts that the offset would have been set to for what post to view
 -If a user is removed while they are viewing the program, an appropriate message will be outputted
 -If a user has seen all posts in a stream, then the stream will begin viewing from the newest post
--If a user is viewing all streams at once (they've inputted 'all' as the stream), and they select 'Mark all as read', each post in all subscribed streams will be marked as read and the  newest post will be displayed
  -If the user navigates to the oldest post in a stream and hits 'Next post', the second oldest post will be skipped.
  	-This is a very minor bug that I'm positive is caused by a small counter issue.
  -The 'Return to main menu' button will take you to the main menu, and the 'Switch streams' button will return you to the view menu
 
-Messages folder:
--The messages folder will be created by my program if necessary.
--Please note, an additional file will be present called 'streamList'. This file is used by the viewing program in order for it to know which streams have been created in order to check which streams a user is subscribed to.
+Database Program Flags:
 
-Configuration File:
--Tags MUST contain the values that they are supposed to, otherwise a seg fault will occur.
-	-This does not apply to tags that have default values for input if it is not present
--The sizes in the image tag cannot be larger than 5 digits in length.
--If multiple input-related tags are on the same line they will be put into the same HTML form
-	-NOTE that if multiple input tags are present on a line (.i, .r, .b), then the FIRST action listed will be the action associated with that form
--When using the .e tag, DO NOT include './' in the name of the executable if it is located in the local directory.
-	-This is because my program will search for the executable in the local directory, and if it finds it, will concatenate './' onto the front of it and run it.
-	-This is not an issue if the executable is located in the user or system bin folders, as it will run fine since the './' is not concatenated onto the executable name
+To use these flags, run (from the command line) ./db <FLAG>
+-users
+	-This flag will display the contents of the authors table.
+	-This includes the author, stream they are subscribed to, and the number of posts that they have read so far in the stream.
+	-If the authors table does not exist, then an appropriate message will be printed.
+	-The output will be ordered by name.
 
--.t tag
-	-Text inside a t flag is printed inside an HTML <p>, or paragraph tag
--.i tag
-	-It is possible to have multiple inputs inside the same .i tag
-	-This will output all of the appropriate input fields inside one form with one submit button
-		-To do this, list the name, value, text, and action for each input IN THAT ORDER inside the .i tag.
-		-PLEASE NOTE that ONLY the first instance of action will be used as the action for the form, any other instances of 'action="<>"' will be ignored
-		-Example: .i(name="streamInput",value="Overwatch",text="Stream", action="post.php",name="testInput",value="This is a test",text="Stream")
-	-It is possible to make an input field a text area by including textArea="True" after the 'text = "<>"' part of an i tag
-		-Example: .i(name="streamInput",value="Overwatch",text="Stream", textArea="True", action="post.php",name="testInput",value="This is a test",text="Stream",action="sees.php")
-		 would output a text area followed by a normal text input, followed by a submit button
+-posts
+	-This flag will display the entire contents of the posts table
+	-Please note that the stream, sender, and dates will appear twice since they are concatenated into the actual post as well as into columns in the table
+		-Also note that the times may be SLIGHTLY different between the date column and the date in the post, since I retrieve the date from the system at different times, and 
+		 the date in the date column is only used for sorting, and can be slighlty varied from the time stored in the post
+	-The author, stream, date, and post content will all be displayed.
+	-If there are no posts, or the table does not exist, an appropriate message will be printed.
+	-Posts are printed out in the order of the date
+	-The actual post will be between two headers of asterisks labelled like '********TEXT********' in order to be able to differentiate between the names, stream, and dates in the database for a post and the actual content of a post.
 
--.q tag
-	-This tag was made to keep track of variables between web pages
-	-It creates a hidden input field with a static piece of text inside it that is replaced upon printing it out to the screen
-	-It takes in a name and text input
-	-Example: .q(name="username",value="ENTER USERNAME HERE") would create a hidden input field called username with ENTER USERNAME HERE as the text
-		-My PHP programs will find these lines and replace the static strings with their appropriate values, which are passed between the web pages.
+-streams
+	-This flag will display all of the streams that are present in the database
+	-The streams will be outputted in the order of their names
+	-If no streams are present or the streams table is empty, an appropriate message will be printed.
 
--.r tag
-	-To have multiple radio buttons inside a list of radio buttons, simply list multiple values inside the tag. This will produce  a multiple radio buttons inside the same form
-	-Example: .r(action="addAuthor.php",name="isRemovable",value="Add",value="Remove") would produce 2 radio buttons, 'Add', and 'Remove'
-	-The first value listed will be selected by default.
-	-Will not output any buttons, the .b flag would have to be used.
+-clear
+	-This flag will clear all of the tables present in the database
+	-If the tables are already empty, an appropriate message will be outputted
+	-If the tables do not exist, the tables will be created, and a message will be outputted saying that they are clear
 
+-reset
+	-drops all tables in use if they exist
+	-if the table does not exist, it cannot be dropped and an appropriate message will be outputted
+
+-help
+	-Outputs information about all previous flags and how to run them

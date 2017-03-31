@@ -40,14 +40,12 @@ void updateStream (struct userPost * st)
     strcat(command, " ");
     strcat(command, text);
 
-    printf("COMMAND IS %s\n", command);
     system(command);
-    printf("Post successfully added to the stream.<BR>");
  
     free(username);
     free(stream);
     free(text);
-    
+
     return;
 }
 

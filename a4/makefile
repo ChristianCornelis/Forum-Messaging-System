@@ -33,8 +33,10 @@ view: view.py
 
 converter: configConverter.c
 	gcc  -Wall -ansi -g configConverter.c -o converter
+	
 clean:
-	rm *.o libstream.a addauthor post converter a1 post.c test.tar
+	rm *.o libstream.a addauthor post converter a1 post.c db
+
 cleanStreams:
 	rm messages -r
 
@@ -45,10 +47,11 @@ ssh:
 	ssh ccorneli@2750web.socs.uoguelph.ca
 
 tar:
-	tar cf test.tar *.php *.py *.c *.cc *.txt *.wpml *.h makefile
+	tar cf a4.tar *.php *.py *.c *.cc *.txt *.wpml *.h makefile
 
 scp:
 	scp *.php *.py *.c *.cc *.txt *.wpml *.h makefile ccorneli@2750web.socs.uoguelph.ca:/srv/www/ccorneli
+
 db: db.o
 	gcc db.o -o db -lmysqlclient -L/usr/lib/x86_64-linux-gnu/
 

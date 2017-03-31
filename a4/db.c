@@ -1,13 +1,11 @@
 #include "db.h"
 
-
 int main(int argc, char const *argv[])
 {
 	MYSQL mysql;
 	MYSQL_ROW row;
-	MYSQL_FIELD *field;
 	MYSQL_RES *res;
-	char* query = calloc(MAX_QUERY, sizeof(char));
+	char* query = calloc(MAX_QUERY_LENGTH, sizeof(char));
 	char author[255];
 	char stream[255];
 	char text[10000];
@@ -17,6 +15,7 @@ int main(int argc, char const *argv[])
 	int viewing = 0;
 	int removing = 0;
 
+	/*if adding an author to the database*/
 	if (strcmp(argv[1], "addAuthor") == 0)
 	{
 		adding = 1;
@@ -29,17 +28,37 @@ int main(int argc, char const *argv[])
 		strcpy(author, argv[2]);
 		strcpy(stream, argv[3]);
 	}
+	/*if sending a post to the database*/
 	else if (strcmp(argv[1], "post") == 0)
 	{
 		posting = 1;
+		if (argc != 5)
+		{
+			printf("Error: Incorrect number of arguments.\nExitting\n");
+			mysql_close(&mysql);
+			return 0;
+		}
+
 		strcpy(author, argv[2]);
 		strcpy(stream, argv[3]);
 		strcpy(text, argv[4]);
 	}
+	/*if viewing a post*/
 	else if (strcmp(argv[1], "view") == 0)
 		viewing = 1;
+	/*if removing an author from the database*/
 	else if (strcmp(argv[1], "removeAuthor") == 0)
+	{
 		removing = 1;
+
+		if (argc != 4)
+		{
+			printf("Error: Incorrect number of arguments.\nExitting.\n");
+			return 0;
+		}
+		strcpy(author, argv[2]);
+		strcpy(stream, argv[3]);
+	}
 
 	int i;
 	mysql_init(&mysql);
@@ -51,29 +70,26 @@ int main(int argc, char const *argv[])
 
 	if (adding)
 	{
-		printf("Creating table if it does not exist\n");
 		strcpy(query, "create table if not exists authors (name char(255),stream char(255),last_post_read int,primary key(name, stream))");
 		if (mysql_query(&mysql, query))
-			handleError("Table creation not successful.", &mysql);
+			handleError("Users table creation not successful.", &mysql);
 		query = clearQuery(query);
 
 		strcpy(query, "create table if not exists streams (name char(255) primary key)");
 		if (mysql_query(&mysql, query))
-			handleError("Failed to create the stream table.\n", &mysql);
+			handleError("Failed to create the streams table.\n", &mysql);
 
 		strcpy(query, "select * from streams where name='");
 		strcat(query, stream);
 		strcat(query, "'");
 
+		/*check if the stream is already in the streams table*/
 		if (mysql_query(&mysql, query))
-		{
 			handleError("Failed to select from streams table<BR>/n", &mysql);
-		}
 
+		/*trying to store results*/
 		if (!(res = mysql_store_result(&mysql)))
-		{
 			handleError("Failed to store stream from stream table\n<BR>", &mysql);
-		}
 
 		/*checking if the stream is already in the streams table*/
 		if (mysql_num_rows(res) == 0)
@@ -85,91 +101,153 @@ int main(int argc, char const *argv[])
 			strcat(query, "')");
 
 			if (mysql_query(&mysql, query))
-			{
 				handleError("Failed to insert stream into streams table.<BR>/n", &mysql);
-			}
 
 		}
 
 		query = clearQuery(query);
-		printf("Creation successful!\n");
 		strcat(query, "insert into authors values ('");
 		strcat(query, author);
 		strcat(query, "','");
 		strcat(query, stream);
 		strcat(query, "',0)");
 
-		printf("trying to add to table with query: %s\n", query);
 		/*add author and handle if errors occur*/
 		if (mysql_query(&mysql, query))
-		{
-			printf("Failed to insert author %s\n", author);
-			handleError("Failed to insert record.", &mysql);
-		}
-		printf("Add successful!\n");
+			printf("Failed to insert user into the users table:<BR>%s is already in the %s table.<BR>", author, stream);
+		else
+			printf("User successfully added to the %s stream.<BR>", stream);
 		query = clearQuery(query);
-		strcpy(query, "select * from authors order by name");
-
-		if (mysql_query(&mysql, query))
-			handleError("Selection failed", &mysql);
-
-		if (!(res = mysql_store_result(&mysql)))
-		{
-			handleError("Failed to store", &mysql);
-		}
-
-		printf("Trying to print rows!\n");
-		while ((row = mysql_fetch_row(res)))
-			printf("%s ", row[0]);
-		printf("\n");
-		query = clearQuery(query);
-
-
-		strcpy(query, "select * from authors order by name");
-	
-		if(mysql_query(&mysql, query)){
-			handleError("fail select 2",&mysql);
-		}
-
-		/*
-			Store results from query into res structure.
-		*/
-		if (!(res = mysql_store_result(&mysql))){
-			handleError("fail store 2",&mysql);
-		}
-
-		/*
-			print all results
-		*/
-		while ((row = mysql_fetch_row(res))) {
-			for (i=0; i < mysql_num_fields(res); i++){
-				printf("%s ", row[i]);
-			}
-			printf("\n");
-		}
-
-		query = clearQuery(query);
-
 	}
 
-	else if (strcmp(argv[1], "-drop") == 0)
+	else if (strcmp(argv[1], "-clear") == 0)
 	{
-		if (argc != 3)
+		if (argc != 2)
 		{
 			printf("Error: Incorrect number of arguments");
 			mysql_close(&mysql);
-			exit(1);
+			return 0;
 		}
-		strcpy(query, "drop table ");
-		strcat(query, argv[2]);
+		
+		/*creating all tables if they do not exist*/
+
+		strcpy(query, "create table if not exists authors (name char(255),stream char(255),last_post_read int,primary key(name, stream))");
 		if (mysql_query(&mysql, query))
-			handleError("Failed to drop table", &mysql);
-		printf("table dropped\n");
+			handleError("Users table creation not successful.", &mysql);
+		query = clearQuery(query);
+
+		strcpy(query, "create table if not exists posts (name char(255),stream char(255),last_post_read int,primary key(name, stream))");
+		if (mysql_query(&mysql, query))
+			handleError("Posts table creation not successful.", &mysql);
+		query = clearQuery(query);
+
+		strcpy(query, "create table if not exists streams (name char(255) primary key)");
+		if (mysql_query(&mysql, query))
+			handleError("Streams table creation not successful.", &mysql);
+		query = clearQuery(query);
+
+		/*getting count from stream table*/
+		sprintf(query, "select count(*) from streams");
+		if (mysql_query(&mysql, query))
+			handleError("Failed to get count from streams table.", &mysql);
+
+		/*storing results*/
+		if (!(res = mysql_store_result(&mysql)))
+			handleError("Failed to store results of count for streams table.", &mysql);
+
+		/*calculating the number of rows*/
+		int numRows = -1;
+		while ((row = mysql_fetch_row(res)))
+			numRows = atoi(row[0]);
+
+		/*if 0, table is already empty*/
+		if (numRows == 0)
+		{
+			printf("The streams table is already empty.\n");
+		}
+		/*else drop the table and recreate it*/
+		else
+		{
+			query = clearQuery(query);
+			sprintf(query, "truncate table streams");
+
+			if (mysql_query(&mysql, query))
+				handleError("Failed to get clear streams table.", &mysql);
+			else
+				printf("Streams table cleared successfully.\n");
+		}
+
+		query = clearQuery(query);
+
+		/*getting count from authors table*/
+		sprintf(query, "select count(*) from authors");
+		if (mysql_query(&mysql, query))
+			handleError("Failed to get count from users table.", &mysql);
+
+		/*storing results*/
+		if (!(res = mysql_store_result(&mysql)))
+			handleError("Failed to store results of count for users table.", &mysql);
+
+		/*calculating the number of rows*/
+		numRows = -1;
+		while ((row = mysql_fetch_row(res)))
+			numRows = atoi(row[0]);
+
+		/*if 0, table is already empty*/
+		if (numRows == 0)
+		{
+			printf("The users table is already empty.\n");
+		}
+		/*else drop the table and recreate it*/
+		else
+		{
+			query = clearQuery(query);
+			sprintf(query, "truncate table authors");
+
+			if (mysql_query(&mysql, query))
+				handleError("Failed to clear users table.", &mysql);
+			else
+				printf("Users table cleared successfully.\n");
+		}
+
+		query = clearQuery(query);
+
+		/*getting count from posts table*/
+		sprintf(query, "select count(*) from posts");
+		if (mysql_query(&mysql, query))
+			handleError("Failed to get count from posts table.", &mysql);
+
+		/*storing results*/
+		if (!(res = mysql_store_result(&mysql)))
+			handleError("Failed to store results of count for posts table.", &mysql);
+
+		/*calculating the number of rows*/
+		numRows = -1;
+		while ((row = mysql_fetch_row(res)))
+			numRows = atoi(row[0]);
+
+		/*if 0, table is already empty*/
+		if (numRows == 0)
+		{
+			printf("The posts table is already empty.\n");
+		}
+		/*else drop the table and recreate it*/
+		else
+		{
+			query = clearQuery(query);
+			sprintf(query, "truncate table posts");
+
+			if (mysql_query(&mysql, query))
+				handleError("Failed to clear posts table.", &mysql);
+			else
+				printf("Posts table cleared successfully.\n");
+		}
+
+		query = clearQuery(query);
 	}
 	/*else if removing an author from the database*/
 	else if (removing == 1)
 	{
-		printf("Attempting to delete.\n");
 
 		/*if incorrect number of arguments, exit the program.*/
 		if (argc != 4)
@@ -178,6 +256,29 @@ int main(int argc, char const *argv[])
 			mysql_close(&mysql);
 			exit(1);
 		}
+
+		sprintf(query, "select * from authors where name='%s' and stream='%s'", author, stream);
+
+		/*delete the entry from the authors table if it exists*/
+		if(mysql_query(&mysql, query))
+			handleError("Failed to select user from authors table.",&mysql);
+
+		/*storing results*/
+		if (!(res = mysql_store_result(&mysql)))
+			handleError("Failed to store results of count for posts table.", &mysql);
+
+		/*calculating the number of rows*/
+		int numRows = 0;
+		while ((row = mysql_fetch_row(res)))
+			numRows++;
+
+		/*if the user is not in the stream then exit.*/
+		if (numRows == 0)
+		{
+			printf("%s is not in the %s stream and cannot be removed from it.<BR>\n", author, stream);
+			return 0;
+		}
+		query = clearQuery(query);
 
 		strcpy(query, "delete from authors where name='");
 		strcat(query, argv[2]);
@@ -188,15 +289,11 @@ int main(int argc, char const *argv[])
 		/*delete the entry from the authors table if it exists*/
 		if(mysql_query(&mysql, query))
 			handleError("Deletion failed.",&mysql);
+		else
+			printf("%s successfully removed from the %s stream.<BR>\n", author, stream);
 	}
 	else if (posting)
 	{
-		if (argc != 5)
-		{
-			printf("Error: Incorrect number of arguments.\nExitting\n");
-			mysql_close(&mysql);
-			return 1;
-		}
 
 		strcpy(query, "select * from authors where name='");
 		strcat(query, author);
@@ -206,7 +303,7 @@ int main(int argc, char const *argv[])
 
 		if (mysql_query(&mysql, query))
 		{
-			handleError("Failed to select from authors table<BR>/n", &mysql);
+			handleError("Failed to select from authors table. Table is empty.<BR>", &mysql);
 		}
 
 		if (!(res = mysql_store_result(&mysql)))
@@ -219,15 +316,9 @@ int main(int argc, char const *argv[])
 			handleError("This user does not have access to this stream.\n<BR>Use addauthor to gain permission to post to streams.\n<BR>", &mysql);
 		}
 
-		/*while ((row = mysql_fetch_row(res))) {
-			for (i=0; i < mysql_num_fields(res); i++){
-				printf("%s ", row[i]);
-			}
-			printf("\n");
-		}*/
 		query = clearQuery(query);
 
-		strcpy(query, "create table if not exists posts (name char(255),stream char(255),text varchar(10000), date_time datetime)");
+		strcpy(query, "create table if not exists posts (name char(255),stream char(255),last_post_read int,primary key(name, stream))");
 		if (mysql_query(&mysql, query))
 			handleError("Post table creation not successful.", &mysql);
 		query = clearQuery(query);
@@ -237,68 +328,65 @@ int main(int argc, char const *argv[])
 		strcat(query, "','");
 		strcat(query, stream);
 		strcat(query, "','");
-		/*strcat(query, (mysql_real_escape_string(&mysql, end, text, ((int)strlen(text)))));*/
 		strcat(query, text);
 		strcat(query, "',NOW()");
 		strcat(query, ")");
 
 		if (mysql_query(&mysql, query))
 			handleError("Failed to insert post.\n<BR>", &mysql);
-
-		query = clearQuery(query);
-
-		strcpy(query, "select * from posts order by name");
-	
-		if(mysql_query(&mysql, query)){
-			handleError("fail select 2",&mysql);
-		}
-		if (!(res = mysql_store_result(&mysql))){
-			handleError("fail store 2",&mysql);
-		}
-
-		while ((row = mysql_fetch_row(res))) {
-			for (i=0; i < mysql_num_fields(res); i++){
-				printf("%s ", row[i]);
-			}
-			printf("\n");
-		}
+		else
+			printf("Post successfully added to the %s stream.<BR>\n", stream);
 		query = clearQuery(query);
 	}
 	else if (strcmp(argv[1], "-posts") == 0)
 	{
-		strcpy(query, "select * from posts order by name");
+		strcpy(query, "select * from posts order by date_time");
 	
-		if(mysql_query(&mysql, query)){
+		if(mysql_query(&mysql, query))
 			handleError("Failed selecting from posts table\nThe table does not exist!\n",&mysql);
-		}
+		
 		if (!(res = mysql_store_result(&mysql)))
-		{
-			handleError("fail store 2",&mysql);
-		}
+			handleError("Failed to store results for selection of posts in posts table.",&mysql);
 
 		printf("*******POSTS:*******\n");
+		int cnt = 0;
 		while ((row = mysql_fetch_row(res))) {
-			for (i=0; i < mysql_num_fields(res); i++){
+			for (i = 0; i < mysql_num_fields(res); i++){
 				printf("%s ", row[i]);
+
+				if (i+1 == (int) mysql_num_fields(res)-2)
+				{
+					printf("\n");
+					printf("********TEXT********\n");
+				}
+				else if (i+1 == (int) mysql_num_fields(res)-1)
+				{
+					printf("********************\n");
+					printf("Date in database: ");
+				}
 			}
-			printf("\n");
+			cnt++;
+			printf("\n\n");
 		}
+		if (cnt == 0)
+			printf("No posts to display.\n");
 		query = clearQuery(query);
 	}
 	else if (strcmp(argv[1], "-streams") == 0)
 	{
 		strcpy(query, "select * from streams order by name");
 	
-		if(mysql_query(&mysql, query)){
-			handleError("Failed selecting from streams table\nThe table does not exist!\n",&mysql);
-		}
-		if (!(res = mysql_store_result(&mysql))){
-			handleError("fail store 2",&mysql);
-		}
+		if(mysql_query(&mysql, query))
+			handleError("Failed selecting from streams table\nThe table does not exist or is empty!",&mysql);
+		
+		if (!(res = mysql_store_result(&mysql)))
+			handleError("Failed to store results for streams.",&mysql);
+		
 
 		printf("*******STREAMS:*******\n");
 		while ((row = mysql_fetch_row(res))) {
-			for (i=0; i < mysql_num_fields(res); i++){
+			for (i=0; i < mysql_num_fields(res); i++)
+			{
 				printf("%s ", row[i]);
 			}
 			printf("\n");
@@ -326,13 +414,11 @@ int main(int argc, char const *argv[])
 		strcat(query, stream);
 		strcat(query, "'");
 
-		if(mysql_query(&mysql, query)){
+		if(mysql_query(&mysql, query))
 			handleError("This user does not have access to any streams.<BR>\n",&mysql);
-		}
+		
 		if (!(res = mysql_store_result(&mysql)))
-		{
 			handleError("Store failed.",&mysql);
-		}
 
 		/*saving the current number of posts read*/
 		int curPost = -1;
@@ -352,31 +438,14 @@ int main(int argc, char const *argv[])
 		strcat(query, stream);
 		strcat(query, "'");
 
-		if(mysql_query(&mysql, query)){
+		if(mysql_query(&mysql, query))
 			handleError("Failed selecting from authors table\nThe table does not exist!\n",&mysql);
-		}
+		
 		if (!(res = mysql_store_result(&mysql)))
-		{
 			handleError("Store failed.",&mysql);
-		}
 
 		int numPosts = -1;
 		numPosts = (int) mysql_num_rows(res);
-		/*
-		strcpy(query, "select count(*) from posts");
-		if(mysql_query(&mysql, query)){
-			handleError("Failed selecting from authors table\nThe table does not exist!\n",&mysql);
-		}
-		if (!(res = mysql_store_result(&mysql)))
-		{
-			handleError("Store failed.",&mysql);
-		}
-
-		int numPosts = -1;
-		while ((row = mysql_fetch_row(res)))
-		{
-			numPosts = atoi(row[0]);
-		}*/
 
 		printf("NUM POSTS IS %d\n", numPosts);
 		int oldCount = curPost;
@@ -392,20 +461,17 @@ int main(int argc, char const *argv[])
 		else if (curPost > numPosts-1)
 		{
 			curPost = numPosts -1;
-			/*printf("*AT END*");*/
 		}
 		strcpy(query, "select * from posts where stream='");
 		strcat(query, stream);
 		strcat(query,"'");
 
 		printf("CURPOST W OFFSET IS %d\n", curPost);
-		if(mysql_query(&mysql, query)){
+		if(mysql_query(&mysql, query))
 			handleError("Failed selecting from posts table\nThe table does not exist!\n",&mysql);
-		}
+
 		if (!(res = mysql_store_result(&mysql)))
-		{
 			handleError("fail store 2",&mysql);
-		}
 
 		int postCnt = 0;
 		while ((row = mysql_fetch_row(res))) {
@@ -441,26 +507,22 @@ int main(int argc, char const *argv[])
 
 	}
 
-	else if (strcmp(argv[1], "-authors") == 0)
+	else if (strcmp(argv[1], "-users") == 0)
 	{
 		strcpy(query, "select * from authors order by name");
 	
-		if(mysql_query(&mysql, query)){
-			handleError("fail select 2",&mysql);
-		}
+		if(mysql_query(&mysql, query))
+			handleError("Error: The users table is empty or does not exist.",&mysql);
 
-		/*
-			Store results from query into res structure.
-		*/
-		if (!(res = mysql_store_result(&mysql))){
-			handleError("fail store 2",&mysql);
-		}
+		/*storing results*/
+		if (!(res = mysql_store_result(&mysql)))
+			handleError("Error: The users table is empty or does not exist.",&mysql);
 
-		/*
-			print all results
-		*/
-		while ((row = mysql_fetch_row(res))) {
-			for (i=0; i < mysql_num_fields(res); i++){
+		/*going through all of the rows*/
+		while ((row = mysql_fetch_row(res)))
+		{
+			for (i=0; i < mysql_num_fields(res); i++)
+			{
 				printf("%s ", row[i]);
 			}
 			printf("\n");
@@ -480,6 +542,24 @@ int main(int argc, char const *argv[])
 		/*copying author and stream from arguments*/
 		strcpy(author, argv[2]);
 		strcpy(stream, argv[3]);
+
+		sprintf(query, "select * from authors where name='%s' and stream='%s'", author, stream);
+
+		if(mysql_query(&mysql, query))
+			handleError("Failed selecting from authors table\nThe table does not exist!\n",&mysql);
+
+		/*storing results*/
+		if (!(res = mysql_store_result(&mysql)))
+			handleError("Store failed.",&mysql);
+
+		/*checking if the user has access to the desired stream*/
+		int results = -1;
+		results = (int) mysql_num_rows(res);
+		if (results == 0)
+		{
+			printf("Error: This user does not have access to the %s stream.", stream);
+			return 0;
+		}
 
 		/*building query to get total number of posts in a stream*/
 		strcpy(query, "select * from posts where stream='");
@@ -510,13 +590,11 @@ int main(int argc, char const *argv[])
 		strcat(query, stream);
 		strcat(query,"'");
 
-		if(mysql_query(&mysql, query)){
+		if(mysql_query(&mysql, query))
 			handleError("Failed selecting from posts table\nThe table does not exist!\n",&mysql);
-		}
+		
 		if (!(res = mysql_store_result(&mysql)))
-		{
 			handleError("fail store 2",&mysql);
-		}
 
 		int postCnt = 0;
 		while ((row = mysql_fetch_row(res))) {
@@ -552,13 +630,11 @@ int main(int argc, char const *argv[])
 
 		sprintf(query, "select * from authors where name='%s'", author);
 
-		if(mysql_query(&mysql, query)){
+		if(mysql_query(&mysql, query))
 			handleError("Failed selecting from authors table\nThe table does not exist!\n",&mysql);
-		}
+		
 		if (!(res = mysql_store_result(&mysql)))
-		{
 			handleError("Store failed.",&mysql);
-		}
 
 		int cnt = 0;
 		while ((row = mysql_fetch_row(res)))
@@ -633,7 +709,6 @@ int main(int argc, char const *argv[])
 			return 0;
 		}
 
-		printf("*AT END*");
 		/*copying author and stream from arguments*/
 		strcpy(author, argv[2]);
 		strcpy(stream, argv[3]);
@@ -646,7 +721,8 @@ int main(int argc, char const *argv[])
 		if (!(res = mysql_store_result(&mysql)))
 			handleError("Store failed.",&mysql);
 
-		while ((row = mysql_fetch_row(res))) {
+		while ((row = mysql_fetch_row(res))) 
+		{
 			strcpy(stream, row[1]);
 
 			MYSQL_RES * res2;
@@ -680,12 +756,10 @@ int main(int argc, char const *argv[])
 		if (!(res = mysql_store_result(&mysql)))
 			handleError("Store failed.",&mysql);
 
-		int numRows = (int) mysql_num_rows(res);
-
-		int offset = numRows-1;
-		
-
+		int offset = 0;
 		int postCnt = 0;
+
+		/*printing out post*/
 		while ((row = mysql_fetch_row(res))) 
 		{
 			if (postCnt == offset)
@@ -705,7 +779,45 @@ int main(int argc, char const *argv[])
 		}
 		query = clearQuery(query);
 	}
+	else if (strcmp(argv[1], "-reset") == 0)
+	{
+		query = clearQuery(query);
+		sprintf(query, "drop table streams");
 
+		if (mysql_query(&mysql, query))
+			printf("The streams table does not exist and cannot be dropped.\n");
+		else
+			printf("Streams table dropped successfully.\n");
+	
+		query = clearQuery(query);
+		sprintf(query, "drop table authors");
+
+		if (mysql_query(&mysql, query))
+			printf("The authors table does not exist and cannot be dropped.\n");
+		else
+			printf("Users table dropped successfully.\n");
+	
+		query = clearQuery(query);
+		sprintf(query, "drop table posts");
+
+		if (mysql_query(&mysql, query))
+			printf("The posts table does not exist and cannot be dropped.\n");
+		else
+			printf("Posts table dropped successfully.\n");
+
+	}
+	else if (strcmp(argv[1], "-help") == 0)
+	{
+		printf("\n*******DB PROGRAM HELP*******\n");
+		printf("Commands and how to run them:\n\n");
+		printf("-users\n\tOutputs the contents of the table containing all users, the streams they have access to,"); 
+		printf("and the last post that they read in that stream.\n\tOutputs data for each row in the table in that order.\n\n");
+		printf("-posts\n\tOutputs the contents of the table containing all posts.\n\tData stored in this table for each row includes the user, the stream name, ");
+		printf("the content of the post, and the data and time it was sent to the database.\n\tThe content of the post is in between a header of asterisks marked ******TEXT******\n\n");
+		printf("-streams\n\tLists all streams that are present in the database currently.\n\n");
+		printf("-clear\n\tClears all tables in the database.\n\tIf a table is already empty an appropriate message will be outputted.\n\tThis flag will create the tables if they do not exist.\n\n");
+		printf("-reset\n\tDeletes all tables from the database.\n");
+	}
 	/*closing connection to database*/
 	free(query);
 	mysql_close(&mysql);
@@ -724,7 +836,7 @@ void handleError (char* msg, MYSQL *mysql)
 char* clearQuery(char* query)
 {
 	int i;
-	for (i = 0; i < MAX_QUERY; i++)
+	for (i = 0; i < MAX_QUERY_LENGTH; i++)
 	{
 		query[i] = '\0';
 	}
