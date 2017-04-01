@@ -118,7 +118,6 @@
 	$markAll = 0;
 	$returnedOffset = 0;
 	$orderBy = $_POST['order'];
-	echo "Currently ordering by " . $orderBy;
 	//outputting the current user and stream to inform the user
 	echo ("Currently logged in as: " . $username);
 	echo("<BR> Currently viewing the " . $stream . " stream");
@@ -155,15 +154,6 @@
 		$markAll = 1;
 		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll, $orderBy);
 		$offset = $returnedOffset;
-	}
-	else if (isset($_POST['Order_toggle']))
-	{
-		if (strcmp($orderBy, "name") == 0)
-			$orderBy = "date";
-		else
-			$orderBy = "name";
-
-		$returnedOffset = printPost($offset, $output, $status, $username, $stream, $markAll, $orderBy);
 	}
 	else {
 		$returnedOffset = printPost(0, $output, $status, $username, $stream, $markAll, $orderBy);

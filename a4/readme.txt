@@ -52,7 +52,9 @@ NOTES AND ISSUES:
 *****************
 -If the user tries to post to a stream or view a stream that they do not belong to, or if there are no streams in existence yet, appropriate messages will be displayed as this happens.
 -On any page, the 'Return' button will take the user to the main menu, and the 'Logout' button will take them to the login screen
-
+-The maximum query length is 10000 characters. 
+	-However, an odd limitation is in place for single quotes: If a query contains 2000 single quotes, in can only be 8000 characters in length.
+-The table that contains the users, the streams they have access to, and the number of posts they have read may be referred to as either the authors or users table.
 -Usernames can contain spaces for all programs, but streams CAN NOT
 -Both usernames and streams CAN NOT contain single quotes (apostrophes -> ')
 -If a post contains an apostrophe it will be sanitized so that it does not cause a mySQL error
@@ -68,6 +70,7 @@ Addauthor program:
         -For example, if the user entered 'cars, trucks' when prompted for streams, an error would occur due to a space being present
         -If the user entered nothing in the streams input, an appropriate error message would be outputted.
         -Correct input would be as follows: 'cars,trucks,vans'
+    -If the users table does not exist, and the user tries to remove themselves from a stream, an error message will be outputted that will contain an error from mySQL as well
 
 Post program:
 -If the user tries to post to a stream that DOES NOT EXIST, then an error message will be outputted telling the user to use the addauthor program before adding to the stream
@@ -76,6 +79,7 @@ Post program:
 
 Viewing Program:
 -Messages are displayed starting from the most recent unread messaage
+-If the posts and or users tables do not exist
 -Long messages that contain a lot of newlines will cause the viewing program to act funny and start printing past the end of a stream.
 	-Long posts without newlines will not have this problem
 	-This problem does not occur when viewing all streams that a user is subscribed to

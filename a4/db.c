@@ -136,7 +136,7 @@ int main(int argc, char const *argv[])
 			handleError("Users table creation not successful.", &mysql);
 		query = clearQuery(query);
 
-		strcpy(query, "create table if not exists posts (name char(255),stream char(255),last_post_read int,primary key(name, stream))");
+		strcpy(query, "create table if not exists posts (name char(255),stream char(255),text varchar(10000), date_time datetime)");
 		if (mysql_query(&mysql, query))
 			handleError("Posts table creation not successful.", &mysql);
 		query = clearQuery(query);
@@ -261,7 +261,7 @@ int main(int argc, char const *argv[])
 
 		/*delete the entry from the authors table if it exists*/
 		if(mysql_query(&mysql, query))
-			handleError("Failed to select user from authors table.",&mysql);
+			handleError("<BR>Failed to select user from users table.<BR>",&mysql);
 
 		/*storing results*/
 		if (!(res = mysql_store_result(&mysql)))
@@ -288,7 +288,7 @@ int main(int argc, char const *argv[])
 
 		/*delete the entry from the authors table if it exists*/
 		if(mysql_query(&mysql, query))
-			handleError("Deletion failed.",&mysql);
+			handleError("Deletion of author failed.",&mysql);
 		else
 			printf("%s successfully removed from the %s stream.<BR>\n", author, stream);
 	}
@@ -303,7 +303,7 @@ int main(int argc, char const *argv[])
 
 		if (mysql_query(&mysql, query))
 		{
-			handleError("Failed to select from authors table. Table is empty.<BR>", &mysql);
+			handleError("Failed to select from users table. Table is empty.<BR>", &mysql);
 		}
 
 		if (!(res = mysql_store_result(&mysql)))
@@ -313,12 +313,12 @@ int main(int argc, char const *argv[])
 
 		if (mysql_num_rows(res) == 0)
 		{
-			handleError("This user does not have access to this stream.\n<BR>Use addauthor to gain permission to post to streams.\n<BR>", &mysql);
+			handleError("This user does not have access to this stream.\n<BR>Use the  add author page to gain permission to post to streams.\n<BR>", &mysql);
 		}
 
 		query = clearQuery(query);
 
-		strcpy(query, "create table if not exists posts (name char(255),stream char(255),last_post_read int,primary key(name, stream))");
+		strcpy(query, "create table if not exists posts (name char(255),stream char(255),text varchar(10000), date_time datetime)");
 		if (mysql_query(&mysql, query))
 			handleError("Post table creation not successful.", &mysql);
 		query = clearQuery(query);
@@ -332,6 +332,7 @@ int main(int argc, char const *argv[])
 		strcat(query, "',NOW()");
 		strcat(query, ")");
 
+		printf("QUERY IS %s\n", query);
 		if (mysql_query(&mysql, query))
 			handleError("Failed to insert post.\n<BR>", &mysql);
 		else
@@ -431,7 +432,6 @@ int main(int argc, char const *argv[])
 
 		if (found == 0)
 			handleError("Error: This user does not have access to this stream.", &mysql);
-		printf("CURPOST IS %d\n", curPost);
 		query = clearQuery(query);
 
 		strcpy(query, "select * from posts where stream='");
@@ -439,22 +439,21 @@ int main(int argc, char const *argv[])
 		strcat(query, "'");
 
 		if(mysql_query(&mysql, query))
-			handleError("Failed selecting from authors table\nThe table does not exist!\n",&mysql);
+			handleError("Failed selecting from users table\nThe table does not exist!\n",&mysql);
 		
 		if (!(res = mysql_store_result(&mysql)))
 			handleError("Store failed.",&mysql);
 
 		int numPosts = -1;
 		numPosts = (int) mysql_num_rows(res);
-
-		printf("NUM POSTS IS %d\n", numPosts);
+		if (numPosts == 0)
+			printf("No posts to display");
 		int oldCount = curPost;
 
 		curPost += offset;
 
 		if (curPost < 0)
 		{
-			printf("Found the beginning<BR>");
 			printf("*AT BEGINNING*");
 			curPost = 0;
 		}
@@ -466,7 +465,6 @@ int main(int argc, char const *argv[])
 		strcat(query, stream);
 		strcat(query,"'");
 
-		printf("CURPOST W OFFSET IS %d\n", curPost);
 		if(mysql_query(&mysql, query))
 			handleError("Failed selecting from posts table\nThe table does not exist!\n",&mysql);
 
@@ -546,7 +544,7 @@ int main(int argc, char const *argv[])
 		sprintf(query, "select * from authors where name='%s' and stream='%s'", author, stream);
 
 		if(mysql_query(&mysql, query))
-			handleError("Failed selecting from authors table\nThe table does not exist!\n",&mysql);
+			handleError("Failed selecting from users table\nThe table does not exist!\n",&mysql);
 
 		/*storing results*/
 		if (!(res = mysql_store_result(&mysql)))
@@ -568,7 +566,7 @@ int main(int argc, char const *argv[])
 
 		/*checking if query was successful or not*/
 		if(mysql_query(&mysql, query))
-			handleError("Failed selecting from authors table\nThe table does not exist!\n",&mysql);
+			handleError("Failed selecting from users table\nThe table does not exist!\n",&mysql);
 
 		/*storing results*/
 		if (!(res = mysql_store_result(&mysql)))
@@ -615,7 +613,7 @@ int main(int argc, char const *argv[])
 		}
 
 		if (postCnt == 0)
-			printf("This user has access to no posts.");
+			printf("No posts to display.");
 		query = clearQuery(query);
 	}
 	else if (strcmp(argv[1], "output") == 0)
@@ -631,7 +629,7 @@ int main(int argc, char const *argv[])
 		sprintf(query, "select * from authors where name='%s'", author);
 
 		if(mysql_query(&mysql, query))
-			handleError("Failed selecting from authors table\nThe table does not exist!\n",&mysql);
+			handleError("Failed selecting from users table\nThe table does not exist!\n",&mysql);
 		
 		if (!(res = mysql_store_result(&mysql)))
 			handleError("Store failed.",&mysql);
@@ -663,7 +661,7 @@ int main(int argc, char const *argv[])
 
 		sprintf(query, "select * from posts where stream in (select stream from authors where name = '%s')", author);
 		if(mysql_query(&mysql, query))
-			handleError("Failed selecting from posts table with subquery to authors table.\nEither table does not exist!\n",&mysql);
+			handleError("Failed selecting from posts table with subquery to users table.\nEither table does not exist!\n",&mysql);
 
 		if (!(res = mysql_store_result(&mysql)))
 			handleError("Store failed.",&mysql);
@@ -751,7 +749,7 @@ int main(int argc, char const *argv[])
 		/*printing out last post now*/
 		sprintf(query, "select * from posts where stream in (select stream from authors where name = '%s')", author);
 		if(mysql_query(&mysql, query))
-			handleError("Failed selecting from posts table with subquery to authors table.\nEither table does not exist!\n",&mysql);
+			handleError("Failed selecting from posts table with subquery to users table.\nEither table does not exist!\n",&mysql);
 
 		if (!(res = mysql_store_result(&mysql)))
 			handleError("Store failed.",&mysql);
@@ -793,7 +791,7 @@ int main(int argc, char const *argv[])
 		sprintf(query, "drop table authors");
 
 		if (mysql_query(&mysql, query))
-			printf("The authors table does not exist and cannot be dropped.\n");
+			printf("The users table does not exist and cannot be dropped.\n");
 		else
 			printf("Users table dropped successfully.\n");
 	
