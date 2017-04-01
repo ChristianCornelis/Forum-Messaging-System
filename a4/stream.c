@@ -1,7 +1,7 @@
 /***************************************************
 Christian Cornelis        ccorneli@mail.uoguelph.ca
 CIS*2750                  ID# 0939357
-February 19th, 2017       Assignment 2
+February 19th, 2017       Assignment 3
 ***************************************************/
 
 #include "stream.h"

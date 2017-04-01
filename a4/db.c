@@ -1,3 +1,9 @@
+/***************************************************
+Christian Cornelis        ccorneli@mail.uoguelph.ca
+CIS*2750                  ID# 0939357
+March 31st, 2017          Assignment 4
+***************************************************/
+
 #include "db.h"
 
 int main(int argc, char const *argv[])
@@ -332,7 +338,6 @@ int main(int argc, char const *argv[])
 		strcat(query, "',NOW()");
 		strcat(query, ")");
 
-		printf("QUERY IS %s\n", query);
 		if (mysql_query(&mysql, query))
 			handleError("Failed to insert post.\n<BR>", &mysql);
 		else
@@ -352,22 +357,11 @@ int main(int argc, char const *argv[])
 		printf("*******POSTS:*******\n");
 		int cnt = 0;
 		while ((row = mysql_fetch_row(res))) {
-			for (i = 0; i < mysql_num_fields(res); i++){
-				printf("%s ", row[i]);
-
-				if (i+1 == (int) mysql_num_fields(res)-2)
-				{
-					printf("\n");
-					printf("********TEXT********\n");
-				}
-				else if (i+1 == (int) mysql_num_fields(res)-1)
-				{
-					printf("********************\n");
-					printf("Date in database: ");
-				}
-			}
+				printf(row[2]);
+				printf("\n");
+			
 			cnt++;
-			printf("\n\n");
+			
 		}
 		if (cnt == 0)
 			printf("No posts to display.\n");
@@ -641,13 +635,12 @@ int main(int argc, char const *argv[])
 		}
 
 		if (cnt == 0)
-			printf("This user has access to no posts.");
+			printf("This user has access to no streams.");
 		else
 			printf("all");
 	}
 	else if (strcmp(argv[1], "viewAll") == 0)
 	{
-		printf("IN VIEW ALL\n");
 		if (argc != 5)
 		{
 			printf("Error: Incorrect number of arguments.\n<BR>Exitting.\n<BR>");
@@ -667,7 +660,6 @@ int main(int argc, char const *argv[])
 
 		int numRows = (int) mysql_num_rows(res);
 
-		printf("NUM ROWS IS %d\n", numRows);
 		if (offset > numRows-1)
 		{
 			offset = numRows-1;
@@ -810,9 +802,8 @@ int main(int argc, char const *argv[])
 		printf("Commands and how to run them:\n\n");
 		printf("-users\n\tOutputs the contents of the table containing all users, the streams they have access to,"); 
 		printf("and the last post that they read in that stream.\n\tOutputs data for each row in the table in that order.\n\n");
-		printf("-posts\n\tOutputs the contents of the table containing all posts.\n\tData stored in this table for each row includes the user, the stream name, ");
-		printf("the content of the post, and the data and time it was sent to the database.\n\tThe content of the post is in between a header of asterisks marked ******TEXT******\n\n");
-		printf("-streams\n\tLists all streams that are present in the database currently.\n\n");
+		printf("-posts\n\tOutputs all posts in the posts table.\n\n");
+		printf("-streams\n\tOutputs all streams that are present in the database.\n\n");
 		printf("-clear\n\tClears all tables in the database.\n\tIf a table is already empty an appropriate message will be outputted.\n\tThis flag will create the tables if they do not exist.\n\n");
 		printf("-reset\n\tDeletes all tables from the database.\n");
 	}

@@ -1,3 +1,9 @@
+/***************************************************
+Christian Cornelis        ccorneli@mail.uoguelph.ca
+CIS*2750                  ID# 0939357
+March 31st, 2017          Assignment 4
+***************************************************/
+
 #ifndef __CCORNELI_DB_H__
 #define __CCORNELI_DB_H__
 
