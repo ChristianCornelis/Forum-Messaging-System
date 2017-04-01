@@ -30,6 +30,8 @@
 					echo("Error: No spaces can be present in the streams list.");
 				else if (strcmp($_POST['streamInput'], "") == 0)
 					echo("Error: Stream input cannot be left blank.");
+				else if (strstr($_POST['streamInput'], "'") != NULL)
+					echo "Error: The stream list cannot contain an apostrophe.";
 				else
 				{
 					exec("./addauthor " . $_POST["streamInput"] ." " . $username, $output2, $status2);

@@ -24,6 +24,12 @@
 
 		if ($_POST["streamInput"] == " ")
 			echo "Error: Stream name cannot be a space.";
+		else if ($_POST["streamInput"] == "")
+			echo "Error: Stream name cannot be left blank";
+		else if (strstr($_POST["streamInput"], "'") != NULL)
+			echo "Error: Stream name cannot contain an apostrophe.";
+		else if ($_POST["textInput"] == "")
+			echo "Error: Text cannot be blank.";
 		else
 		{
 			exec("./post " . escapeshellarg($_POST["streamInput"]) ." " . escapeshellarg($username). " " . escapeshellarg($_POST["textInput"]), $output2, $status2);

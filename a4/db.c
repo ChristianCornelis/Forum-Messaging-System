@@ -498,9 +498,8 @@ int main(int argc, char const *argv[])
 			strcat(query, stream);
 			strcat(query, "'");
 
-			if(mysql_query(&mysql, query)){
+			if(mysql_query(&mysql, query))
 				handleError("Failed selecting from posts table\nThe table does not exist!\n",&mysql);
-			}
 		}
 
 	}
@@ -721,6 +720,7 @@ int main(int argc, char const *argv[])
 
 		while ((row = mysql_fetch_row(res))) 
 		{
+			/*grabbing stream*/
 			strcpy(stream, row[1]);
 
 			MYSQL_RES * res2;
